@@ -107,6 +107,34 @@ export function createDrizzleCaseRepo(
         .orderBy(asc(auditLog.occurredAt), desc(auditLog.id))
       return rows.map(mapAudit)
     },
+
+    async listCasesByCustomer(customerId: string): Promise<readonly CaseRecord[]> {
+      const rows = await db
+        .select()
+        .from(cases)
+        .where(eq(cases.customerId, customerId))
+        .orderBy(asc(cases.createdAt))
+      return rows.map(mapCase)
+    },
+
+    async deleteCaseAndAudit(
+      caseIdValue: string,
+    ): Promise<{ auditRowsRemoved: number }> {
+      return db.transaction(async (tx) => {
+        const removedAudit = await tx
+          .delete(auditLog)
+          .where(eq(auditLog.caseId, caseIdValue))
+          .returning({ id: auditLog.id })
+        const removedCase = await tx
+          .delete(cases)
+          .where(eq(cases.id, caseIdValue))
+          .returning({ id: cases.id })
+        if (removedCase.length === 0) {
+          return { auditRowsRemoved: 0 }
+        }
+        return { auditRowsRemoved: removedAudit.length }
+      })
+    },
   }
 }
 

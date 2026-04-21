@@ -45,8 +45,14 @@ export interface IdentityRepo {
   upsertStaffUser(input: UpsertStaffUserInput): Promise<StaffUserRecord>
   deactivateStaffUser(clerkUserId: string): Promise<void>
   findCustomerByClerkUserId(clerkUserId: string): Promise<CustomerRecord | null>
+  /** Primary-key lookup. Used by the data-rights (export + deletion)
+   *  services per PRD 10. */
+  findCustomerById(customerId: string): Promise<CustomerRecord | null>
   findStaffUserByClerkUserId(clerkUserId: string): Promise<StaffUserRecord | null>
   // Listing methods primarily for tests / admin diagnostics.
   listCustomers(): Promise<readonly CustomerRecord[]>
   listStaffUsers(): Promise<readonly StaffUserRecord[]>
+  /** Hard-delete a customer row. Used only by the deletion worker
+   *  after it has purged owned cases. */
+  deleteCustomer(customerId: string): Promise<{ deleted: boolean }>
 }

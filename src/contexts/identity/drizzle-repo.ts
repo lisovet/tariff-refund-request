@@ -112,6 +112,15 @@ export function createDrizzleIdentityRepo(db: Db): IdentityRepo {
       return rows[0] ? toCustomer(rows[0]) : null
     },
 
+    async findCustomerById(customerId) {
+      const rows = (await db
+        .select()
+        .from(customers)
+        .where(eq(customers.id, customerId))
+        .limit(1)) as CustomerRow[]
+      return rows[0] ? toCustomer(rows[0]) : null
+    },
+
     async findStaffUserByClerkUserId(clerkUserId) {
       const rows = (await db
         .select()
@@ -129,6 +138,14 @@ export function createDrizzleIdentityRepo(db: Db): IdentityRepo {
     async listStaffUsers() {
       const rows = (await db.select().from(staffUsers)) as StaffUserRow[]
       return rows.map(toStaff)
+    },
+
+    async deleteCustomer(customerId) {
+      const rows = (await db
+        .delete(customers)
+        .where(eq(customers.id, customerId))
+        .returning({ id: customers.id })) as { id: string }[]
+      return { deleted: rows.length > 0 }
     },
   }
 }

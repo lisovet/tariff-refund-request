@@ -98,6 +98,23 @@ export function createInMemoryCaseRepo(): CaseRepo {
         .filter((a) => a.caseId === caseId)
         .sort((a, b) => a.occurredAt.getTime() - b.occurredAt.getTime())
     },
+    async listCasesByCustomer(customerId) {
+      return Array.from(cases.values())
+        .filter((c) => c.customerId === customerId)
+        .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+    },
+    async deleteCaseAndAudit(caseIdValue) {
+      const existed = cases.delete(caseIdValue)
+      if (!existed) return { auditRowsRemoved: 0 }
+      let removed = 0
+      for (let i = audit.length - 1; i >= 0; i -= 1) {
+        if (audit[i]?.caseId === caseIdValue) {
+          audit.splice(i, 1)
+          removed += 1
+        }
+      }
+      return { auditRowsRemoved: removed }
+    },
   }
 }
 

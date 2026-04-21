@@ -20,6 +20,29 @@ export { createInMemoryIdentityRepo } from './in-memory-repo'
 export { createDrizzleIdentityRepo } from './drizzle-repo'
 export { handleClerkEvent, type ClerkWebhookEvent } from './sync'
 
+export {
+  DELETION_SLA_DAYS,
+  DELETION_REQUEST_STATUSES,
+  createInMemoryDeletionRepo,
+  exportCustomerData,
+  processPendingDeletions,
+  requestCustomerDeletion,
+  type CustomerExport,
+  type DeletionRepo,
+  type DeletionRequest,
+  type DeletionRequestStatus,
+  type ExportCustomerDataDeps,
+  type ExportCustomerDataInput,
+  type ExportCustomerDataResult,
+  type GlobalAuditSink,
+  type GlobalAuditSinkInput,
+  type ProcessOneResult,
+  type ProcessPendingDeletionsDeps,
+  type ProcessPendingDeletionsResult,
+  type RequestCustomerDeletionDeps,
+  type RequestCustomerDeletionInput,
+} from './data-rights'
+
 import { createDbClient } from '@shared/infra/db/client'
 import { createDrizzleIdentityRepo } from './drizzle-repo'
 import { createInMemoryIdentityRepo } from './in-memory-repo'

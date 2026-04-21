@@ -79,4 +79,18 @@ export interface CaseRepo {
   appendAuditEntry(input: AppendAuditEntryInput): Promise<AppendAuditEntryResult>
   /** Read-only audit history. Used by tests + the ops console. */
   listAudit(caseId: string): Promise<readonly AuditEntry[]>
+  /**
+   * List every case tied to a customer. Used by the data-rights
+   * (export + deletion) workflows per PRD 10. Returns in
+   * chronological order of creation.
+   */
+  listCasesByCustomer(customerId: string): Promise<readonly CaseRecord[]>
+  /**
+   * Hard-delete a case, its audit-log rows, and any satellite
+   * records owned by it. Used only by the deletion worker. The
+   * worker is responsible for writing a separate, content-free
+   * audit row elsewhere (typically on a global "deletion log")
+   * BEFORE calling this.
+   */
+  deleteCaseAndAudit(caseId: string): Promise<{ auditRowsRemoved: number }>
 }

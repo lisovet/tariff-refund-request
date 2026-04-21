@@ -69,6 +69,13 @@ export function createInMemoryIdentityRepo(): IdentityRepo {
       return customers.get(clerkUserId) ?? null
     },
 
+    async findCustomerById(customerId) {
+      for (const c of customers.values()) {
+        if (c.id === customerId) return c
+      }
+      return null
+    },
+
     async findStaffUserByClerkUserId(clerkUserId) {
       return staff.get(clerkUserId) ?? null
     },
@@ -79,6 +86,16 @@ export function createInMemoryIdentityRepo(): IdentityRepo {
 
     async listStaffUsers() {
       return [...staff.values()]
+    },
+
+    async deleteCustomer(customerId) {
+      for (const [clerkUserId, c] of customers.entries()) {
+        if (c.id === customerId) {
+          customers.delete(clerkUserId)
+          return { deleted: true }
+        }
+      }
+      return { deleted: false }
     },
   }
 }

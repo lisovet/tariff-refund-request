@@ -1,29 +1,45 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T14:22:00Z
+**Updated**: 2026-04-21T14:31:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 73 → 74)
+**Loop state**: active (iteration 74 → 75)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 74 |
+| completed | 75 |
 | in-progress | 0 |
-| pending | 12 |
+| pending | 11 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 106 files, 901 tests pass |
+| `npm test` | green — 107 files, 910 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 25 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#75 — Customer data export + deletion endpoints**
+
+New `src/contexts/identity/data-rights/` module implementing PRD 10 §Your rights acceptance criteria:
+
+- **`exportCustomerData({customerId}, deps)`** — returns `{ok:true, export: CustomerExport}` with the customer's identity + every case + every audit entry, all dates ISO-serialized so the payload is JSON-safe. `customer_not_found` discriminated-union failure when the id doesn't resolve.
+- **`requestCustomerDeletion({customerId, reason}, deps)`** — enqueues a deletion request with `scheduledFor = now + DELETION_SLA_DAYS` (30 days). Idempotent on customerId: a second request returns the existing queued record with `replay: true`.
+- **`processPendingDeletions(now, deps)`** — worker that picks every queued request with `scheduledFor ≤ now` and purges its cases + audit rows + customer row. Before purge, writes a **content-free** audit row via the injected `globalAuditSink` — `{kind: 'customer.deleted', customerId, deletionRequestId, counts: {casesDeleted, auditRowsDeleted}}`. No PII in the audit payload.
+- **`createInMemoryDeletionRepo()`** — v1 seam for the `customer_deletion_requests` store; Drizzle cutover is a follow-up.
+- **Repo surface extensions**: `CaseRepo.listCasesByCustomer(customerId)` + `CaseRepo.deleteCaseAndAudit(caseId)` (both in-memory + Drizzle impls); `IdentityRepo.findCustomerById(id)` + `IdentityRepo.deleteCustomer(id)` (both impls).
+
+9 new tests: export (customer record + cases + audit + empty-cases + ISO serialization + not-found), deletion (queueing with 30-day SLA, idempotency, worker purges + counts-only audit row, early-schedule skip, idempotent re-run no-op).
+
+910/910 pass.
+
+## Previously completed this wave
 
 **#74 — /trust/security page + sub-processor automation**
 
@@ -170,13 +186,13 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #75 — deps satisfied (74 done). **Eligible — lowest id.** (Customer data export + deletion endpoints.)
+- Task #76 — deps satisfied (75 done). **Eligible — lowest id.** (USER-TEST: Trust posture review.)
 - Task #77 — eligible.
 
-Lowest-id eligible is **task #75**.
+Lowest-id eligible is **task #76**.
 
 ## Notes
 
-- 74/86 v1 done — 86.0% of Phase 0.
+- 75/86 v1 done — 87.2% of Phase 0.
 - Post-v1 backlog includes AI-copy funnel task #401.
-- Loop will continue with #75 next iteration.
+- Loop will continue with #76 next iteration.
