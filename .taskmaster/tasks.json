@@ -155,13 +155,15 @@
         "epic": "E2. Auth + roles",
         "title": "Build Actor resolver + context-layer authorization",
         "description": "Resolve Clerk user to typed Actor (Customer | StaffUser); enforce permissions inside contexts, not only middleware.",
-        "details": "src/shared/infra/auth/actor.ts. Every context method accepts an `actor` parameter and checks permissions via a `can(actor, action, resource)` helper.",
+        "details": "Pure resolveActorFromSession(ClerkSessionShape) maps Clerk session → Actor without hitting Clerk's runtime; resolveCurrentActor() is the thin Next-runtime wrapper. requireActor / requireCan / requireStaff guards in src/shared/infra/auth/require.ts throw AuthenticationError (→ 401) and AuthorizationError (→ 403) sharing an abstract AuthError base. requireStaff supports a minimum-role constraint. Integration test demonstrates the guarded-route-handler pattern with 401/403/200 mapping. Local customer/staff_user lookup lands in task #11 (resolver currently surfaces clerkUserId as actor.id).",
         "testStrategy": "Unit tests for `can()`; integration test rejects forbidden actions from a route handler.",
         "priority": "high",
         "dependencies": [9],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 5,
-        "source": ["ADR 001", "ADR 004"]
+        "source": ["ADR 001", "ADR 004"],
+        "completedAt": "2026-04-21T06:26:30Z",
+        "completedNotes": "src/shared/infra/auth/resolver.ts exposes resolveActorFromSession (pure, fully testable) and resolveCurrentActor (calls Clerk's auth() + currentUser() in route-handler context). Resolver maps Clerk session → Actor: anonymous when no userId; staff when sessionClaims.org_role matches isStaffRole; customer otherwise. Defensive: unrecognized org_role values fall back to customer; missing email throws (cannot construct CustomerActor). require.ts: AuthError abstract base + AuthenticationError (401) + AuthorizationError (403, carries the denied Action). requireActor narrows away AnonymousActor; requireCan combines auth + can() check with anon-permitted actions short-circuiting before the auth check; requireStaff narrows to StaffActor and supports minimum-role constraint via hasAtLeastRole. tests/integration/auth/route-guards.test.ts demonstrates the canonical guarded-route-handler pattern with 401/403/200 outcomes for anonymous/customer/analyst/validator/admin against qa.signoff (validator-gated per .claude/rules/human-qa-required.md). 23 new tests RED-then-GREEN; 116/116 pass; lint + typecheck clean. Bug caught + fixed: AuthError class needed `abstract` keyword for the abstract status property. Local customers.id / staff_users.id lookup ships in task #11; the resolver currently surfaces clerkUserId as actor.id."
       },
       {
         "id": 11,

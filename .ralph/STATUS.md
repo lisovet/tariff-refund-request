@@ -1,50 +1,43 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T06:21:00Z
+**Updated**: 2026-04-21T06:26:30Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 9 → 10)
+**Loop state**: active (iteration 10 → 11)
 
 ## Counts
 
 | Status | Count |
 | --- | --- |
-| completed | 9 |
+| completed | 10 |
 | in-progress | 0 |
-| pending | 77 |
+| pending | 76 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 15 files, 93 tests pass |
+| `npm test` | green — 18 files, 116 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
-| `npm run build` | green — middleware 85.1 kB |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
 
-**#9 — Configure Clerk staff org with roles**
+**#10 — Build Actor resolver + context-layer authorization**
 
-- `STAFF_ROLES` enum (coordinator | analyst | validator | admin) + `staffRoleRank` + `hasAtLeastRole` + `isStaffRole` in `src/shared/infra/auth/roles.ts`.
-- `can(actor, action)` permission helper in `src/shared/infra/auth/can.ts` — single chokepoint for authorization decisions across contexts and route handlers. Typed `Action` union covers public (screener), customer (case.read, document.upload, etc.), ops (queue.view, case.assign, case.transition, entry.extract), QA (qa.signoff, validator-gated per `.claude/rules/human-qa-required.md`), and admin (refund.issue, role.manage, audit.export).
-- `src/middleware.ts` extended to gate `/ops/**` via `session.sessionClaims.org_role`. Authed-but-no-staff-role users bounce to `/app`. Unauthed continues to redirect to `/sign-in`.
-- `tests/e2e/anonymous/ops-redirect.spec.ts` covers the unauthed branch (skips without Clerk env).
-- 12 new tests (roles + can matrix) — RED-confirmed before implementation.
-
-## Human-verification still owes
-
-- Create the staff Clerk organization in the dashboard.
-- Define the four roles in Clerk (coordinator, analyst, validator, admin).
-- Enable MFA on the staff org.
-- Run the live Playwright spec covering: analyst can access /ops, customer cannot, admin can manage roles.
+- `src/shared/infra/auth/resolver.ts` exposes `resolveActorFromSession` (pure, fully testable) and `resolveCurrentActor` (Next-runtime wrapper around Clerk's `auth()` + `currentUser()`).
+- Mapping: anonymous when `userId` is missing; staff when `sessionClaims.org_role` matches `isStaffRole`; customer otherwise. Unrecognized org_role values fall back to customer (defensive). Missing email throws (cannot construct CustomerActor).
+- `src/shared/infra/auth/require.ts` — `AuthError` abstract base + `AuthenticationError` (401) + `AuthorizationError` (403, carries the denied `Action`). `requireActor` narrows away `AnonymousActor`; `requireCan` combines auth + can() with anon-permitted actions short-circuiting; `requireStaff` narrows to `StaffActor` with optional minimum-role constraint via `hasAtLeastRole`.
+- `tests/integration/auth/route-guards.test.ts` demonstrates the canonical guarded-route-handler pattern — anon → 401, customer/analyst on validator-gated action → 403, validator/admin → 200. Satisfies the task's "integration test rejects forbidden actions" criterion.
+- 23 new tests (resolver + require + integration) — RED-confirmed before implementation.
+- Bug caught + fixed: `AuthError` needed `abstract` keyword for its abstract `status` property.
 
 ## Next eligible
 
-Task #10 — Build Actor resolver + context-layer authorization (depends on #9; eligible). Wires the actor + can() into a request-scoped resolver and enforces it in the context layer.
+Task #11 — Customer + StaffUser DB tables and sync (depends on #2, #10; eligible). Closes Wave 2 by giving the resolver real DB rows to look up.
 
 ## Notes
 
-- Wave 2 (auth + roles) is 2/4 done.
-- Loop will continue with task #10 next iteration.
+- Wave 2 (auth + roles) is 3/4 done.
+- Loop will continue with task #11 next iteration.
