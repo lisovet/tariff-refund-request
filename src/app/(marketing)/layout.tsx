@@ -1,12 +1,11 @@
 import { SiteFooter } from './_components/SiteFooter'
+import { SiteHeader } from './_components/SiteHeader'
 
 /**
- * Marketing route-group layout. Wraps every marketing page with the
- * shared site footer (real-text disclosures live there per
- * .claude/rules/disclosure-language-required.md).
- *
- * Header / nav lands in a follow-up — for v1, the homepage is
- * intentionally header-less so the editorial hero owns the fold.
+ * Marketing route-group layout. Every marketing page gets the
+ * SiteHeader masthead + shared SiteFooter. The footer hosts the
+ * real-text disclosures per
+ * .claude/rules/disclosure-language-required.md.
  */
 
 export default function MarketingLayout({
@@ -16,6 +15,7 @@ export default function MarketingLayout({
 }) {
   return (
     <>
+      <SiteHeader />
       {children}
       <SiteFooter />
     </>

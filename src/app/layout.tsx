@@ -1,12 +1,16 @@
 import type { Metadata } from 'next'
-import { ClerkProvider } from '@clerk/nextjs'
 import { Geist, Geist_Mono, Newsreader } from 'next/font/google'
 import './globals.css'
 
 /*
  * Root layout. Marketing, app, and ops route groups all inherit from this.
- * ClerkProvider must wrap everything so useUser/auth() helpers work in
- * RSC + client components alike. Per ADR 004.
+ *
+ * ClerkProvider is NOT mounted here — it's mounted inside the (app)
+ * and (ops) route-group layouts so marketing + screener pages don't
+ * depend on Clerk JS bootstrapping. This avoids a whole class of
+ * hydration failures on hosts that aren't the Clerk-configured
+ * frontend domain (e.g., Railway's *.up.railway.app preview URLs),
+ * and keeps marketing bundles ~150 KB lighter.
  *
  * Font strategy per DESIGN-LANGUAGE.md:
  *   - Display (headlines) → Newsreader (license-friendly proxy for
@@ -60,13 +64,11 @@ export default function RootLayout({
   readonly children: React.ReactNode
 }) {
   return (
-    <ClerkProvider>
-      <html
-        lang="en"
-        className={`${display.variable} ${sans.variable} ${mono.variable}`}
-      >
-        <body>{children}</body>
-      </html>
-    </ClerkProvider>
+    <html
+      lang="en"
+      className={`${display.variable} ${sans.variable} ${mono.variable}`}
+    >
+      <body>{children}</body>
+    </html>
   )
 }
