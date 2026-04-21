@@ -274,13 +274,15 @@
         "epic": "E3. Marketing site",
         "title": "Footer + global trust footnote pattern",
         "description": "Footer component with trust link, status link, and 'not legal advice' real footnote pattern.",
-        "details": "Reusable component used on every marketing + app page.",
+        "details": "Canonical CANONICAL_TRUST_PROMISE + NOT_LEGAL_ADVICE_DISCLOSURE constants in src/app/_components/ui/Disclosure.tsx — single source of truth, frozen by tests so accidental edits fail loudly. TrustFootnote component with optional asFooter prop renders the disclosure either inline (used by SiteFooter) or as a standalone <footer> landmark (used by /app + /ops route-group layouts). Every customer-facing surface now ends with the canonical disclosure linking to /trust.",
         "testStrategy": "Component test renders footnote; integration: footer present on every public route.",
         "priority": "high",
         "dependencies": [12],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 2,
-        "source": ["PRD 10"]
+        "source": ["PRD 10"],
+        "completedAt": "2026-04-21T07:16:00Z",
+        "completedNotes": "Disclosure module at src/app/_components/ui/Disclosure.tsx exposes CANONICAL_TRUST_PROMISE + NOT_LEGAL_ADVICE_DISCLOSURE constants frozen by string-equality tests (per .claude/rules/disclosure-language-required.md — verbatim across surfaces, never paraphrased). TrustFootnote component with optional asFooter prop. SiteFooter (marketing) refactored to use <TrustFootnote /> inline. New (app)/layout.tsx and (ops)/layout.tsx wrap their route groups with <TrustFootnote asFooter /> so every customer + staff surface ends with the canonical disclosure. tests/integration/marketing/footer-presence.test.tsx asserts the disclosure + /trust link appears on every marketing page (5 pages × multiple checks). 7 new tests RED-then-GREEN; 180/180 pass; lint + typecheck clean; build green (13 routes, all customer + ops surfaces now share the disclosure footer)."
       },
       {
         "id": 19,

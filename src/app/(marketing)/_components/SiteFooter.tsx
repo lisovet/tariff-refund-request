@@ -1,4 +1,4 @@
-import { Hairline } from '@/app/_components/ui'
+import { Hairline, TrustFootnote } from '@/app/_components/ui'
 
 /**
  * Marketing-site footer. Per .claude/rules/disclosure-language-required.md:
@@ -67,24 +67,8 @@ export function SiteFooter() {
           ))}
         </div>
 
-        <div className="mt-16 border-t border-rule pt-8 text-sm text-ink/70">
-          <p>
-            <span className="font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
-              Not legal advice
-            </span>
-            {' — '}
-            This site provides software and document-prep services. It
-            is not legal advice, not a customs brokerage (unless your
-            engagement letter explicitly says otherwise), and does not
-            guarantee any outcome with U.S. Customs and Border
-            Protection.{' '}
-            <a
-              href="/trust"
-              className="text-accent underline underline-offset-[6px] decoration-accent/40 hover:decoration-accent"
-            >
-              Read the full trust posture →
-            </a>
-          </p>
+        <div className="mt-16 border-t border-rule pt-8">
+          <TrustFootnote />
         </div>
       </div>
     </footer>

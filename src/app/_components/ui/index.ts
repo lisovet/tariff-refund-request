@@ -5,6 +5,11 @@
 
 export { Button } from './Button'
 export { Card } from './Card'
+export {
+  CANONICAL_TRUST_PROMISE,
+  NOT_LEGAL_ADVICE_DISCLOSURE,
+  TrustFootnote,
+} from './Disclosure'
 export { Eyebrow } from './Eyebrow'
 export { Hairline } from './Hairline'
 export { Footnote, FootnoteContent } from './Footnote'

@@ -1,66 +1,49 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T07:09:00Z
+**Updated**: 2026-04-21T07:16:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 16 → 17)
+**Loop state**: active (iteration 17 → 18)
 
 ## Counts
 
 | Status | Count |
 | --- | --- |
-| completed | 16 |
+| completed | 17 |
 | in-progress | 0 |
-| pending | 70 |
+| pending | 69 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 31 files, 170 tests pass |
+| `npm test` | green — 33 files, 180 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
-| `npm run build` | green — 13 routes (`/trust`, `/trust/sub-processors` static at 151B) |
+| `npm run build` | green — 13 routes; all customer + ops layouts wrap their pages with the trust footer |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
 
-**#17 — Build /trust + /trust/sub-processors**
+**#18 — Footer + global trust footnote pattern**
 
-Two long-form editorial trust pages.
-
-- `/trust`:
-  - Canonical promise rendered **verbatim** per `.claude/rules/disclosure-language-required.md`.
-  - "What we are not" real-text list with 5 non-goals (incl. never-auto-submit + not-legal-advice).
-  - "What we collect" `dl` of 4 categories.
-  - Retention `table` of 5 classes with windows.
-  - Customer rights (access / correction / deletion / portability).
-  - Security posture with a real footnote on the 15-min upload-URL expiry (per ADR 006).
-  - Compliance posture (GDPR / CCPA / SOC 2 target / CBP regs).
-  - Footnotes block at the page footer.
-- `/trust/sub-processors`:
-  - Typeset table of 11 vendors (Vercel, Neon, Cloudflare R2, Clerk, Stripe, Inngest, Resend, Sentry, Axiom, OCR Phase-2, Anthropic Phase-2).
-  - **Phase-2 vendors flagged in warning color** so current readers know which vendors don't yet receive customer data.
-  - 14-day update commitment published in mono.
-- Both pages structured with hairline-labeled section breaks.
-- 9 new component tests + 1 Playwright spec — RED-confirmed before implementation.
-
-## Human-verification still owes
-
-- Live a11y audit (axe-core).
-- Design-taste review at the dev server.
-- Legal-counsel sign-off on the canonical promise + disclosures.
+- `src/app/_components/ui/Disclosure.tsx` — canonical `CANONICAL_TRUST_PROMISE` and `NOT_LEGAL_ADVICE_DISCLOSURE` constants frozen by string-equality tests (per `.claude/rules/disclosure-language-required.md` — verbatim across surfaces, never paraphrased).
+- `TrustFootnote` component with optional `asFooter` prop renders the disclosure either inline or as a standalone `<footer>` landmark.
+- `SiteFooter` (marketing) refactored to use `<TrustFootnote />` inline.
+- New `(app)/layout.tsx` and `(ops)/layout.tsx` wrap their route groups with `<TrustFootnote asFooter />` — every customer + staff surface now ends with the canonical disclosure linking to `/trust`.
+- Integration test (`tests/integration/marketing/footer-presence.test.tsx`) asserts the disclosure + `/trust` link appears on every marketing page (5 pages × multiple checks).
+- 7 new tests — RED-confirmed before implementation.
 
 ## Next eligible
 
-Per dependency check:
-- Task #16 (/pricing) blocked on #36 (Stripe).
-- Task #18 (Footer + global trust footnote pattern) deps `[12]` — already satisfied; SiteFooter from task #14 already covers most of this.
-- Task #20 (Screener domain logic) deps `[1]` — satisfied; this is the start of Wave 4 (Eligibility screener).
+Per dependency check: lowest-id eligible is **task #19** — USER-TEST: Marketing site live at staging. Deps `[14, 15, 16, 17, 18]` — `#16` (/pricing) is still blocked on `#36`. Two paths:
 
-Loop will pick **task #18** next iteration as it's the lowest-id eligible (and a small finishing touch on the marketing site).
+1. **Mark task #19 partially completed** (4/5 marketing pages live; pricing still blocked).
+2. **Skip past #19 to #20** (Screener domain logic) and circle back when /pricing lands.
+
+Per `.ralph/PROMPT.md`: "If a task cannot be done unattended (e.g., requires real Clerk webhook from a real Clerk account that doesn't exist): set status to human-blocked, build the scaffolding, move on." Task #19 isn't human-blocked — it's task-blocked on #16. Loop will skip #19, pick **task #20** (screener domain logic, deps `[1]` already satisfied) and revisit #19 once #16 lands.
 
 ## Notes
 
-- Wave 3 (marketing site) 4/6 done.
-- Loop will continue with task #18 next iteration.
+- Wave 3 (marketing site) 5/6 done; pricing + USER-TEST checkpoint on hold for Stripe.
+- Wave 4 (Eligibility screener — tasks 20-26) begins next iteration with task #20.
