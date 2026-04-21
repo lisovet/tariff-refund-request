@@ -129,25 +129,44 @@ describe('renderReadinessReport — buffer output', () => {
   }, 15_000)
 
   it('full-body render still carries the disclosure footnote wording', async () => {
-    // ReadinessReportDoc tree exposes the footer in its React
-    // element tree as a Text node — assert by walking the tree.
+    // The disclosure block is composed from smaller pure components
+    // (DisclosureFooter etc.). The shared `DISCLOSURE_FOOTNOTE`
+    // constant stays a reliable sentinel — it embeds
+    // SUBMISSION_CONTROL_CLAUSE, which MUST appear in the report.
     const tree = ReadinessReportDoc({
       ...FIXTURE_PROPS,
       body: FIXTURE_BODY,
     })
-    const allTextStrings = collectTextStrings(tree)
-    expect(allTextStrings).toContain(DISCLOSURE_FOOTNOTE)
+    const joined = collectTextStrings(tree as AnyNode).join(' ')
+    expect(DISCLOSURE_FOOTNOTE).toMatch(/We prepare files; you control submission\./)
+    expect(joined).toMatch(/We prepare files; you control submission\./)
   })
 })
 
-type AnyNode = { props?: { children?: unknown } } | string | number | null | undefined
+type AnyNode =
+  | {
+      readonly type?: unknown
+      readonly props?: { readonly children?: unknown } & Record<string, unknown>
+    }
+  | string
+  | number
+  | null
+  | undefined
 
 function collectTextStrings(node: AnyNode): string[] {
   if (node == null) return []
   if (typeof node === 'string') return [node]
   if (typeof node === 'number') return [String(node)]
   if (Array.isArray(node)) return node.flatMap(collectTextStrings as (n: AnyNode) => string[])
-  const props = typeof node === 'object' && node !== null ? node.props : undefined
-  if (!props) return []
-  return collectTextStrings(props.children as AnyNode)
+  if (typeof node !== 'object') return []
+  const type = (node as { type?: unknown }).type
+  const props = (node as { props?: unknown }).props
+  if (typeof type === 'function') {
+    const fn = type as (p: unknown) => AnyNode
+    return collectTextStrings(fn(props ?? {}))
+  }
+  if (!props || typeof props !== 'object') return []
+  return collectTextStrings(
+    (props as { children?: unknown }).children as AnyNode,
+  )
 }

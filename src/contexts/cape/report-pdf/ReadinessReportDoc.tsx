@@ -3,18 +3,23 @@ import { Masthead, type MastheadProps } from './Masthead'
 import { HeroMetric } from './HeroMetric'
 import { EntryTable, type EntryTableRow } from './EntryTable'
 import { PrerequisitesList } from './PrerequisitesList'
+import { SignOffBlock, type SignOffBlockProps } from './SignOffBlock'
+import { Footnotes, type FootnoteItem } from './Footnotes'
+import { DisclosureFooter } from './DisclosureFooter'
 import { FONT_FAMILIES, registerReadinessFonts } from './fonts'
+import { SUBMISSION_CONTROL_CLAUSE } from '@/shared/disclosure/constants'
 import type { PrerequisiteCheck } from '../schema'
 
 /**
  * Readiness Report PDF document — masthead + hero metric + entry
- * table + prerequisites checklist (tasks #67 + #68). Downstream
- * tasks add the analyst sign-off block (#69) and artifact storage
- * (#70).
+ * table + prerequisites checklist + analyst sign-off + footnotes
+ * (tasks #67, #68, #69). Task #70 wires artifact storage to this
+ * document.
  *
  * `body` carries the data the body sections need. It's optional so
- * callers that only want the masthead (e.g. legacy #67 tests) still
- * render. When omitted, the body renders a placeholder sentence.
+ * callers that only want the masthead (e.g. legacy smoke tests)
+ * still render. When omitted, the body renders a placeholder
+ * sentence.
  */
 
 export interface ReadinessReportBody {
@@ -24,6 +29,8 @@ export interface ReadinessReportBody {
   readonly infoCount: number
   readonly entryRows: readonly EntryTableRow[]
   readonly prerequisites: readonly PrerequisiteCheck[]
+  readonly signoff?: SignOffBlockProps
+  readonly footnotes?: readonly FootnoteItem[]
 }
 
 export interface ReadinessReportDocProps extends MastheadProps {
@@ -47,7 +54,7 @@ const styles = StyleSheet.create({
   page: {
     backgroundColor: COLORS.paper,
     paddingTop: 48,
-    paddingBottom: 64,
+    paddingBottom: 140,
     paddingHorizontal: 56,
     fontFamily: FONT_FAMILIES.body,
     color: COLORS.ink,
@@ -60,30 +67,15 @@ const styles = StyleSheet.create({
     color: COLORS.ink70,
     fontSize: 10,
   },
-  footer: {
-    position: 'absolute',
-    left: 56,
-    right: 56,
-    bottom: 36,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.ink,
-    paddingTop: 10,
-    fontFamily: FONT_FAMILIES.mono,
-    fontSize: 7,
-    color: COLORS.ink70,
-    textTransform: 'uppercase',
-    letterSpacing: 1.4,
-  },
 })
 
 /**
- * Canonical disclosure footer — verbatim match to the product's
- * disclosure rule. Appears on every rendered Readiness Report so
- * the PDF carries the same "Not legal advice" footing as every
- * other customer-facing surface.
+ * Short disclosure footnote preserved for backwards compatibility
+ * with task #67-era tests. The full, multi-line disclosure block is
+ * rendered by `DisclosureFooter` via `CANONICAL_TRUST_PROMISE` +
+ * siblings (see `src/shared/disclosure/constants.ts`).
  */
-const DISCLOSURE_FOOTNOTE =
-  'Not legal advice. We prepare files; you control submission. Every artifact has been human-reviewed before reaching you.'
+const DISCLOSURE_FOOTNOTE = `Not legal advice. ${SUBMISSION_CONTROL_CLAUSE} Every artifact has been human-reviewed before reaching you.`
 
 export function ReadinessReportDoc(props: ReadinessReportDocProps) {
   registerReadinessFonts()
@@ -107,6 +99,10 @@ export function ReadinessReportDoc(props: ReadinessReportDocProps) {
             />
             <EntryTable rows={body.entryRows} />
             <PrerequisitesList prerequisites={body.prerequisites} />
+            {body.signoff ? <SignOffBlock {...body.signoff} /> : null}
+            {body.footnotes && body.footnotes.length > 0 ? (
+              <Footnotes items={body.footnotes} />
+            ) : null}
           </>
         ) : (
           <Text style={styles.placeholder}>
@@ -114,9 +110,7 @@ export function ReadinessReportDoc(props: ReadinessReportDocProps) {
               'Summary tiles, entry table, prerequisites checklist, and analyst sign-off block render here in subsequent iterations.'}
           </Text>
         )}
-        <Text fixed style={styles.footer}>
-          {DISCLOSURE_FOOTNOTE}
-        </Text>
+        <DisclosureFooter />
       </Page>
     </Document>
   )

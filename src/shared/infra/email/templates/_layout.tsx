@@ -8,7 +8,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
-import { NOT_LEGAL_ADVICE_DISCLOSURE } from '@/app/_components/ui/Disclosure'
+import { NOT_LEGAL_ADVICE_DISCLOSURE } from '@/shared/disclosure/constants'
 
 /**
  * Shared editorial-email shell. Every template wraps its body in this

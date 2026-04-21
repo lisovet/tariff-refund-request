@@ -1,29 +1,49 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T13:27:00Z
+**Updated**: 2026-04-21T13:36:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 67 → 68)
+**Loop state**: active (iteration 68 → 69)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 68 |
+| completed | 69 |
 | in-progress | 0 |
-| pending | 18 |
+| pending | 17 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 97 files, 816 tests pass |
+| `npm test` | green — 99 files, 838 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 24 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#69 — Footnotes, signed footer, disclosures**
+
+Extracted the canonical disclosure strings into a shared, JSX-free module (`src/shared/disclosure/constants.ts`) so the Readiness Report PDF + email templates + Next UI all import from one source. `src/app/_components/ui/Disclosure.tsx` + `src/shared/infra/email/templates/_layout.tsx` re-exported / re-imported accordingly.
+
+Three new PDF components:
+
+1. **`SignOffBlock.tsx`** — the analyst reviewing-attribution block per the disclosure rule (*"Readiness Report… always names the validator and timestamp"*). Paper-toned card with ink border, GT Sectra analyst name, Berkeley Mono timestamp, and the validator's note. Empty-note case renders an italic fallback — no Readiness Report ships without attribution.
+2. **`Footnotes.tsx`** + **`FootnoteMarker`** — numbered footnotes at the end of the body (`[1]`, `[2]`...) referenced inline via `FootnoteMarker({ index })`. Real text — no circled-digit glyphs that break screen readers.
+3. **`DisclosureFooter.tsx`** — the per-page fixed footer block now renders four lines verbatim from the shared disclosure module: "Not legal advice" eyebrow, `SUBMISSION_CONTROL_CLAUSE`, `CANONICAL_TRUST_PROMISE`, and `NOT_LEGAL_ADVICE_DISCLOSURE`. Old `<Text fixed>` one-line footer retired.
+
+`ReadinessReportBody` gained two optional fields: `signoff: SignOffBlockProps` + `footnotes: FootnoteItem[]`. `ReadinessReportDoc` composes them after the prerequisites list.
+
+Test suite additions: `src/shared/disclosure/__tests__/constants.test.ts` (6 tests freezing the four canonical strings) + `src/contexts/cape/report-pdf/__tests__/footer-sections.test.ts` (16 tests: SignOffBlock attribution + timestamp + note paths, FootnoteMarker numeric + multi-digit, Footnotes ordering + verbatim body + empty case, DisclosureFooter verbatim on three clauses, full integration tree-walk asserting the canonical promise + sign-off + timestamp appear in the report).
+
+The tree-walk helper was upgraded to invoke pure function-components inline so tests can traverse the full composed tree (react-pdf components don't execute until render).
+
+838/838 pass.
+
+## Previously completed this wave
 
 **#68 — Hero metric + entry table + prerequisites**
 
@@ -53,16 +73,16 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #69 — deps satisfied (68 done). **Eligible — lowest id.**
+- Task #70 — deps satisfied (69 done). **Eligible — lowest id.** (Artifact generation pipeline + R2 storage.)
 - Task #72 — eligible.
 - Task #74 — eligible.
 - Task #75 — eligible.
 - Task #77 — eligible.
 
-Lowest-id eligible is **task #69**.
+Lowest-id eligible is **task #70**.
 
 ## Notes
 
-- 68/86 v1 done — 79.1% of Phase 0.
-- Post-v1 backlog now includes AI-copy funnel task #401.
-- Loop will continue with #69 next iteration.
+- 69/86 v1 done — 80.2% of Phase 0.
+- Post-v1 backlog includes AI-copy funnel task #401.
+- Loop will continue with #70 next iteration.
