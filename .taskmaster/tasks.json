@@ -721,11 +721,13 @@
           33,
           35
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 5,
         "source": [
           "PRD 06"
-        ]
+        ],
+        "completedAt": "2026-04-21T09:25:00Z",
+        "completedNotes": "POST /api/checkout opens a Stripe Checkout Session for the requested (sku, tier). Pure builders in checkout.ts: buildCheckoutSessionParams (mode=payment for one-time, mode=subscription for monitoring; metadata.{screenerSessionId,sku,tier,app} for webhook routing; subscription_data.metadata mirror; success/cancel URLs templated against request origin; automatic_tax enabled per PRD 06; allow_promotion_codes for discount code edge case); buildIdempotencyKey scoped to (sku, tier, screenerSessionId) so retries are safe. createCheckoutForSku resolves the price by lookup_key (trr__<sku>__<tier>) \u2014 callers never hardcode price IDs; throws a clear error pointing at npm run stripe:sync if the catalog is stale. Stripe-backed adapter (createStripeCheckoutClient) lives in checkout-client.ts (server-only). Route handler validates sku/tier via Zod, 502 on misconfigured Checkout (no url), 500 on unexpected (catalog mismatch). 24 new tests (13 builder + 4 adapter + 7 integration); 360/360 pass; lint + typecheck clean; build green (18 routes; /screener still 5.67kB \u2014 no Stripe SDK in client)."
       },
       {
         "id": 37,

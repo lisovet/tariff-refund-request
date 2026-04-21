@@ -59,3 +59,20 @@ export {
   lookupKeyFor,
   planCatalogSync,
 } from './stripe-catalog'
+
+export type {
+  BuildCheckoutInput,
+  BuildIdempotencyInput,
+} from './checkout'
+export {
+  CHECKOUT_IDEMPOTENCY_PREFIX,
+  buildCheckoutSessionParams,
+  buildIdempotencyKey,
+} from './checkout'
+
+export type {
+  CheckoutClient,
+  CreateCheckoutInput,
+  CreateCheckoutResult,
+} from './checkout'
+export { createCheckoutForSku } from './checkout'

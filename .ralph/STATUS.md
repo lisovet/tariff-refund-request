@@ -1,57 +1,61 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T09:10:00Z
+**Updated**: 2026-04-21T09:25:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 31 → 32)
+**Loop state**: active (iteration 32 → 33)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 31 |
+| completed | 32 |
 | in-progress | 0 |
-| pending | 55 |
+| pending | 54 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 54 files, 336 tests pass |
+| `npm test` | green — 57 files, 360 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
-| `npm run build` | green — 17 routes |
+| `npm run build` | green — 18 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
 
-**#35 — Stripe catalog sync script**
+**#36 — Checkout sessions for each SKU**
 
-- `planCatalogSync(snapshot) → Plan` is pure: diffs `PRICE_LADDER` against a Stripe snapshot. Tags products with `metadata.app=tariff-refund-request`; uses `lookup_key=trr__<sku>__<tier>` for stable lookup; archives stale prices on amount drift; archives obsolete products when SKUs leave the ladder; ignores products owned by other apps.
-- `SKU_RECURRENCE`: `monitoring=monthly`, all others `one_time`.
-- `executeCatalogPlan(plan, client)` applies via narrow `StripeCatalogClient` surface (real impl in `stripe-catalog-client.ts`). Order: products → prices → archive prices → archive products.
-- `npm run stripe:sync` CLI wrapper. Re-running on the resulting snapshot returns `isNoOp=true` — idempotency property frozen by tests.
-- Missing `STRIPE_SECRET_KEY` → script logs notice + exits 0 (CI smoke without secrets).
-- Added `tsconfig.scripts.json` (stubs `server-only` via the existing vitest noop) so the tsx CLI can import `@contexts/billing/server`.
-- 17 new tests including no-op-on-second-run, amount-drift archive+create, extra-active-price archive, obsolete-product archive, foreign-app product ignored, recurring config passed through.
+- `POST /api/checkout` opens a Stripe Checkout Session per (sku, tier).
+- Pure `buildCheckoutSessionParams` in `checkout.ts`:
+  - `mode=payment` for one-time SKUs, `mode=subscription` for monitoring.
+  - `metadata.{screenerSessionId, sku, tier, app}` for webhook routing.
+  - `subscription_data.metadata` mirror so the same context lands on the subscription object.
+  - `success_url` / `cancel_url` templated against the request `Origin`.
+  - `automatic_tax: { enabled: true }` per PRD 06; `allow_promotion_codes: true` for the discount-code edge.
+- `buildIdempotencyKey` scoped to `(sku, tier, screenerSessionId)` — retries from the client never double-create.
+- `createCheckoutForSku` resolves price by `lookup_key=trr__<sku>__<tier>` — never hardcodes Stripe price IDs. Throws a clear error pointing at `npm run stripe:sync` if the catalog is stale.
+- Stripe-backed adapter (`createStripeCheckoutClient`) lives in `checkout-client.ts` (server-only).
+- Route validates `sku/tier/screenerSessionId/customerEmail?` via Zod; 400 on bad body, 502 if Stripe returns no URL, 500 on catalog mismatch.
+- Stripe `Checkout.SessionCreateParams` namespace doesn't resolve through TS 6's class+namespace merge of the SDK's re-exports; switched to `Parameters<Stripe['checkout']['sessions']['create']>[0]` inference — same shape, version-stable.
 
 ## Human-verification still owes
 
-- Run `npm run stripe:sync` against real Stripe test-mode account once `STRIPE_SECRET_KEY=sk_test_...` is set; verify products/prices appear in dashboard with correct lookup keys.
-- Re-run + confirm second invocation is a true no-op end-to-end (not just at planner level).
+- Run `npm run stripe:sync` against real Stripe test-mode account, then exercise `/api/checkout` end-to-end: complete in test mode, observe webhook → `platform/payment.completed` published.
+- Confirm Stripe Tax is configured for the test account (the route opts in via `automatic_tax: enabled`).
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #36 (Checkout sessions for each SKU) — deps `[33, 35]` now satisfied. **Eligible — lowest id.**
-- Task #39 (cases + audit_log schema) — deps `[2]` satisfied. Eligible.
-- Task #49 (recovery routing — broker vs DIY) — deps satisfied. Eligible.
-- Task #67 (CAPE prep workflow scaffold) — deps satisfied. Eligible.
-- Task #72 (admin dashboard scaffold) — deps satisfied. Eligible.
+- Task #39 (cases + audit_log schema) — deps `[2]` satisfied. **Eligible — lowest id.**
+- Task #49 (recovery routing — broker vs DIY) — deps satisfied.
+- Task #67 (CAPE prep workflow scaffold) — deps satisfied.
+- Task #72 (admin dashboard scaffold) — deps satisfied.
 
-Lowest-id eligible is **task #36** — Checkout sessions for each SKU.
+Lowest-id eligible is **task #39** — cases + audit_log schema.
 
 ## Notes
 
-- Wave 6 (Stripe + pricing) 3/5 done.
-- Loop will continue with task #36 next iteration.
+- Wave 6 (Stripe + pricing) 4/5 done. Task #37 (success-fee invoicing) is task-blocked on the case state (#39+).
+- Loop will continue with task #39 next iteration.

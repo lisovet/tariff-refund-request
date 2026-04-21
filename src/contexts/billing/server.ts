@@ -24,6 +24,7 @@ export {
   createStripeCatalogClient,
   loadStripeCatalogSnapshot,
 } from './stripe-catalog-client'
+export { createStripeCheckoutClient } from './checkout-client'
 
 let cachedRepo: BillingRepo | undefined
 let cachedClient: Stripe | undefined
