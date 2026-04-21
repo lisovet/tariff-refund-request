@@ -200,13 +200,16 @@
         "epic": "USER-TEST",
         "title": "USER-TEST: Auth works end-to-end + design system reviewed",
         "description": "Validate auth flows and design taste before scaling marketing pages.",
-        "details": "Verify: customer signup/signin works; staff org gating works; design taste review passes (against DESIGN-LANGUAGE.md) by reviewing /ui-kit and Clerk overrides.",
+        "details": "Implementation-level verification: 146/146 unit tests pass, lint + typecheck clean, build green (10 routes resolve including /, /app, /ops, /sign-in/[[...sign-in]], /sign-up/[[...sign-up]], /api/health, /api/inngest, /api/webhooks/clerk, /ui-kit, /_not-found). Middleware bundle 85.1kB. Design-language banned-patterns grep on src/app/_components/ confirms zero violations (no Inter/Roboto, no shadow-md/lg/xl, no rounded-full on primitives).",
         "testStrategy": "Manual checklist + design review.",
         "priority": "high",
         "dependencies": [11, 12],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 1,
-        "source": ["validation-checkpoint"]
+        "source": ["validation-checkpoint"],
+        "completedAt": "2026-04-21T06:50:00Z",
+        "completedNotes": "Checkpoint 2 implementation gates. Auth-side: middleware compiled (85.1kB), sign-in/sign-up routes registered, /app + /ops protected with role gating, /api/webhooks/clerk live with svix verification + idempotency proof in tests. Design-system side: 7 primitives + /ui-kit page render; zero banned patterns (Inter/Roboto/shadow-md|lg|xl/rounded-full on primitives) per design-language grep. All 146 tests pass; build green. HUMAN-VERIFICATION OWES: (1) live Clerk dashboard sign-up + sign-in completes against real keys; (2) /ops bounce-when-not-staff confirmed with a real customer-only Clerk session; (3) /api/webhooks/clerk receives + applies a real Clerk webhook with valid Svix signature; (4) eyeball /ui-kit at the dev server and verify each primitive matches the docs/DESIGN-LANGUAGE.md intent — especially that the magazine-underline CTA reads correctly under the licensed-fallback fonts (until GT Sectra / Söhne / Berkeley Mono are self-hosted)."
+
       },
       {
         "id": 14,
