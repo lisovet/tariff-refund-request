@@ -13,16 +13,17 @@ describe('<SiteFooter>', () => {
     expect(matches.length).toBeGreaterThanOrEqual(1)
   })
 
-  it('links to the canonical /trust page from both the nav and the footnote CTA', () => {
+  it('links to the canonical /trust page from the nav + footnote CTA', () => {
     render(<SiteFooter />)
-    const trustPostureLink = screen.getByRole('link', {
-      name: /^Trust posture$/i,
+    // Both the nav link and the inline "How we handle your data →"
+    // CTA in the disclosure footnote point at /trust.
+    const links = screen.getAllByRole('link', {
+      name: /how we handle your data/i,
     })
-    expect(trustPostureLink.getAttribute('href')).toBe('/trust')
-    const fullPostureLink = screen.getByRole('link', {
-      name: /Read the full trust posture/i,
-    })
-    expect(fullPostureLink.getAttribute('href')).toBe('/trust')
+    expect(links.length).toBeGreaterThanOrEqual(2)
+    for (const link of links) {
+      expect(link.getAttribute('href')).toBe('/trust')
+    }
   })
 
   it('renders inside a <footer> landmark', () => {

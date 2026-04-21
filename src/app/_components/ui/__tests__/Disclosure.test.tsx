@@ -33,7 +33,7 @@ describe('<TrustFootnote>', () => {
     // Phrase appears as both an eyebrow label and inline in the body sentence.
     const matches = screen.getAllByText(/Not legal advice|not legal advice/)
     expect(matches.length).toBeGreaterThanOrEqual(1)
-    const link = screen.getByRole('link', { name: /trust posture/i })
+    const link = screen.getByRole('link', { name: /how we handle your data/i })
     expect(link.getAttribute('href')).toBe('/trust')
   })
 

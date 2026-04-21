@@ -1,29 +1,59 @@
 'use client'
 
-import { useState } from 'react'
-import {
-  ScreenerFlow,
-  clearScreenerSession,
-} from '@/app/_components/screener/ScreenerFlow'
+import { useEffect, useState } from 'react'
+import { ScreenerFlow } from '@/app/_components/screener/ScreenerFlow'
 import { ResultsDossier } from '@/app/_components/screener/ResultsDossier'
 import { TrustFootnote } from '@/app/_components/ui'
 import type { ScreenerAnswers, ScreenerResult } from '@contexts/screener'
 
 /**
- * /screener — focused single-column transactional flow per PRD 01 +
- * docs/DESIGN-LANGUAGE.md.
+ * /screener — focused single-column transactional flow per PRD 01.
  *
- * On completion: ResultsDossier renders the full editorial result
- * (the same dossier surfaced at /screener/results?token= for the
- * magic-link resume); client also POSTs to /api/screener/complete
- * which persists the session, writes a lead row, and queues the
- * magic-link email — best-effort, since the inline dossier is
- * already rendered.
+ * Persistence: the completed ScreenerResult is saved to
+ * sessionStorage so a page refresh rehydrates the dossier instead
+ * of sending the customer back to question 1. Answers persist
+ * during the flow via ScreenerFlow's own storage.
+ *
+ * On completion the client fires a best-effort POST to
+ * /api/screener/complete which writes the lead row and queues the
+ * magic-link email; the inline dossier is already authoritative,
+ * so a transient network failure costs the customer nothing
+ * visible.
  */
 
+const RESULT_STORAGE_KEY = 'tariff-refund:screener-result:v1'
+
+function loadSavedResult(): ScreenerResult | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = window.sessionStorage.getItem(RESULT_STORAGE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    return parsed && typeof parsed === 'object' ? (parsed as ScreenerResult) : null
+  } catch {
+    return null
+  }
+}
+
+function saveResult(result: ScreenerResult): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.sessionStorage.setItem(RESULT_STORAGE_KEY, JSON.stringify(result))
+  } catch {
+    // Ignored — the in-memory result keeps the dossier on screen.
+  }
+}
+
 export default function ScreenerPage() {
+  // Start as null on both server + client first render so hydration
+  // matches; rehydrate from sessionStorage in an effect afterwards.
   const [result, setResult] = useState<ScreenerResult | null>(null)
   const [emailSent, setEmailSent] = useState(false)
+
+  useEffect(() => {
+    const saved = loadSavedResult()
+    if (saved) setResult(saved)
+  }, [])
 
   return (
     <div className="flex min-h-[100dvh] flex-col bg-paper">
@@ -33,7 +63,7 @@ export default function ScreenerPage() {
             <ScreenerFlow
               onComplete={(r, answers) => {
                 setResult(r)
-                clearScreenerSession()
+                saveResult(r)
                 void postCompletion(answers).then(() => setEmailSent(true))
               }}
             />

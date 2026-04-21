@@ -16,8 +16,10 @@ test.describe('/how-it-works', () => {
     await expect(
       page.getByRole('heading', { name: '03 — Concierge' }),
     ).toBeVisible()
+    // Masthead + page-bottom CTA both link to /screener; either
+    // is valid for this integration check.
     await expect(
-      page.getByRole('link', { name: /Check eligibility/i }),
+      page.getByRole('link', { name: /Check eligibility/i }).first(),
     ).toHaveAttribute('href', '/screener')
   })
 })

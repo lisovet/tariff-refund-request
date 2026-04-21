@@ -29,7 +29,7 @@ const SECTIONS: ReadonlyArray<{
   {
     heading: 'Trust',
     links: [
-      { label: 'Trust posture', href: '/trust' },
+      { label: 'How we handle your data', href: '/trust' },
       { label: 'Sub-processors', href: '/trust/sub-processors' },
       { label: 'Security', href: '/trust/security' },
     ],

@@ -6,17 +6,18 @@ import {
 } from '@/app/_components/ui'
 
 /**
- * /trust — long-form editorial trust posture page per PRD 10.
- * Calmer than the homepage: this is the page we are most proud to
- * point lawyers at. Real footnotes (per
- * .claude/rules/disclosure-language-required.md), no banners hiding
- * required text, no collapsed accordions.
+ * /trust — the long-form page PRD 10 calls the "trust posture"
+ * internally. Customer-facing copy uses plainer language
+ * ("How we handle your data") so the page is legible to a
+ * non-legal reader on first visit. Real footnotes (per
+ * .claude/rules/disclosure-language-required.md), no banners
+ * hiding required text, no collapsed accordions.
  */
 
 export const metadata = {
-  title: 'Trust posture',
+  title: 'How we handle your data',
   description:
-    'How we collect, store, and protect your data — and exactly what we do not do with it.',
+    'What we collect, how long we keep it, and exactly what we will not do with it.',
 }
 
 const NON_GOALS: readonly string[] = [
@@ -88,10 +89,15 @@ export default function TrustPage() {
   return (
     <main className="bg-paper">
       <header className="mx-auto max-w-3xl px-6 pb-16 pt-32 sm:px-10 sm:pb-24 sm:pt-40">
-        <Eyebrow>Trust posture</Eyebrow>
+        <Eyebrow>Trust</Eyebrow>
         <h1 className="mt-3 font-display text-5xl tracking-display text-ink sm:text-7xl">
-          What we promise. What we do not. How your data lives here.
+          How we handle your data.
         </h1>
+        <p className="mt-8 text-lg text-ink/80">
+          What we collect, how long we keep it, and what we will
+          not do with it — in plain language. Anything that matters
+          legally is written as real text, not an accordion.
+        </p>
       </header>
 
       <Hairline />

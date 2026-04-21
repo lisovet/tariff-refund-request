@@ -45,7 +45,7 @@ export function TrustFootnote({ asFooter = false }: TrustFootnoteProps) {
         href="/trust"
         className="text-accent underline underline-offset-[6px] decoration-accent/40 hover:decoration-accent decoration-1"
       >
-        Read the full trust posture →
+        How we handle your data →
       </a>
     </p>
   )

@@ -99,7 +99,7 @@ export default function SubProcessorsPage() {
               href="/trust"
               className="text-accent underline underline-offset-[6px] decoration-accent/40 hover:decoration-accent decoration-1"
             >
-              the trust posture page
+              the data-handling page
             </a>
             .
           </p>

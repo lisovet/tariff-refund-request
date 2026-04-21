@@ -26,7 +26,10 @@ test.describe('/trust/sub-processors', () => {
   }) => {
     await page.goto('/trust/sub-processors')
     await expect(page.getByRole('table')).toBeVisible()
-    await expect(page.getByText('Vercel')).toBeVisible()
+    // Vendors asserted verbatim. Railway replaced Vercel + Neon in
+    // the infra-consolidation swap; the presence check is pinned
+    // against the canonical shared list.
+    await expect(page.getByText('Railway')).toBeVisible()
     await expect(page.getByText('Stripe')).toBeVisible()
     await expect(page.getByText('Cloudflare R2')).toBeVisible()
     await expect(page.getByText('Anthropic')).toBeVisible()

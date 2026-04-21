@@ -32,9 +32,10 @@ test.describe('/pricing', () => {
     // No popular badges.
     await expect(page.getByText(/popular|recommended|best value/i)).toHaveCount(0)
 
-    // CTA at the bottom.
+    // CTA appears in the masthead + at the bottom; either resolves
+    // to /screener for this integration check.
     await expect(
-      page.getByRole('link', { name: /check eligibility/i }),
+      page.getByRole('link', { name: /check eligibility/i }).first(),
     ).toHaveAttribute('href', '/screener')
   })
 })

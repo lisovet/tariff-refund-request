@@ -17,20 +17,25 @@ test.describe('homepage', () => {
 
     // Hero
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      /IEEPA tariff refund/i,
+      /get back the tariffs you overpaid/i,
     )
-    await expect(
-      page.getByRole('link', { name: /Check eligibility/i }),
-    ).toHaveAttribute('href', '/screener')
+    // The hero has a "Check eligibility" solid CTA; the masthead
+    // also links to /screener with the same label. Both are valid.
+    const checkEligibility = page
+      .getByRole('link', { name: /Check eligibility/i })
+      .first()
+    await expect(checkEligibility).toHaveAttribute('href', '/screener')
 
     // Three movements
     await expect(page.getByRole('heading', { name: 'Recovery' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Filing prep' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Concierge' })).toBeVisible()
 
-    // Anti-positioning
+    // Deliverables section (replaces old "What we are not")
     await expect(
-      page.getByRole('heading', { name: /What we are not/i }),
+      page.getByRole('heading', {
+        name: /three artifacts, reviewed by a human/i,
+      }),
     ).toBeVisible()
 
     // Pull-quote canonical promise
@@ -39,6 +44,6 @@ test.describe('homepage', () => {
     )
 
     // Footer "Not legal advice" disclosure as real text
-    await expect(page.getByText(/Not legal advice/i)).toBeVisible()
+    await expect(page.getByText(/Not legal advice/i).first()).toBeVisible()
   })
 })
