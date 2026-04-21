@@ -140,13 +140,15 @@
         "epic": "E2. Auth + roles",
         "title": "Configure Clerk staff org with roles",
         "description": "Create internal Clerk org. Define roles: coordinator, analyst, validator, admin. MFA required.",
-        "details": "Roles defined in Clerk dashboard. Middleware for (ops) route group requires org membership + role. Role enum in code: src/shared/infra/auth/roles.ts.",
+        "details": "STAFF_ROLES enum + ranking + isStaffRole guard in src/shared/infra/auth/roles.ts. can() permission helper at src/shared/infra/auth/can.ts is the single chokepoint for authorization decisions across contexts and route handlers. Middleware extended to gate /ops/** by org_role claim — authed-but-no-staff-role users bounce to /app. ops-redirect Playwright spec covers the unauthed branch (skips without Clerk env).",
         "testStrategy": "Playwright: org member without role cannot access (ops); analyst can; admin can manage roles.",
         "priority": "high",
         "dependencies": [8],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 3,
-        "source": ["ADR 004", "PRD 04"]
+        "source": ["ADR 004", "PRD 04"],
+        "completedAt": "2026-04-21T06:21:00Z",
+        "completedNotes": "STAFF_ROLES enum (coordinator, analyst, validator, admin) + staffRoleRank + hasAtLeastRole + isStaffRole in src/shared/infra/auth/roles.ts. can() permission helper at src/shared/infra/auth/can.ts: typed Action union + STAFF_MATRIX dispatch. Customer surfaces (screener, case.read, document.upload, document.download.own) and ops surfaces (queue.view, case.assign, case.transition, entry.extract) plus the validator-gated qa.signoff and admin-only admin.* family. AnonymousActor permitted only screener.complete. middleware.ts extended to gate /ops/** via session.sessionClaims.org_role — authed-but-no-staff-role users bounce to /app. tests/e2e/anonymous/ops-redirect.spec.ts covers the unauthed branch. 12 new tests (roles + can matrix) RED-then-GREEN. All qa gates green: 93/93 tests, lint + typecheck clean, build green with stub Clerk env (middleware bundle 85.1kB). HUMAN-VERIFICATION: create the staff Clerk organization in the dashboard, define the four roles, enable MFA, run the live Playwright spec for analyst-can-access-ops + customer-cannot-access-ops + admin-can-manage-roles."
       },
       {
         "id": 10,

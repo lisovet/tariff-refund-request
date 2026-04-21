@@ -1,6 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { isProtectedRoute } from '@shared/infra/auth/route-gating'
+import { isStaffRole } from '@shared/infra/auth/roles'
 
 /**
  * Edge middleware. Per ADR 004 + PRD 04:
@@ -9,21 +10,30 @@ import { isProtectedRoute } from '@shared/infra/auth/route-gating'
  *   /api/inngest, /api/webhooks/*) require no auth.
  * - Protected routes (/app/**, /ops/**, certain /api/**) require an
  *   authenticated Clerk session — unauth users are redirected to
- *   /sign-in with a returnUrl.
- *
- * Role gating (analyst | validator | coordinator | admin for /ops)
- * happens inside the contexts via the Actor resolver (task #10), not
- * here. This middleware only enforces "any authed user reaches /app
- * and /ops"; the context layer decides what they may *do*.
+ *   /sign-in with a returnBackUrl.
+ * - /ops/** ALSO requires the user to be a member of the staff
+ *   organization with one of our recognized roles. Per-action role
+ *   enforcement (analyst-can-extract, validator-can-signoff) lives
+ *   in the contexts via can() — middleware only enforces "have a
+ *   recognized staff role to enter the building."
  */
 
 const isProtected = createRouteMatcher((req) => isProtectedRoute(req.nextUrl.pathname))
+const isOpsRoute = createRouteMatcher(['/ops', '/ops/(.*)'])
 
 export default clerkMiddleware(async (auth, req) => {
   if (!isProtected(req)) return NextResponse.next()
-  const { userId, redirectToSignIn } = await auth()
-  if (!userId) {
-    return redirectToSignIn({ returnBackUrl: req.url })
+  const session = await auth()
+  if (!session.userId) {
+    return session.redirectToSignIn({ returnBackUrl: req.url })
+  }
+  if (isOpsRoute(req)) {
+    const role = session.sessionClaims?.org_role
+    if (!isStaffRole(role)) {
+      // Authed but not staff — bounce to /app (their customer surface).
+      const url = new URL('/app', req.url)
+      return NextResponse.redirect(url)
+    }
   }
   return NextResponse.next()
 })

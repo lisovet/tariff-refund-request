@@ -1,53 +1,50 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T06:16:30Z
+**Updated**: 2026-04-21T06:21:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 8 → 9)
+**Loop state**: active (iteration 9 → 10)
 
 ## Counts
 
 | Status | Count |
 | --- | --- |
-| completed | 8 |
+| completed | 9 |
 | in-progress | 0 |
-| pending | 78 |
+| pending | 77 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 13 files, 81 tests pass |
+| `npm test` | green — 15 files, 93 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
-| `npm run build` | green — middleware (85kB) + sign-in / sign-up routes compile |
+| `npm run build` | green — middleware 85.1 kB |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
 
-**#8 — Wire Clerk for customer accounts**
+**#9 — Configure Clerk staff org with roles**
 
-- `@clerk/nextjs` + `@clerk/testing` installed.
-- `ClerkProvider` wraps the root layout.
-- `src/middleware.ts` uses `clerkMiddleware` + `isProtectedRoute` predicate to gate `/app/**`, `/ops/**`, `/api/cases/**`, `/api/uploads/**`. Unauthed → `redirectToSignIn({ returnBackUrl })`.
-- Pure predicates `isPublicRoute` / `isProtectedRoute` in `src/shared/infra/auth/route-gating.ts` — unit-testable without the middleware runtime.
-- Themed sign-in / sign-up pages at `src/app/sign-in/[[...sign-in]]/page.tsx` and `src/app/sign-up/[[...sign-up]]/page.tsx`. Appearance overrides re-skin Clerk to our token system (bg-paper, font-display GT Sectra fallback chain, ink-on-paper, customs-orange `--accent` for the footer link).
-- `Actor` type surface in `src/shared/infra/auth/actor.ts` (`CustomerActor | StaffActor | AnonymousActor` with `isAnonymous` / `isCustomer` / `isStaff` discriminants). Full Clerk → Actor resolver lands in task #10.
-- Playwright protected-redirect spec at `tests/e2e/anonymous/protected-redirect.spec.ts` — skips when Clerk env unset.
-- 29 new tests (route-gating + actor) — RED-confirmed before implementation.
-- Bug caught + fixed: `PUBLIC_PREFIXES` used trailing-slash patterns that didn't match nested webhook paths.
+- `STAFF_ROLES` enum (coordinator | analyst | validator | admin) + `staffRoleRank` + `hasAtLeastRole` + `isStaffRole` in `src/shared/infra/auth/roles.ts`.
+- `can(actor, action)` permission helper in `src/shared/infra/auth/can.ts` — single chokepoint for authorization decisions across contexts and route handlers. Typed `Action` union covers public (screener), customer (case.read, document.upload, etc.), ops (queue.view, case.assign, case.transition, entry.extract), QA (qa.signoff, validator-gated per `.claude/rules/human-qa-required.md`), and admin (refund.issue, role.manage, audit.export).
+- `src/middleware.ts` extended to gate `/ops/**` via `session.sessionClaims.org_role`. Authed-but-no-staff-role users bounce to `/app`. Unauthed continues to redirect to `/sign-in`.
+- `tests/e2e/anonymous/ops-redirect.spec.ts` covers the unauthed branch (skips without Clerk env).
+- 12 new tests (roles + can matrix) — RED-confirmed before implementation.
 
 ## Human-verification still owes
 
-- Real Clerk dashboard sign-up; `CLERK_SECRET_KEY` + `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` in `.env.local`.
-- Google OAuth provider configured in Clerk dashboard.
-- End-to-end Playwright sign-up → sign-in → access /app flow.
+- Create the staff Clerk organization in the dashboard.
+- Define the four roles in Clerk (coordinator, analyst, validator, admin).
+- Enable MFA on the staff org.
+- Run the live Playwright spec covering: analyst can access /ops, customer cannot, admin can manage roles.
 
 ## Next eligible
 
-Task #9 — Configure Clerk staff org with roles (depends on #8; eligible). Adds the (ops) gating + role enum.
+Task #10 — Build Actor resolver + context-layer authorization (depends on #9; eligible). Wires the actor + can() into a request-scoped resolver and enforces it in the context layer.
 
 ## Notes
 
-- Wave 2 (auth + roles) underway — 1/4 done.
-- Loop will continue with task #9 next iteration.
+- Wave 2 (auth + roles) is 2/4 done.
+- Loop will continue with task #10 next iteration.
