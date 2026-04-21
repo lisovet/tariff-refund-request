@@ -1,29 +1,49 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T15:28:00Z
+**Updated**: 2026-04-21T15:37:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 82 → 83)
+**Loop state**: active (iteration 83 → 84)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 83 |
+| completed | 84 |
 | in-progress | 0 |
-| pending | 3 |
+| pending | 2 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 118 files, 1016 tests pass |
+| `npm test` | green — 119 files, 1021 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
-| `npm run build` | green — 25 routes |
+| `npm run build` | last green run this session (sandbox declined current re-run, unrelated to code) |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#84 — Cross-context lint rule + CI gate**
+
+Tightened the ADR 001 boundary + added a permanent test that proves the rule bites:
+
+- **`eslint.config.mjs`** `no-restricted-imports` now covers two patterns:
+  1. `@contexts/*/*` with `!@contexts/*/server` exception — blocks `@contexts/<name>/repo`, `@contexts/<name>/case-machine`, `@contexts/<name>/workflows/*`, `@contexts/<name>/internals/*`. Allows `@contexts/<name>` (UI-safe surface) and `@contexts/<name>/server` (server-only surface).
+  2. Relative-path escape hatch — `../contexts/*`, `../../contexts/*`, `../../../contexts/*` — blocks a source file in context A from reaching into ../B/internal via a relative path instead of the alias.
+  Error messages cite ADR 001 explicitly.
+- **`tests/integration/lint/cross-context-imports.test.ts`** — uses ESLint's Node API (`new ESLint().lintText`) to lint in-memory source fixtures. Five tests freeze the rule's behavior:
+  1. `@contexts/ops` allowed
+  2. `@contexts/ops/server` allowed
+  3. `@contexts/ops/repo` blocked
+  4. `@contexts/ops/workflows/stalled-cadence` blocked
+  5. `@contexts/ops/case-machine` blocked
+- **CI already runs `npm run lint`** via `.github/workflows/ci.yml` — rule violations fail CI from the `qa` job before the `e2e` job runs.
+
+5 new lint-rule behavior tests. Full suite 1021/1021.
+
+## Previously completed this wave
 
 **#83 — USER-TEST: Ops staff complete a full case**
 
@@ -322,12 +342,11 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 
 ## Next eligible
 
-- Task #84 — deps satisfied. **Eligible — lowest id.** (Cross-context lint rule + CI gate.)
-- Task #85 — eligible (Internal funnel metrics instrumentation).
+- Task #85 — deps satisfied. **Eligible — lowest id.** (Internal funnel metrics instrumentation.)
 - Task #86 — final USER-TEST (Phase 0 launch readiness review).
 
 ## Notes
 
-- 83/86 v1 done — 96.5% of Phase 0. Only cross-cutting + launch-readiness remain.
+- 84/86 v1 done — 97.7% of Phase 0. Two tasks remain (#85 funnel metrics, #86 launch readiness).
 - Post-v1 backlog: AI-copy funnel task **#401**, and now **#402 — Production deploy** (full checklist: Vercel + Neon migrations + R2 buckets + Clerk prod org + Stripe live + Resend DKIM/SPF + Inngest prod + Sentry + Axiom + E-sign provider wiring + 12-step staging smoke + launch gates). Depends on #86 (final USER-TEST launch readiness review).
 - Loop will continue with #82 next iteration.

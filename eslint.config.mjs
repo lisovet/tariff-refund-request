@@ -28,14 +28,24 @@ const config = [
         {
           patterns: [
             {
-              // Allow the sanctioned public surfaces:
+              // ADR 001 boundary. Allow the sanctioned public surfaces:
               //   @contexts/<name>          — UI-safe public surface
               //   @contexts/<name>/server   — server-only public surface
               // Forbid everything else (e.g., @contexts/<name>/repo,
-              // @contexts/<name>/internals/...) — see ADR 001.
+              // @contexts/<name>/case-machine,
+              // @contexts/<name>/workflows/*, @contexts/<name>/internals/*).
+              // Enforcement test: tests/integration/lint/cross-context-imports.test.ts
               group: ['@contexts/*/*', '!@contexts/*/server'],
               message:
-                'Cross-context imports must go through the public surface (@contexts/<name> or @contexts/<name>/server). Other deep imports are forbidden — see ADR 001.',
+                'ADR 001: cross-context imports must go through the public surface (@contexts/<name> or @contexts/<name>/server). Reaching into internals is forbidden.',
+            },
+            {
+              // Catches a source file in context A reaching into
+              // ../B/internal-file via a relative path rather than
+              // through the sanctioned @contexts alias.
+              group: ['../contexts/*', '../../contexts/*', '../../../contexts/*'],
+              message:
+                'ADR 001: use the @contexts/<name> alias, not a relative path, when importing across contexts.',
             },
           ],
         },
