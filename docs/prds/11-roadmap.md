@@ -98,3 +98,16 @@ Every 30 days, re-answer:
 - Have any kill-criteria triggered (PRD 00 §7)?
 
 The roadmap is a hypothesis, not a commitment.
+
+## Skills (per phase)
+
+Phase-by-phase, the skills that get heaviest use:
+
+| Phase | Heaviest taste skills | Heaviest implementation skills |
+| --- | --- | --- |
+| 0 — MVP | `minimalist-ui` (marketing + customer + PDFs), `industrial-brutalist-ui` Swiss (ops console), `high-end-visual-design` Editorial Luxury (homepage hero only) | `software-architecture`, `test-driven-development`, `coder`, `judge` |
+| 1 — Ops scaling | Same as Phase 0 | `coder`, `qa-monkey`, `pipeline-orchestrator`, `simplify` |
+| 2 — AI assist | Same as Phase 0 | **`claude-api` (mandatory)**, `test-driven-development` (eval suites), `judge` |
+| 3 — Partner & enterprise | Same + `industrial-brutalist-ui` for partner dashboards | `software-architecture` (multi-tenant boundary), `security-review`, `coder` |
+
+Always pair UI scaffolding work with `full-output-enforcement`. See `docs/DESIGN-LANGUAGE.md` for the binding Surface → skill mapping.

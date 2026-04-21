@@ -375,9 +375,11 @@ Per PRD 09.
 ### Aesthetic compliance (NFR — design)
 
 - Every screen passes the `docs/DESIGN-LANGUAGE.md` gate before merge.
+- The Surface → skill mapping in `docs/DESIGN-LANGUAGE.md` is binding: marketing → `minimalist-ui` (+ `high-end-visual-design` Editorial Luxury hero), customer app + PDFs → `minimalist-ui`, ops console → `industrial-brutalist-ui` Swiss mode (degradation effects disabled).
+- All UI scaffolding runs `/taste-skill` at start and pairs with `full-output-enforcement`.
 - No system fonts; no default Tailwind color usage; no default shadcn button styling.
 - One accent element max above the fold on marketing.
-- No motion springs; no purple gradients; no Inter.
+- No motion springs; no purple gradients; no Inter; no CRT scanlines / halftone / ASCII brackets / aviation hazard red even when a chosen skill prescribes them.
 
 ---
 

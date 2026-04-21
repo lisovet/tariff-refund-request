@@ -109,6 +109,16 @@ Every `EntryRecord` carries at least one `EntrySourceRecord`. Multiple sources s
 
 ## Design notes
 
+### Skills
+
+- **Taste — upload UX (customer)**: `minimalist-ui`. The upload zone + document list live in the recovery + prep workspaces (covered by PRDs 02 and 03), but their visual contract is owned here. Invoke via `/taste-skill restrained customer document upload zone with hairline border, accent progress, and typographic confirmation`.
+- **Taste — extraction / review surfaces (ops)**: `industrial-brutalist-ui` Swiss mode (degradation effects disabled). Inherits ops console rules from PRD 04.
+- **Pair with**: `full-output-enforcement` for the upload component and review-pair UI.
+- **Other (critical)**: `test-driven-development` for canonicalization, dedupe, fuzzy match, ACE CSV parser. Golden-file fixtures for each parser. `software-architecture` when shaping the public surface of `src/contexts/entries/`.
+- **Override from `docs/DESIGN-LANGUAGE.md`**: confidence pills use `--positive` / `--warning` / `--blocking` tokens — never the `industrial-brutalist-ui` aviation hazard red or the `minimalist-ui` pastel set.
+
+### Aesthetic intent
+
 - Upload UX is restrained — no progress confetti. A clean progress bar in the accent color, then a satisfying typographic "X documents received" confirmation.
 - Document list uses Berkeley Mono for filenames and timestamps.
 - Confidence pills use the design language's status colors strictly.

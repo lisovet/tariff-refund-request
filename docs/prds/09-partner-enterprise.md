@@ -106,6 +106,17 @@ CaseAttribution = { caseId, partnerOrgId, capturedAt }
 
 ## Design notes
 
+### Skills (Phase 3)
+
+- **Taste — partner referral / co-branded screener embed**: `minimalist-ui` (mirrors the marketing/customer surfaces from PRDs 01 + 05).
+- **Taste — partner dashboard** (lead list, revenue summary, marketing assets): `industrial-brutalist-ui` Swiss mode (inherits ops console rules from PRD 04 — partner dashboard is a data surface, not a marketing surface).
+- **Taste — white-label**: same as above; only `--accent` and the logo are partner-overridable. Typography, layout, motion stay ours.
+- **Pair with**: `full-output-enforcement` for the dashboard tables and embedded screener iframe shell.
+- **Other**: `test-driven-development` for attribution capture, revenue-share math, and the partner RLS rules. `software-architecture` when introducing the multi-tenant `orgId` boundary across all contexts.
+- **Override from `docs/DESIGN-LANGUAGE.md`**: white-label CSS allowlist is restricted to two tokens (`--accent`, `--paper`) plus the logo asset — never typography, motion, or layout primitives. Reject any partner asks that would break the editorial-utilitarian contract.
+
+### Aesthetic intent
+
 - Partner dashboard inherits the design language; partner branding overrides only color tokens and the logo, not typography or layout.
 - White-label CSS allows partner accent + paper colors; we never expose the rest of the system.
 

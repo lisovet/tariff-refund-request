@@ -158,6 +158,17 @@ AuditLogRow = { id, caseId, actorId, kind, fromState?, toState?, payload jsonb, 
 
 ## Design notes (taste)
 
+### Skills
+
+- **Taste**: `industrial-brutalist-ui`, **Swiss Industrial Print mode only** (degradation effects disabled). The entire ops console is the Bloomberg-terminal surface.
+- **Pair with**: `full-output-enforcement` for queue-list virtualization, three-pane workspace shell, audit-log viewer — every component is dense and long.
+- **Other**: `test-driven-development` for the case state machine (`@xstate/test` model-based), the SLA-timer math, queue-permission rules. `software-architecture` when shaping the public surface of `src/contexts/ops/`.
+- Invoke via `/taste-skill data-dense ops console with queue list, three-pane case workspace, side-by-side document viewer, audit-log timeline, keyboard-first navigation`.
+- **Apply from `industrial-brutalist-ui` Swiss**: rigid CSS Grid (`gap: 1px` over contrasting bg for hairline grid lines), zero `border-radius` on every surface, monospace dominance for case IDs / state tokens / SLA timers / coordinates, generous uppercase tracking on column headers and queue labels, bimodal density (dense tables next to calculated negative space around the action panel), semantic `<data>` / `<output>` / `<dl>` / `<kbd>` markup throughout, visible compartmentalization via solid 1–2px hairlines.
+- **Override from `docs/DESIGN-LANGUAGE.md` (binding)**: customs-orange `--accent` substitutes for aviation hazard red `#E61919`. **No** CRT scanlines, halftone overlays, 1-bit dithering, ASCII brackets `[ ... ]`, viewport-bleeding numerals (clamp 4rem–15rem reserved for the queue's count headline only and capped at 4rem), randomized "REV / UNIT" decoration strings. **No** Tactical Telemetry dark mode at v1; dark mode is a real designed Swiss-Industrial-Print-on-dark mode (not phosphor green CRT).
+
+### Aesthetic intent
+
 - Density is the point. The console looks like a Bloomberg terminal because the work demands it.
 - Berkeley Mono everywhere a number, ID, or timestamp appears.
 - Color used sparingly — only for state pills and SLA risk; everything else is ink-on-paper.

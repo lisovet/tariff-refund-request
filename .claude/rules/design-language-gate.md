@@ -19,8 +19,21 @@
 
 - Every UI PR description includes a screenshot.
 - The PR description answers: "What is this screen *trying* to feel like?"
-- A design taste review (against this document, not personal preference) runs before merge.
-- For new screens, invoke `/frontend-design` skill at scaffolding time — taste is part of the dev pipeline.
+- The PR description names the **taste skill** chosen and lists which of its rules were applied vs overridden (per `docs/DESIGN-LANGUAGE.md` Surface → skill mapping table).
+- A design taste review (against `docs/DESIGN-LANGUAGE.md`, not personal preference) runs before merge.
+- For new screens, run `/taste-skill <description>` at scaffolding time — taste is part of the dev pipeline. Always pair with `/full-output-enforcement` to prevent truncated components.
+
+## Skill selection (binding)
+
+Per the Surface → skill mapping in `docs/DESIGN-LANGUAGE.md`:
+
+- **Marketing site** → `minimalist-ui` (+ `high-end-visual-design` *Editorial Luxury* archetype for hero only).
+- **Customer app** (screener, recovery customer view, prep customer view, status banner) → `minimalist-ui`.
+- **Readiness Report PDF + engagement letter** → `minimalist-ui` editorial-document mode.
+- **Ops console** (queues, case workspace, doc viewer, validator, audit log, admin) → `industrial-brutalist-ui`, **Swiss Industrial Print mode only**, with degradation effects (CRT, halftone, ASCII brackets, hazard-red accent) **disabled**.
+- **All UI work** → pair with `full-output-enforcement`.
+
+If a skill's rule conflicts with `docs/DESIGN-LANGUAGE.md`, the document wins. Do not import banned patterns (pill nav, fluid-island modal, magnetic button physics, CRT scanlines, halftone, ASCII brackets, hazard red, pastel multi-accent palettes) even when the skill prescribes them.
 
 ## Common mistakes to catch
 

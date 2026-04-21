@@ -124,6 +124,17 @@ This object — not the UI — is the source of truth. The results page renders 
 
 ## Design notes (taste lens applied)
 
+### Skills
+
+- **Taste**: `minimalist-ui` (Premium Utilitarian Minimalism) — customer-facing app surface.
+- **Pair with**: `full-output-enforcement` for the question-screen + results-dossier components.
+- **Other**: `test-driven-development` for the branching engine in `src/contexts/screener/branching.ts` (pure function, table-driven tests).
+- Invoke via `/taste-skill screener question screens and editorial results dossier for an importer eligibility check`.
+- **Apply from `minimalist-ui`**: warm-monochrome canvas, generous macro-whitespace per question screen, 1px hairline rules, IntersectionObserver scroll-fade entry on results, kbd-styled chip for `Q3 / 10` indicator, no shadows, no rounded-full pills.
+- **Override from `docs/DESIGN-LANGUAGE.md`**: GT Sectra display (not Playfair); single `--accent` (not pastel multi-accent palette); refund metric in Berkeley Mono, not the body face.
+
+### Aesthetic intent
+
 - The screener is the customer's first encounter with us. It must feel like the *form a competent professional designed*, not a SaaS funnel.
 - GT Sectra display sets the tone: this is a serious, considered question.
 - No progress bar — replaced with a small mono `Q3 / 10`. A bar implies a transactional sprint; this is consultative.

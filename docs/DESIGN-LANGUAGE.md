@@ -14,6 +14,42 @@ We are not a friendly consumer SaaS. We are not a fintech. We are not another AI
 
 The customer is a CEO of a $5M ecommerce brand with thirty Slack messages open, a half-eaten lunch, and a vague memory that they paid duties through Flexport last year. Our job is to feel like the most competent professional that has ever walked into their inbox.
 
+---
+
+## Surface → skill mapping (binding)
+
+Every UI surface gets a designated taste skill. Invoke `/taste-skill` at scaffolding time with the surface in mind; the table below names the right pick. **This document overrides the skill** wherever they conflict — see the "Skill rules we discard" column.
+
+| Surface | Primary skill | Skill mode / archetype | Skill rules we keep | Skill rules we discard (because they conflict with this document) |
+| --- | --- | --- | --- | --- |
+| Marketing site (`/`, `/how-it-works`, `/pricing`, `/trust`, blog) | `minimalist-ui` | Premium Utilitarian Minimalism | Warm-monochrome canvas, editorial serif hero, generous macro-whitespace (py-24+), 1px `--rule` borders, no drop shadows, IntersectionObserver scroll-fade entry, accordions stripped to hairline-bottom dividers | **Their pastel accent palette** — replace with our single `--accent` customs-orange. **Their Playfair Display recommendation** — we use GT Sectra. **Their warm-grain ambient orb suggestion** — we use the static paper-grain noise overlay |
+| Marketing hero only (within above) | + `high-end-visual-design`, *Editorial Luxury* vibe archetype | Editorial Luxury (warm cream, variable serif, paper noise overlay) | Massive variable-serif hero scale; paper-grain texture rationale; macro-whitespace doubling | **Vibe Glass / Soft Structuralism** — never. **Fluid Island nav** — banned. **Pill CTAs / magnetic button physics / button-in-button trailing icon** — banned. **Z-axis cascade / asymmetric bento with rotation** — banned. **Custom cubic-bezier bounce easings** — banned (use our 0.2,0.8,0.2,1) |
+| Customer app: screener, recovery (customer view), prep (customer view), status banner, all authenticated marketing-adjacent surfaces | `minimalist-ui` | Premium Utilitarian Minimalism | The full Component Specifications: solid `#111111` CTA pattern (we re-skin to `--ink` / `--accent`), 1px hairline cards, generous internal padding, kbd-styled keystroke chips for shortcuts | Same overrides as marketing |
+| Readiness Report PDF + engagement letter (artifact surface) | `minimalist-ui`, editorial-document mode | Editorial document | Macro-whitespace, editorial serif masthead, body sans, monochrome canvas, hairline rules between sections | Berkeley Mono mandatory for numbers/IDs/timestamps (skill endorses mono for code/keystrokes; we extend it to all numerics). Real footnote markup mandatory |
+| Ops console: queue list, case workspace, doc viewer, validator UI, audit log viewer, admin views | `industrial-brutalist-ui`, **Swiss Industrial Print mode** | Swiss Industrial Print (light substrate `#F4F4F0` ≈ our paper, heavy sans, rigid CSS Grid, visible compartmentalization, `border-radius: 0`, bimodal density, monospace metadata) | Strict CSS Grid with `gap: 1px` over contrasting bg for hairline grid lines, zero `border-radius`, monospace dominance for IDs/timestamps/coords, `<dl>` / `<data>` / `<samp>` semantics, generous tracking for uppercase metadata | **Aviation Hazard Red `#E61919`** — we substitute our `--accent` customs-orange. **Tactical Telemetry dark mode** — light only at v1 (dark mode is a real designed mode but built on Swiss Industrial Print, not on phosphor green CRT). **CRT scanlines, halftone overlays, 1-bit dithering, ASCII brackets `[ ... ]`, viewport-bleeding numerals, registration/copyright marks as decoration, randomized "REV 2.6" / "UNIT D-01" strings** — all banned (theatrics that erode trust in a regulated product). **Heavy uppercase macro-typography at clamp(4rem, 10vw, 15rem)** — restrained to functional headings only |
+| All UI work | + `full-output-enforcement` (paired) | n/a | Prevents truncated components and placeholder code in scaffolding | n/a |
+
+### Why the conflicts are resolved this way
+
+The three skills represent different aesthetic philosophies, and our product spans surfaces that legitimately want different treatment. But every override above traces to one of three principles in this document:
+
+1. **Restraint signals competence.** This product is regulated and high-trust. Bouncy motion, theatrics (CRT scanlines, ASCII frames, hazard red, magnetic-physics buttons) actively undermine the trust we are trying to earn. Whenever a skill's spectacle conflicts with our restraint, restraint wins.
+2. **Single accent.** We commit to one severe accent (customs-orange `--accent`). Skill palettes that introduce multiple pastels (`minimalist-ui`) or hazard red (`industrial-brutalist-ui`) get re-skinned to the single token.
+3. **Editorial typography is the through-line.** GT Sectra display, Söhne body, Berkeley Mono numerics. Skill font recommendations (Playfair Display, Neue Haas Grotesk Black, Geist, Plus Jakarta Sans) are inputs to this commitment, not substitutes for it.
+
+## Skill invocation (development workflow)
+
+When scaffolding any new screen:
+
+1. Identify which row of the surface mapping the screen falls under.
+2. Run `/taste-skill <one-sentence-description-of-screen>`. The router picks the subskill; verify it matches the table above.
+3. If the router picks differently, the table wins — invoke the table's pick directly via the Skill tool.
+4. Always pair with `full-output-enforcement` for any non-trivial component.
+5. Apply the **kept** rules from the skill plus the **overrides** from this document. When in doubt, this document wins.
+6. Cite the chosen skill + override list in the PR description so the design-language gate review can verify.
+
+
+
 ### What this rules out
 
 - Purple gradients. Indigo gradients. Any gradient that says "AI."

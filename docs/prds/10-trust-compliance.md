@@ -140,6 +140,17 @@ This list lives at `/trust` and is restated in the engagement letter.
 
 ## Design notes
 
+### Skills
+
+- **Taste — `/trust`, `/trust/sub-processors`, `/trust/security`, `/trust/legal-requests`**: `minimalist-ui` editorial-document mode. The trust pages are long-form editorial — closer to a Stripe Press chapter than a SaaS legal page. Invoke via `/taste-skill long-form editorial trust posture pages with real footnotes, sub-processor table, and calm typographic restraint`.
+- **Taste — engagement letter (e-sign) flow**: `minimalist-ui` editorial-document mode (matches the Readiness Report PDF surface from PRD 03).
+- **Taste — customer data export / deletion request UI**: `minimalist-ui` (inherits customer-app rules).
+- **Pair with**: `full-output-enforcement` for the engagement-letter renderer and the long-form trust pages.
+- **Other**: `test-driven-development` for the deletion + export workers (must purge all in-scope records and write the audit row without retaining content). `security-review` skill before each PR that touches auth, retention, or sub-processor changes.
+- **Override from `docs/DESIGN-LANGUAGE.md`**: disclosures must be real text — never images, never collapsed accordions hiding required text by default. The canonical trust promise appears verbatim across surfaces — never paraphrased.
+
+### Aesthetic intent
+
 - The `/trust` page is its own editorial surface — long-form, well-typeset, intentionally calm. It is the page we are most proud to point lawyers at.
 - Disclosures use real footnote markup with superscript references to a footer block. Never a collapsed accordion.
 - Status of "human-reviewed" on artifacts uses the validator's actual name and timestamp — restraint over generic "verified" badges.

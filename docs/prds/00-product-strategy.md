@@ -93,3 +93,15 @@ We stop if, after the first 90 days:
 7. Partner motion start date?
 
 Answered or re-examined every 30 days.
+
+## 11. Pipeline skills
+
+Strategic work in this repo runs through a defined skill pipeline (see `~/.claude/CLAUDE.md`):
+
+- `plan-ceo` — strategic filter on any new feature or capability before planning *how*. Skip for bug fixes / refactors.
+- `planner` — execution planning with 10-pass adversarial review for anything touching 3+ files or design decisions.
+- `critic` — adversarial PRD review before code is written.
+- `prd-taskmaster` — generates this PRD set + backlog. Re-run when a PRD needs major revision.
+- `claude-md-improver` — periodic audit of `CLAUDE.md` and `.claude/rules/`.
+
+Surface-level taste skills are documented per-PRD (`docs/prds/01..11`) and bound by the Surface → skill mapping in `docs/DESIGN-LANGUAGE.md`.

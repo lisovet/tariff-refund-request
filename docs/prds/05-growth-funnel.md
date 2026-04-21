@@ -128,6 +128,18 @@ We do not chase keyword volume. We chase intent.
 
 ## Design notes (taste)
 
+### Skills
+
+- **Taste — sitewide**: `minimalist-ui` (Premium Utilitarian Minimalism). Invoke via `/taste-skill editorial marketing site for a customs-refund prep service — homepage, how-it-works, pricing, trust, blog`.
+- **Taste — homepage hero only**: pair in `high-end-visual-design` *Editorial Luxury* vibe archetype for the masthead-style hero typography and paper-grain texture rationale. Invoke via `/taste-skill editorial luxury hero for a serious B2B refund prep service masthead`.
+- **Pair with**: `full-output-enforcement` for every page — marketing components are long, must not truncate.
+- **Other (copy)**: `copywriting-strategist` to brainstorm angles for the headline and anti-positioning section; `copywriting-formatter` to turn approved angles into finished copy (homepage, lifecycle templates, footnotes); `ad-validator` to stress-test the homepage and pricing copy before launch. (These are pipeline skills available in this install.)
+- **Apply from `minimalist-ui`**: warm-monochrome paper canvas, generous macro-whitespace (py-32 on hero, py-24 elsewhere), 1px hairline section dividers, accordion items separated by hairline-bottom only, real footnotes, IntersectionObserver scroll-fade for section reveals, Phosphor (or equivalent) bold-weight icons for the few iconographic moments.
+- **Apply from `high-end-visual-design` (hero only)**: massive variable-serif scale at clamp(4rem, 8vw, 8rem), warm-cream paper texture, paper-grain overlay (fixed pseudo-element, opacity 0.03–0.06), eyebrow-tag pattern for section labels.
+- **Override from `docs/DESIGN-LANGUAGE.md` (binding, both skills)**: GT Sectra display (not Playfair, not Geist, not Clash); single `--accent` customs-orange (not pastel multi-accents, not hazard red); magazine-underline CTA pattern (not pill `rounded-full` CTAs, not button-in-button trailing icons); restrained 0.2,0.8,0.2,1 easing (not custom bounce cubic-beziers); **no** Fluid Island floating nav, **no** magnetic button physics, **no** Z-axis cascade rotations, **no** asymmetric bento with tilt — those are spectacle that erodes trust here.
+
+### Aesthetic intent
+
 - The homepage is the moment we either earn or lose taste credit. GT Sectra display, ink on paper, hairline rules, one accent.
 - One full-bleed documentary photograph max — high-contrast, possibly black-and-white, of a real customs form or a port at dawn (we have a budget for this; do not stock).
 - Footnotes are real superscript footnotes. The first time someone scrolls to one, they remember the site.

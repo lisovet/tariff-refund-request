@@ -164,6 +164,18 @@ EntryRecord = {
 
 ## Design notes (taste)
 
+### Skills
+
+- **Taste — customer workspace**: `minimalist-ui`. Invoke via `/taste-skill recovery workspace for an importer to receive an outreach kit and upload customs documents`.
+- **Taste — ops workspace** (three-pane PDF + extraction form): `industrial-brutalist-ui`, **Swiss Industrial Print mode only** (degradation effects disabled). Invoke via `/taste-skill dense ops console workspace with side-by-side PDF viewer and tabular entry-extraction form, Bloomberg-terminal energy`.
+- **Pair with**: `full-output-enforcement` for the three-pane workspace components on both surfaces.
+- **Other**: `test-driven-development` for routing logic and outreach-template snapshots; `software-architecture` when building the public surface of `src/contexts/recovery/`.
+- **Apply from `minimalist-ui` (customer)**: hairline-bordered upload zone with no cloud illustration, generous internal padding on the three-pane shell, accent-only progress on upload, IntersectionObserver scroll-fade for status changes.
+- **Apply from `industrial-brutalist-ui` Swiss (ops)**: rigid CSS Grid with `gap: 1px` for the three-pane spine, zero `border-radius` on the work surface, monospace dominance for entry numbers / dates / IDs, generous tracking on uppercase queue labels, `<dl>` / `<data>` / `<samp>` semantics in the extraction form.
+- **Override from `docs/DESIGN-LANGUAGE.md`**: customs-orange `--accent` substitutes for both `minimalist-ui` pastel accents and `industrial-brutalist-ui` aviation hazard red. CRT scanlines, halftone, ASCII brackets `[ ... ]`, viewport-bleeding numerals, "REV/UNIT" decoration strings — all banned. No phosphor-green Tactical Telemetry mode.
+
+### Aesthetic intent
+
 - The outreach template is the workspace's hero. It must read like a thoughtful email a competent person would actually send — not a form letter. GT Sectra subject line preview, Söhne body, Berkeley Mono for the entry-window dates.
 - The checklist uses typographic status glyphs (`✓`, `—`, `?`) in the accent face, not iconographic checkmarks.
 - The upload zone has a hairline-bordered, ink-on-paper texture — never a friendly cloud illustration.

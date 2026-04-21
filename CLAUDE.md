@@ -52,10 +52,22 @@ To be filled in once stack is chosen. Until then, defer to global defaults in `~
 
 ## Where to look
 
-- `docs/prds/` — feature PRDs (one per area: screener, recovery, CAPE prep, ops, growth, monetization, ingestion, AI, partner, trust, roadmap).
+- `docs/prds/` — feature PRDs (one per area: screener, recovery, CAPE prep, ops, growth, monetization, ingestion, AI, partner, trust, roadmap). Each one names the **taste skill** and other implementation skills it depends on.
+- `docs/DESIGN-LANGUAGE.md` — the visual contract + the binding **Surface → skill mapping** table (which taste skill owns which surface; which skill rules we keep vs override).
 - `docs/architecture-decisions.md` — ADRs for stack, data model, deploy target.
 - `.taskmaster/` — active backlog, task state, dependency graph.
-- `.claude/rules/` — project-specific rules layered on top of `~/.claude/rules/`.
+- `.claude/rules/` — project-specific rules layered on top of `~/.claude/rules/`. `design-language-gate.md` enforces the skill-selection workflow.
+
+## Skills routing (cheat sheet)
+
+When scaffolding any UI work, run `/taste-skill <description>` and verify it picks per the mapping in `docs/DESIGN-LANGUAGE.md`:
+
+- Marketing → `minimalist-ui` (+ `high-end-visual-design` Editorial Luxury for homepage hero only)
+- Customer app + PDFs → `minimalist-ui`
+- Ops console → `industrial-brutalist-ui`, **Swiss Industrial Print mode only** (CRT scanlines / halftone / ASCII brackets / hazard red **disabled**)
+- Always pair with `full-output-enforcement`
+
+Non-design skills called out per PRD: `claude-api` (mandatory for PRD 08), `test-driven-development` (mandatory for the validator, pricing.ts, parsers, eval suites), `software-architecture` for context boundaries, `security-review` for any auth/retention/data-export PR.
 
 ## Non-goals (do not build)
 

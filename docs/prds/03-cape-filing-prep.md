@@ -159,6 +159,19 @@ Designed in `src/contexts/cape/report-pdf/` using React PDF. Honors the design l
 
 ## Design notes (taste)
 
+### Skills
+
+- **Taste — customer prep workspace**: `minimalist-ui`. Invoke via `/taste-skill customer-facing prep workspace showing entry validation results and downloadable artifacts`.
+- **Taste — Readiness Report PDF + engagement letter**: `minimalist-ui` editorial-document mode. Invoke via `/taste-skill one-page editorial PDF dossier with masthead, entry table, and signed analyst footer — must be photographable`.
+- **Taste — ops prep + QA workspace**: `industrial-brutalist-ui`, **Swiss Industrial Print mode only** (degradation effects disabled). Invoke via `/taste-skill dense ops three-pane workspace for batch validation and Readiness Report editing with keyboard shortcuts`.
+- **Pair with**: `full-output-enforcement` for the React PDF document component (long, must not truncate) and the three-pane ops workspace.
+- **Other (critical)**: `test-driven-development` for the validator and CSV builder — golden-file fixtures in `tests/fixtures/cape/` are non-negotiable per ADR 014. `software-architecture` when shaping the public surface of `src/contexts/cape/`.
+- **Apply from `minimalist-ui` (customer + PDF)**: editorial serif masthead, generous macro-whitespace, hairline section dividers, kbd-style chips for prereq checklist items, monospace for IDs / counts / amounts, no shadows on tiles, IntersectionObserver scroll-fade for state transitions.
+- **Apply from `industrial-brutalist-ui` Swiss (ops)**: rigid CSS grid for the three-pane spine, zero `border-radius` on the validator panes, semantic `<data>` / `<output>` / `<samp>` for batch metadata, generous uppercase tracking on QA-checklist labels, bimodal density (dense entry tables next to vast whitespace around the sign-off CTA).
+- **Override from `docs/DESIGN-LANGUAGE.md`**: status colors (`--positive`, `--warning`, `--blocking`) for severity glyphs are app-only; PDF uses ink + accent + a single restrained status hue per row. Never CRT scanlines / halftone / ASCII brackets in the ops view. PDF footnotes are real superscripted footnotes — not banners or pills.
+
+### Aesthetic intent
+
 - The Readiness Report is the product's most photographable surface. Treat it like a magazine feature.
 - The hero metric on the customer-facing prep workspace uses Berkeley Mono in display size — a number with weight.
 - Status colors (green / amber / red) appear only on app surfaces, never in the marketing site.

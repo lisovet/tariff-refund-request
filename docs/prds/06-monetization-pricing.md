@@ -118,6 +118,18 @@ Target blended ARPU at 12 months: **$1,800 per qualified lead through full ladde
 
 ## Design notes (taste)
 
+### Skills
+
+- **Taste — pricing page**: `minimalist-ui` (inherits from PRD 05 marketing surface).
+- **Taste — Concierge purchase / engagement letter flow**: `minimalist-ui` editorial-document mode.
+- **Pair with**: `full-output-enforcement` for the engagement-letter renderer.
+- **Other (critical)**: `test-driven-development` for `src/contexts/billing/pricing.ts` — SMB / mid-market boundaries, success-fee math, refund clamp logic, idempotency on Stripe retries. `software-architecture` when shaping the public surface of `src/contexts/billing/`. `claude-api` does **not** apply here — there is no LLM in pricing.
+- Invoke via `/taste-skill stage-by-stage pricing page with tabular figures, free tier rendered with same weight as paid tiers, no popular badge`.
+- **Apply from `minimalist-ui`**: hairline-divided pricing rows, generous internal padding, monospace numerics, no shadows, no rounded-full pill plan badges.
+- **Override from `docs/DESIGN-LANGUAGE.md`**: customs-orange `--accent` only on the single "Get started" CTA per stage column. Pricing-table source of truth is `pricing.ts` rendered via snapshot — never hand-typed numbers.
+
+### Aesthetic intent
+
 - Pricing page is tabular, mono numbers, hairline-divided rows. No colored "popular" badge.
 - The "Free" tier is set in the same face and weight as the paid tiers — no visual de-emphasis. Competence implies confidence in the free step.
 - Success-fee disclosure is prominent on the Concierge page — restraint demands transparency.
