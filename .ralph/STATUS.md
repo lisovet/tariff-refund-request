@@ -1,16 +1,16 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T11:55:00Z
+**Updated**: 2026-04-21T12:00:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 53 → 54)
+**Loop state**: active (iteration 54 → 55)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 54 |
+| completed | 55 |
 | in-progress | 0 |
-| pending | 32 |
+| pending | 31 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
@@ -23,42 +23,41 @@
 | `npm run build` | green — 24 routes |
 | `npm run qa` (combined) | green |
 
-## Last completed tasks (this iteration)
+## Last completed task
 
-**#53 — Manual entry-extraction form + provenance write** *(also satisfies #55 schema work)*
+**#54 — USER-TEST checkpoint #8 (full recovery workflow)**
 
-- Schema (drizzle/0006_entries_provenance.sql):
-  - `entries` (id `ent_*`, caseId FK→cases RESTRICT NOT NULL, entryNumber, entryDate, importerOfRecord, dutyAmountUsdCents bigint, htsCodes text[], phaseFlag, validatedAt/validatedBy, createdAt/updatedAt) + UNIQUE(case_id, entry_number) for canonical dedupe + index on (case, time).
-  - `entry_source_records` (id `esrc_*`, entryId FK→entries RESTRICT NOT NULL, **recoverySourceId FK→recovery_sources RESTRICT NOT NULL** — provenance never null per `.ralph/PROMPT.md`, rawData jsonb, confidence enum default pending, extractedAt/extractedBy + indexes).
-- `EntriesRepo` (in-memory + Drizzle) with `saveExtractedEntry` transactional contract — entry + source insert run inside a single `db.transaction()`.
-- Service `saveExtractedEntry` composes entry write + audit log row (`kind=entry.extracted` on first save; `kind=entry.source_attached` on the second-source path).
-- POST `/api/cases/[id]/entries` route: Zod-validated body, 400 on bad body, 404 on missing case, 200 with outcome + entry + sourceRecord + auditId.
-- `ExtractionFormPanel` wired to POST when no `onSave` seam — requires `recoverySourceId` prop; shows error state if missing.
-- 12 new tests (6 service + 6 integration route); existing form tests adapted to async save.
+Implementation-side scaffolding for the four legs of the workflow is complete:
 
-**#55 — Entry record schema** *(landed inside #53)*
+1. **Stripe Checkout** (#36) — `POST /api/checkout` opens a Session per `(sku, tier)`; `/api/webhooks/stripe` dedupes via `processed_stripe_events` UNIQUE + publishes `platform/payment.completed`.
+2. **Customer recovery workspace** (#51) — `/app/case/[id]/recovery`: 3-pane with status banner, outreach kit, upload zone; renders correctly given a case + screener-session pair.
+3. **Ops workspace + extraction form** (#52, #53) — `/ops/case/[id]`: case header + extraction form + side-by-side document viewer; `POST /api/cases/[id]/entries` persists entry + entry_source_record + audit_log row inside one `db.transaction`; idempotent on `(case_id, entry_number)`.
+4. **Lifecycle email cadences** (#28-#31) — workflows registered for screener nudges + entry-list-ready + concierge upsell + reengagement.
 
-Tables + indexes per PRD 07. Integration tests in #53 cover valid-insert + duplicate-attaches-second-source.
+**Gaps for the human walk** (carried from #38):
+- Webhook does not yet write a Payment row OR auto-create a Case from `platform/payment.completed`. The orchestration workflow that closes this is the missing seam — without it the human walk needs to manually create a Case before `/app/case/[id]/recovery` resolves.
+- Extraction form's `recoverySourceId` prop is currently static — wiring DocumentViewerPanel's active doc → ExtractionFormPanel.recoverySourceId is a follow-up; for v1 the wiring requires a `recovery_source` row to exist for each uploaded document, which is also a missing seam.
 
 ## Human-verification still owes
 
-- Apply `0006_entries_provenance.sql` to a real Postgres; insert two entries with the same (case_id, entry_number) and confirm the second hits the unique constraint at the DB level.
-- End-to-end walk: ops user opens `/ops/case/[id]`, picks a doc, fills the form, saves; confirm an entry row + source record + audit row land.
-- Wire the `ExtractionFormPanel` `recoverySourceId` prop dynamically from the active document in `DocumentViewerPanel` (currently a static prop — the wiring needs a recovery_source row creation step which lands with task #54+).
+- Provision Stripe test mode + R2 + Inngest dev server + Postgres.
+- Manually create a case + recovery_source for a customer.
+- Walk the customer through the workspace → upload → staff opens ops workspace → extracts an entry → confirm audit trail in the database.
+- The end-to-end orchestration workflow that closes the two gaps lands as part of the v1-launch wave (likely #80+).
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #54 — deps satisfied. **Eligible — lowest id.**
-- Task #56 — eligible.
+- Task #56 (Entry-number canonicalization function) — deps `[55]` satisfied. **Eligible — lowest id.**
 - Task #61 — eligible.
 - Task #67 (CAPE prep workflow scaffold) — eligible.
 - Task #72 (admin dashboard scaffold) — eligible.
+- Task #74 — eligible.
 
-Lowest-id eligible is **task #54**.
+Lowest-id eligible is **task #56** — pure-function entry-number canonicalization (whitespace strip, separator normalization, CBP format validation).
 
 ## Notes
 
-- 54/86 v1 done — past 60% of Phase 0.
-- Wave 8 (Recovery context) + Wave 9 (Entry ingestion schema) substantially complete.
-- Loop will continue with #54 next iteration.
+- 55/86 v1 done — past 60% of Phase 0.
+- Wave 8 (Recovery context) checkpointed.
+- Loop will continue with #56 next iteration.

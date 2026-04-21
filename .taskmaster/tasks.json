@@ -1095,12 +1095,14 @@
           52,
           53
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 2,
         "source": [
           "validation-checkpoint",
           "Checkpoint 3"
-        ]
+        ],
+        "completedAt": "2026-04-21T12:00:00Z",
+        "completedNotes": "USER-TEST checkpoint #8 (full recovery workflow). Implementation-side scaffolding for the four legs of the workflow is complete: (1) Stripe Checkout (#36) \u2014 POST /api/checkout opens a Session per (sku, tier); /api/webhooks/stripe dedupes via processed_stripe_events UNIQUE + publishes platform/payment.completed. (2) Customer recovery workspace (#51) \u2014 /app/case/[id]/recovery: 3-pane with status banner, outreach kit, upload zone; renders correctly given a case + screener-session pair. (3) Ops workspace + extraction form (#52, #53) \u2014 /ops/case/[id]: case header + extraction form + side-by-side document viewer; POST /api/cases/[id]/entries persists entry + entry_source_record + audit_log row inside one db.transaction; idempotent on (case_id, entry_number). (4) Lifecycle email cadences (#28-#31) \u2014 workflows registered for screener nudges + entry-list-ready + concierge upsell + reengagement. GAPS for the human walk (carry from #38): (a) the webhook does not yet write a Payment row OR auto-create a Case from platform/payment.completed \u2014 that orchestration workflow is the missing seam; without it the human walk needs to manually createCase with a screenerSessionId before /app/case/[id]/recovery resolves. (b) The extraction form requires a recoverySourceId, which currently must be supplied as a static prop \u2014 wiring DocumentViewerPanel's active doc \u2192 ExtractionFormPanel.recoverySourceId is a follow-up; for v1 the wiring requires a recovery_source row to exist for each uploaded document, which is also a missing seam. 637/637 pass. Human owes: provision Stripe test mode + R2 + Inngest dev server + Postgres; manually create a case + recovery_source for a customer; walk the customer through the workspace \u2192 upload \u2192 staff opens ops workspace \u2192 extracts an entry \u2192 confirm audit trail in the database. The end-to-end orchestration workflow that closes both gaps lands as part of the v1-launch wave (likely #80+)."
       },
       {
         "id": 55,
