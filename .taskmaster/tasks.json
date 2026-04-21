@@ -302,13 +302,15 @@
         "epic": "E4. Eligibility screener",
         "title": "Screener domain logic + branching engine",
         "description": "src/contexts/screener/branching.ts — pure function: (answers) → next question or completion. Versioned (v1).",
-        "details": "10-question branching from PRD 01. Estimator function also versioned. Comprehensive table-driven unit tests for every branching path.",
+        "details": "src/contexts/screener/{types,questions,branching,estimator,qualification,index}.ts. types.ts encodes ScreenerAnswers + ScreenerResult per PRD 01. questions.ts holds the 10-question metadata. branching.ts: nextQuestion() advances Q1..Q10 in order with terminal-DQ shortcuts on q1=no and q3=no; isComplete() flags terminal states. estimator.ts (versioned ESTIMATOR_VERSION='v1'): maps duty bands to refund (low,high) ranges with confidence shifting on q2=unknown / q8 / q9. qualification.ts: computeResult() outputs the typed ScreenerResult — qualification (qualified/likely/disqualified), refundEstimate (versioned), confidence, recoveryPath (broker/carrier/ace-self-export/mixed/null with TODO for task #49 to extract into recovery context per ADR 015), prerequisites (ace/ach/ior/liquidationKnown), recommendedNextStep (recovery_kit/service/cape_prep/concierge/none).",
         "testStrategy": "Unit tests cover every branch; ≥95% coverage on branching.ts.",
         "priority": "high",
         "dependencies": [1],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 6,
-        "source": ["PRD 01"]
+        "source": ["PRD 01"],
+        "completedAt": "2026-04-21T07:24:00Z",
+        "completedNotes": "Five new modules in src/contexts/screener/ with 38 new tests covering every branching path + every duty band + every confidence tier + every qualification outcome + every recovery-path mapping + every recommendedNextStep rule. Coverage on the screener context: 96.00% lines / 95.94% branches / 100% functions / 96.72% statements — exceeds the ≥95% acceptance gate. types.ts encodes ScreenerAnswers + ScreenerResult per PRD 01. questions.ts holds the 10-question metadata (frozen). branching.ts: nextQuestion advances Q1..Q10 in order with terminal-DQ shortcuts (q1=no → DQ-1, q3=no → DQ-2). estimator.ts: ESTIMATOR_VERSION='v1', BAND_RANGES mapped to per-band (low,high), confidence rules. qualification.ts: computeResult outputs the full ScreenerResult including recoveryPath determination — TODO marker so task #49 can extract this into src/contexts/recovery/routing.ts per ADR 015. RESULT_VERSION = 'screener-v1+estimator-v1' for audit trail. All qa gates green: 218/218 tests, lint + typecheck clean, build green (13 routes unchanged — context code, no new routes yet)."
       },
       {
         "id": 21,
