@@ -1,4 +1,5 @@
 import { customers, staffUsers } from './schema/identity'
+import { leads, screenerSessions } from './schema/screener'
 
 /**
  * Drizzle schema registry. Downstream tasks register tables here as they
@@ -13,11 +14,14 @@ export const schema = {
   tables: {
     customers,
     staffUsers,
+    screenerSessions,
+    leads,
   },
 } as const
 
 export type Schema = typeof schema
 
 // Re-export tables for direct use by drizzle queries.
-export { customers, staffUsers }
+export { customers, staffUsers, screenerSessions, leads }
 export type { CustomerRow, StaffUserRow } from './schema/identity'
+export type { ScreenerSessionRow, LeadRow } from './schema/screener'

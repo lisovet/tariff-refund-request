@@ -1,6 +1,12 @@
 /**
- * Screener context — public surface. Per ADR 001, callers import from
- * `@contexts/screener` (not from individual files inside).
+ * Screener context — public surface (UI-safe).
+ *
+ * Per ADR 001, callers import from `@contexts/screener`. This module
+ * deliberately exports ONLY pure helpers + types so it can be pulled
+ * into client bundles without dragging in node:crypto / postgres-js.
+ *
+ * The repo factory + Drizzle implementation live in
+ * `@contexts/screener/server` — server-only.
  */
 
 export type {
@@ -22,6 +28,14 @@ export type {
   GoodsCategory,
   EmailCapture,
 } from './types'
+
+export type {
+  ScreenerSessionRecord,
+  LeadRecord,
+  ScreenerRepo,
+  CreateSessionInput,
+  CreateLeadInput,
+} from './repo'
 
 export { QUESTIONS, QUESTION_BY_ID } from './questions'
 export { nextQuestion, isComplete } from './branching'

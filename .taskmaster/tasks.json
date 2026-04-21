@@ -347,10 +347,10 @@
         "epic": "E4. Eligibility screener",
         "title": "Email capture + magic-link resume",
         "description": "Final step captures email; sends magic link via Resend that resumes the session.",
-        "details": "Cloudflare Turnstile gate on email submission. Lead row created in DB.",
+        "details": "Cloudflare Turnstile gate on email submission. Lead row created in DB. (Dependency on #25 added during loop — the magic-link flow needs the screener_sessions + leads tables to write into.)",
         "testStrategy": "Integration: complete screener, receive magic link in dev mailbox, click, see results.",
         "priority": "high",
-        "dependencies": [21, 27],
+        "dependencies": [21, 25, 27],
         "status": "pending",
         "estimateHours": 4,
         "source": ["PRD 01"]
@@ -373,13 +373,15 @@
         "epic": "E4. Eligibility screener",
         "title": "Screener persistence + lead row",
         "description": "Drizzle schema: `screener_sessions`, `leads`. Result jsonb includes versioned estimator output.",
-        "details": "30-day retention for incomplete sessions; 12 months for completed-without-purchase leads.",
+        "details": "src/shared/infra/db/schema/screener.ts: screener_sessions (id sess_*, jsonb answers + result, resultVersion text for audit) + leads (id lead_*, FK to screener_sessions with on-delete-set-null, UNIQUE(email, screener_session_id) for idempotency). Schema registry updated. drizzle/0001_screener.sql generated. ScreenerRepo contract + in-memory + Drizzle repos in src/contexts/screener/. Public surface split: index.ts UI-safe (types + pure helpers); server.ts (with `import 'server-only'`) exports the repo factory and pulls in node:crypto + postgres-js. 30-day / 12-month retention is documented; the purge worker lands in Phase-1 ops scaling.",
         "testStrategy": "Migration applies; integration test creates session + lead.",
         "priority": "high",
         "dependencies": [2, 22],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 3,
-        "source": ["PRD 01", "PRD 10"]
+        "source": ["PRD 01", "PRD 10"],
+        "completedAt": "2026-04-21T07:53:00Z",
+        "completedNotes": "Drizzle schema: src/shared/infra/db/schema/screener.ts adds screener_sessions (id sess_*, jsonb answers + result, resultVersion text for audit, started/completed/created/updated timestamps) + leads (id lead_*, FK to screener_sessions ON DELETE SET NULL, UNIQUE(email, screener_session_id) backing idempotency). drizzle/0001_screener.sql generated cleanly (4 tables tracked total). ScreenerRepo contract in repo.ts; in-memory + Drizzle implementations. Public surface SPLIT: index.ts is UI-safe (types + pure helpers — no node:crypto, no postgres-js — so client bundles stay clean); server.ts (with `import 'server-only'`) exports getScreenerRepo, the in-memory + Drizzle factories. server-only package installed. 12 new tests RED-then-GREEN; 254/254 pass; lint + typecheck clean; build green (/screener still 4.79kB — no server code leaked into client bundle). Bug caught + fixed during gates: in-memory findLeadByEmail used strict > on equal-millisecond timestamps; switched to >= so the later insertion wins (matches Drizzle ORDER BY updated_at DESC). 30-day / 12-month retention is documented; the purge worker lands in Phase-1 ops scaling. Also corrected task #23's dependencies to include #25 — the magic-link flow needs these tables."
       },
       {
         "id": 26,

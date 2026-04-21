@@ -24,4 +24,9 @@ describe('db schema module', () => {
     expect(schema.tables).toHaveProperty('customers')
     expect(schema.tables).toHaveProperty('staffUsers')
   })
+
+  it('registers screener tables (screener_sessions + leads)', () => {
+    expect(schema.tables).toHaveProperty('screenerSessions')
+    expect(schema.tables).toHaveProperty('leads')
+  })
 })
