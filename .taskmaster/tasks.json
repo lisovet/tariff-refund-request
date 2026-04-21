@@ -924,11 +924,13 @@
           45,
           12
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 5,
         "source": [
           "PRD 02"
-        ]
+        ],
+        "completedAt": "2026-04-21T10:32:00Z",
+        "completedNotes": "Reusable UploadZone client component (src/app/_components/upload/UploadZone.tsx) per PRD 02 + the design language. Drag-drop OR browse; multi-file; per-file preview row with filename + size in mono numerics + status pill (Queued/Uploading/Uploaded/Duplicate/Failed); accent-colored slim 1px progress bar (no big colored badges, no progress confetti). Pre-validates content type + size BEFORE any network call so user sees rejection immediately (matches the PRD-07 allowlist via isAcceptedContentType + MAX_UPLOAD_BYTES re-exported from @contexts/recovery). Retry button on failure path. Surfaces duplicate_sha256 as a Duplicate status (not Uploaded). uploadFile() orchestrator in upload-client.ts is dep-injected (fetchFn + hashFile + putToBucket) so tests can stub the network entirely. defaultHashFile uses crypto.subtle.digest(\"SHA-256\"); defaultPutToBucket uses native fetch PUT. UploadZone passes a Partial<UploadDeps> via the `client` prop to allow test wiring + production swap-in. 15 new tests (6 client + 9 component): pre-validation rejection paths do not touch the network, single + multi-file happy paths, drag-drop event acceptance, failure-then-retry recovery, duplicate_sha256 surfaces correctly. Component is not wired into a page yet \u2014 recovery workspace lands in #51. 499/499 pass; lint + typecheck clean; build green (21 routes)."
       },
       {
         "id": 47,

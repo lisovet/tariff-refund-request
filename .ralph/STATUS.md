@@ -1,23 +1,23 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T10:25:00Z
+**Updated**: 2026-04-21T10:32:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 41 → 42)
+**Loop state**: active (iteration 42 → 43)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 41 |
+| completed | 42 |
 | in-progress | 0 |
-| pending | 45 |
+| pending | 44 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 67 files, 484 tests pass |
+| `npm test` | green — 69 files, 499 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 21 routes |
@@ -25,39 +25,39 @@
 
 ## Last completed task
 
-**#45 — Pre-signed upload endpoint + client**
+**#46 — Reusable upload UI component**
 
-Two-step flow per PRD 02 to avoid orphan rows on mid-flight failures:
+`src/app/_components/upload/UploadZone.tsx` — client component for the recovery workspace per PRD 02:
 
-1. **`POST /api/uploads`** — validates the request (case-id segment shape, filename safety, content-type allowlist, byteSize cap 50 MB), generates `documentId`, builds the canonical case-scoped storage key, returns a 15-minute pre-signed PUT URL. **No DB write.**
-2. **`POST /api/uploads/complete`** — verifies the object landed via `headObject()`, inserts the document row using the bucket-reported size (not the client's). UNIQUE (case_id, sha256) dedup surfaces as `outcome: duplicate_sha256` with the existing document — never a hard error.
+- Drag-drop OR browse; multi-file; per-file preview row with filename + size in mono numerics + status pill (Queued/Uploading/Uploaded/Duplicate/Failed).
+- Accent-colored slim 1px progress bar — restraint per the design language: no big colored badges, no progress confetti, no animations beyond the bar fill.
+- Pre-validates content type + size BEFORE any network call so the user sees rejection immediately. Uses `isAcceptedContentType` + `MAX_UPLOAD_BYTES` from `@contexts/recovery`.
+- Retry button on failure path. Surfaces `duplicate_sha256` as a `Duplicate` status (not `Uploaded`).
+- `uploadFile()` orchestrator (`upload-client.ts`) is dependency-injected (`fetchFn` + `hashFile` + `putToBucket`) so tests can stub the network entirely. Defaults: `crypto.subtle.digest("SHA-256")` + native `fetch` PUT.
+- Component takes a `Partial<UploadDeps>` via the `client` prop for test wiring or production swap-in.
 
-- Content-type allowlist: PDF / XLSX / XLS / CSV / EML. No images; paper scans deferred to Phase 2 OCR per PRD 07.
-- Status code map: 400 invalid body / caseId / filename, 413 byte_size_too_large, 409 object_not_uploaded.
-- Recovery context public-surface split: pure validators + service via `@contexts/recovery`; storage adapter + Drizzle repo via `@contexts/recovery/server`.
-- Document repo has two implementations: in-memory (tests) + Drizzle (Postgres). Drizzle repo is race-aware — catches the unique-violation and re-looks-up the existing row.
-- `MAX_UPLOAD_URL_EXPIRY_SECONDS` now re-exported from `shared/infra/storage` barrel (was missing).
-- `/api/uploads` is already in `PROTECTED_PREFIXES` (middleware-gated).
-- 34 new tests (16 validator + 10 service + 8 integration route tests).
+15 new tests (6 client + 9 component): pre-validation rejection paths do NOT touch the network; single + multi-file happy paths; drag-drop event acceptance; failure-then-retry recovery; `duplicate_sha256` surfaces correctly.
+
+Component is not wired into a page yet — recovery workspace lands in #51.
 
 ## Human-verification still owes
 
-- Provision real R2 bucket; set `R2_*` env vars; upload a real file end-to-end; confirm the pre-signed URL works from the browser with the CORS policy R2 needs.
-- Enforce per-customer quota for paid-service tier (PRD 02 edge case). v1 scaffolding is open to all authenticated users; rate-limit / quota middleware lands with task #83 (ops console) or earlier if needed.
-- Wire the upload client component into the recovery workspace (task #51).
+- Eyeball UploadZone on the recovery workspace once #51 ships; confirm the slim progress bar feels restrained against real upload latencies.
+- A11y check: drag-drop zone is announced; keyboard-only flow works (browse via Tab + Enter on the label).
+- Real-world test against R2 with CORS configured (drag-drop a 30-MB PDF and confirm the PUT succeeds + complete returns the document row).
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #46 — deps satisfied. **Eligible — lowest id.**
-- Task #47 — eligible.
+- Task #47 — deps satisfied. **Eligible — lowest id.**
 - Task #49 (recovery routing — broker vs DIY) — eligible.
 - Task #55 (entries schema) — eligible.
 - Task #67 (CAPE prep workflow scaffold) — eligible.
+- Task #72 (admin dashboard scaffold) — eligible.
 
-Lowest-id eligible is **task #46**.
+Lowest-id eligible is **task #47**.
 
 ## Notes
 
-- Wave 8 (Recovery context) 2/many done.
-- Loop will continue with #46 next iteration.
+- Wave 8 (Recovery context) 3/many done.
+- Loop will continue with #47 next iteration.
