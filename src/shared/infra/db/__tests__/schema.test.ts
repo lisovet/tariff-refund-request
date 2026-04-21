@@ -20,7 +20,8 @@ describe('db schema module', () => {
     expect(schema.tables).toBeTypeOf('object')
   })
 
-  it('starts with an empty tables registry awaiting downstream tasks', () => {
-    expect(Object.keys(schema.tables)).toHaveLength(0)
+  it('registers identity tables (customers + staff_users)', () => {
+    expect(schema.tables).toHaveProperty('customers')
+    expect(schema.tables).toHaveProperty('staffUsers')
   })
 })

@@ -38,7 +38,8 @@
     "next": "^15.5.15",
     "postgres": "^3.4.9",
     "react": "^19.2.5",
-    "react-dom": "^19.2.5"
+    "react-dom": "^19.2.5",
+    "svix": "^1.91.1"
   },
   "devDependencies": {
     "@clerk/testing": "^2.0.17",

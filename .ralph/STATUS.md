@@ -1,43 +1,63 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T06:26:30Z
+**Updated**: 2026-04-21T06:35:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 10 → 11)
+**Loop state**: active (iteration 11 → 12)
 
 ## Counts
 
 | Status | Count |
 | --- | --- |
-| completed | 10 |
+| completed | 11 |
 | in-progress | 0 |
-| pending | 76 |
+| pending | 75 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 18 files, 116 tests pass |
+| `npm test` | green — 20 files, 130 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
+| `npm run build` | green |
+| `npm run db:generate` | green — first migration drizzle/0000_identity.sql |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
 
-**#10 — Build Actor resolver + context-layer authorization**
+**#11 — Customer + StaffUser DB tables and sync**
 
-- `src/shared/infra/auth/resolver.ts` exposes `resolveActorFromSession` (pure, fully testable) and `resolveCurrentActor` (Next-runtime wrapper around Clerk's `auth()` + `currentUser()`).
-- Mapping: anonymous when `userId` is missing; staff when `sessionClaims.org_role` matches `isStaffRole`; customer otherwise. Unrecognized org_role values fall back to customer (defensive). Missing email throws (cannot construct CustomerActor).
-- `src/shared/infra/auth/require.ts` — `AuthError` abstract base + `AuthenticationError` (401) + `AuthorizationError` (403, carries the denied `Action`). `requireActor` narrows away `AnonymousActor`; `requireCan` combines auth + can() with anon-permitted actions short-circuiting; `requireStaff` narrows to `StaffActor` with optional minimum-role constraint via `hasAtLeastRole`.
-- `tests/integration/auth/route-guards.test.ts` demonstrates the canonical guarded-route-handler pattern — anon → 401, customer/analyst on validator-gated action → 403, validator/admin → 200. Satisfies the task's "integration test rejects forbidden actions" criterion.
-- 23 new tests (resolver + require + integration) — RED-confirmed before implementation.
-- Bug caught + fixed: `AuthError` needed `abstract` keyword for its abstract `status` property.
+- Drizzle schema (`customers` + `staff_users`) with `UNIQUE(clerk_user_id)` constraint backing webhook idempotency.
+- Initial migration `drizzle/0000_identity.sql` generated.
+- `IdentityRepo` contract + in-memory implementation (used by tests and dev fallback) + Drizzle implementation typed against `PostgresJsDatabase<Schema>`.
+- `handleClerkEvent` dispatcher routes:
+  - `user.created` / `user.updated` → `upsertCustomer`
+  - `organizationMembership.created` / `.updated` → `upsertStaffUser` (rejects unrecognized roles defensively)
+  - `organizationMembership.deleted` → `deactivateStaffUser` (preserves row for audit trail per `.ralph/PROMPT.md`)
+  - Unknown event types are silent no-ops.
+- Webhook route at `src/app/api/webhooks/clerk/route.ts`:
+  - Requires svix-id / svix-timestamp / svix-signature headers.
+  - Verifies via Svix `Webhook` when `CLERK_WEBHOOK_SECRET` is set.
+  - Falls back to JSON parse only in non-production environments.
+  - Logs success + captures errors via the observability adapters from task #5.
+- `getIdentityRepo()` factory switches Drizzle ↔ in-memory by `DATABASE_URL`.
+- 14 new tests (repo + sync) including REPLAY assertions proving idempotency.
+
+## Wave 2 complete
+
+Tasks #8–#11 all done. Identity stack is wired end-to-end: middleware gates, role enum + can() matrix, resolver + require* guards, customer/staff DB sync via Clerk webhook. Wave 3 (marketing surfaces + design system primitives) begins next iteration with task #12.
 
 ## Next eligible
 
-Task #11 — Customer + StaffUser DB tables and sync (depends on #2, #10; eligible). Closes Wave 2 by giving the resolver real DB rows to look up.
+Task #12 — Theme tokens + design system primitives (depends on #1; eligible).
+
+## Human-verification still owes
+
+- Provision Clerk webhook endpoint pointing at `/api/webhooks/clerk` in the dashboard.
+- Set `CLERK_WEBHOOK_SECRET` in `.env.local`.
+- Run live user-created flow and confirm a single `customers` row appears.
 
 ## Notes
 
-- Wave 2 (auth + roles) is 3/4 done.
-- Loop will continue with task #11 next iteration.
+- Loop will continue with task #12 next iteration.

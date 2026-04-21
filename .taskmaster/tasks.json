@@ -170,13 +170,15 @@
         "epic": "E2. Auth + roles",
         "title": "Customer + StaffUser DB tables and sync",
         "description": "Drizzle schema for `customers` and `staff_users`; webhook handler for Clerk user lifecycle events.",
-        "details": "On user.created webhook → upsert customer or staff_user keyed by clerkUserId. Webhook is idempotent.",
+        "details": "Identity tables in src/shared/infra/db/schema/identity.ts with UNIQUE(clerk_user_id) constraint backing idempotency. Drizzle migration drizzle/0000_identity.sql generated and committed. IdentityRepo contract in src/contexts/identity/repo.ts; in-memory and drizzle implementations. handleClerkEvent dispatcher routes user.created/updated, organizationMembership.created/updated/deleted; unknown events are silent no-ops. Webhook route at src/app/api/webhooks/clerk/route.ts verifies Svix signature when CLERK_WEBHOOK_SECRET is set, no-ops in dev when not. getIdentityRepo() factory switches Drizzle vs in-memory by DATABASE_URL.",
         "testStrategy": "Replay a Clerk webhook event twice; one row created.",
         "priority": "high",
         "dependencies": [2, 10],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 4,
-        "source": ["ADR 003", "ADR 004"]
+        "source": ["ADR 003", "ADR 004"],
+        "completedAt": "2026-04-21T06:35:00Z",
+        "completedNotes": "Drizzle schema (customers + staff_users) with UNIQUE(clerk_user_id) backing webhook idempotency. Initial migration drizzle/0000_identity.sql generated. IdentityRepo contract + in-memory implementation (used by tests and dev fallback) + Drizzle implementation typed against PostgresJsDatabase<Schema>. handleClerkEvent dispatches user.created/updated → upsertCustomer; organizationMembership.created/updated → upsertStaffUser (rejects unrecognized roles defensively); organizationMembership.deleted → deactivateStaffUser (preserves row for audit trail per .ralph/PROMPT.md hard rules). Unknown event types are silent no-ops so unmodeled Clerk events do not 500. Webhook route at src/app/api/webhooks/clerk/route.ts: requires svix-id/timestamp/signature headers; verifies via Svix Webhook when CLERK_WEBHOOK_SECRET set; falls back to JSON parse only in non-production envs; logs success + captures errors via observability adapters from task #5. 14 new tests (repo + sync) including REPLAY tests proving idempotency. All qa gates green: 130/130 tests, lint + typecheck clean, build green with stub Clerk env. svix package installed. HUMAN-VERIFICATION: provision Clerk webhook endpoint pointing at /api/webhooks/clerk in the dashboard, set CLERK_WEBHOOK_SECRET in .env.local, run live user-created flow and confirm a single customers row appears."
       },
       {
         "id": 12,
