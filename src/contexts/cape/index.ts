@@ -34,3 +34,10 @@ export type {
   CapeCsvHeader,
 } from './csv-builder'
 export { CAPE_CSV_HEADERS, buildCapeCsv } from './csv-builder'
+
+export type {
+  BatchSuggestion,
+  GroupableEntry,
+  SuggestBatchesOptions,
+} from './grouping'
+export { DEFAULT_MAX_BATCH_SIZE, suggestBatches } from './grouping'

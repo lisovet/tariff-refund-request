@@ -2,6 +2,7 @@ import { payments, processedStripeEvents } from './schema/billing'
 import { auditLog, cases } from './schema/cases'
 import { documents, recoverySources } from './schema/documents'
 import { entries, entrySourceRecords } from './schema/entries'
+import { batchEntries, batches } from './schema/batches'
 import { customers, staffUsers } from './schema/identity'
 import { leads, screenerSessions } from './schema/screener'
 
@@ -28,6 +29,8 @@ export const schema = {
     recoverySources,
     entries,
     entrySourceRecords,
+    batches,
+    batchEntries,
   },
 } as const
 
@@ -47,6 +50,8 @@ export {
   recoverySources,
   entries,
   entrySourceRecords,
+  batches,
+  batchEntries,
 }
 export type { CustomerRow, StaffUserRow } from './schema/identity'
 export type { ScreenerSessionRow, LeadRow } from './schema/screener'
@@ -88,3 +93,10 @@ export type {
   EntrySourceRecordRow,
   NewEntrySourceRecordRow,
 } from './schema/entries'
+export type {
+  BatchRow,
+  NewBatchRow,
+  BatchEntryRow,
+  NewBatchEntryRow,
+} from './schema/batches'
+export { BATCH_STATUSES_DB } from './schema/batches'

@@ -1292,11 +1292,13 @@
         "dependencies": [
           62
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 5,
         "source": [
           "PRD 03"
-        ]
+        ],
+        "completedAt": "2026-04-21T12:57:00Z",
+        "completedNotes": "Batch entity + grouping logic per PRD 03. Schema (drizzle/0007_batches.sql): batches table (id bat_*, caseId FK\u2192cases RESTRICT NOT NULL, label, phaseFlag, status enum draft|validated|qa_pending|ready|submitted default draft, validationRunId, createdAt/updatedAt + indexes on (case,time) + status); batch_entries link table (batchId FK\u2192batches CASCADE, entryId FK\u2192entries RESTRICT, position int 1-indexed for ordered membership, addedAt + composite PK + indexes on (batch,position) and entry). drizzle/0007_batches.sql generated; migration name normalized in _journal.json. Pure suggestBatches(entries, opts) \u2192 BatchSuggestion[]: groups entries by phaseFlag (preserves input order within group); chunks each phase by maxBatchSize (DEFAULT_MAX_BATCH_SIZE=100); deterministic output sorted by phase id; isOversized=true on every chunk of a split phase (the split is the signal \u2014 not just the final chunk); labels are humanized: single chunk \u2192 \"phase_a \u2014 N entries\" (singular/plural correct), split \u2192 \"phase_a \u2014 Group N of M (NN entries)\". 15 new tests covering phase grouping, multi-phase output, input-order preservation, splitting at threshold, default threshold, sub-threshold sibling preservation, single-chunk vs multi-chunk labels, deterministic phase-id ordering, empty input, non-positive threshold rejection, BatchSuggestion shape, oversized flag semantics. 779/779 pass; lint + typecheck clean; build green (24 routes \u2014 pure module; persistence/CRUD lands when ops console adopts the suggestion in #82)."
       },
       {
         "id": 65,
