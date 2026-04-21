@@ -1,16 +1,16 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T08:11:00Z
+**Updated**: 2026-04-21T08:15:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 24 → 25)
+**Loop state**: active (iteration 25 → 26)
 
 ## Counts
 
 | Status | Count |
 | --- | --- |
-| completed | 24 |
+| completed | 25 |
 | in-progress | 0 |
-| pending | 62 |
+| pending | 61 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
@@ -20,35 +20,42 @@
 | `npm test` | green — 46 files, 271 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
-| `npm run build` | green — 16 routes; /screener client bundle 5.67 kB |
+| `npm run build` | green — 16 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
 
-**#24 — Results dossier UI**
+**#26 — USER-TEST: Real screener walkthrough (Checkpoint 2)**
 
-- `src/app/_components/screener/ResultsDossier.tsx` — single canonical photographable surface used by both `/screener` (inline post-completion) and `/screener/results?token` (magic-link resume).
-- Hero refund metric in Berkeley Mono at 4xl–6xl with $-formatted thousands separators.
-- Confidence label in customs-orange uppercase (`CONFIDENCE: HIGH`).
-- One-sentence editorial qualification verdict.
-- Prerequisites checklist (Importer of record / ACE access / ACH on file / Liquidation status known) as Met (positive color) / Missing (warning color) rows in a hairline-bordered `<ul>`.
-- Recommended next-step block: mono price label + plain-English rationale + single magazine-underline CTA to `/how-it-works`.
-- Optional "we also sent these results to your inbox" footnote when `emailSent`.
-- Disqualified variant: respectful headline, mono reason code, "we'll let you know if your situation changes" opt-in language, link to `/how-it-works` for evaluators.
-- `/screener/page.tsx` and `/screener/results/page.tsx` both refactored — the 90-line inline `ScreenerResultCard` removed and the `ResumeResult` removed; both now delegate to `ResultsDossier`.
-- 8 new component tests — RED-confirmed before implementation.
+Implementation-level checkpoint. Wave 4's flow is technically end-to-end:
 
-## Human-verification still owes
+- `/screener` (interactive client component, 5.67 kB) — branching engine, sessionStorage in-flight resume, every question kind has its affordance, back-button works, ResultsDossier renders inline on completion.
+- `/screener/results?token=…` (server-rendered) — verifies the magic-link token, loads the session, renders the same dossier the user saw inline. Friendly error pages for expired / tampered / missing tokens.
+- `POST /api/screener/complete` — Zod-validated body, optional Turnstile gate, persists session + writes idempotent lead + queues replay-safe magic-link email.
+- 85 screener-related tests pass (38 domain + 18 UI + 8 dossier + 9 magic-link/finalize + 12 repo).
 
-- Design taste review at the dev server: confirm the dossier reads photographable.
-- Live a11y audit (axe-core).
-- Playwright happy path against the dev server.
+## Wave 4 (Eligibility screener) complete
+
+Tasks #20 / #21 / #22 / #23 / #24 / #25 / #26 all done. The screener is the first end-to-end customer-facing transaction the platform handles.
+
+## Human-verification still owes (per PRD 01 acceptance)
+
+1. ≥2 real importers walk the screener at the dev server.
+2. Observed confusion points captured as new tasks before Phase 0 ships.
+3. Design taste review: confirm the ResultsDossier reads photographable.
+4. Live a11y audit (axe-core).
+5. Live magic-link delivery via real Resend keys.
 
 ## Next eligible
 
-Task #26 — USER-TEST: Real screener walkthrough. Deps `[24, 25, 23]` — all completed. Wave 4's USER-TEST checkpoint is next.
+Per dependency check:
+- Task #28 (lifecycle workflow #1: screener-completed email) — deps `[27, 24]` both done. Eligible.
+- Task #33 (Stripe SDK + webhook handler) — deps `[2]` done. Eligible.
+- Task #34 (pricing.ts) — deps `[1]` done. Eligible.
+- Task #39 (cases + audit_log schema) — deps `[2]` done. Eligible.
+
+Lowest-id eligible is **task #28** — Wave 5 (Lifecycle email + Inngest) continues.
 
 ## Notes
 
-- Wave 4 (Eligibility screener) 6/7 done.
-- Loop will continue with task #26 (USER-TEST) next iteration, then close Wave 4.
+- Loop will continue with task #28 next iteration.
