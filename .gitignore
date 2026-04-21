@@ -55,3 +55,7 @@ drizzle/meta/_journal.json.bak
 # docker / minio test data
 .minio-data/
 .postgres-data/
+
+# generated sample artifacts (kept local — regenerate via scripts)
+tmp/
+.claude/scheduled_tasks.lock

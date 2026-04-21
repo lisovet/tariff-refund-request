@@ -1,29 +1,52 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T13:47:00Z
+**Updated**: 2026-04-21T13:57:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 69 → 70)
+**Loop state**: active (iteration 70 → 71)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 70 |
+| completed | 71 |
 | in-progress | 0 |
-| pending | 16 |
+| pending | 15 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 100 files, 846 tests pass |
+| `npm test` | green — 101 files, 847 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 24 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#71 — USER-TEST: Photographable Readiness Report**
+
+Codified the "CFO-forward-unchanged" quality bar as a permanent integration test (`tests/integration/cape/photographable-report.test.ts`). A realistic 12-entry batch (Pioneer Optics Corp across four IOR prefixes, dates Jul–Oct 2024, $67K–$412K line items, one warning-severity entry) runs through `validateBatch` → `artifactGenerationHandler`; the test asserts:
+
+- PDF starts with `%PDF-` magic header, byte length in plausible one-page editorial range (2KB..120KB).
+- Case id appears in the PDF info dictionary as the UTF-16BE encoded byte sequence.
+- CSV contains every entry number verbatim + the frozen CBP-compatible header row.
+- Prep-ready email carries the signed PDF URL + `NOT_LEGAL_ADVICE_DISCLOSURE` (from the shared disclosure module via EmailLayout) + correct `batch-signed-off:` idempotency key.
+- Storage keys stay inside the case-scoped prefix (tripwire for cross-customer leaks).
+
+Also added `scripts/generate-sample-readiness-report.ts` + `npm run report:sample` that writes a real PDF to `tmp/readiness-report-sample.pdf` for human eyeball review. First run succeeds (7.7KB PDF). `tmp/` added to `.gitignore`.
+
+Scripts tsconfig updated: `jsx: react-jsx` + `.tsx` includes, so the render script transpiles JSX via tsx's esbuild runtime.
+
+847/847 pass.
+
+## Human-verification still owes (task #71 subjective side)
+
+- Founder + design reviewer: open `tmp/readiness-report-sample.pdf` (regenerate via `npm run report:sample`) and confirm it would survive being forwarded to a CFO without changes. Specifically assess: editorial typography restraint, table rhythm, sign-off attribution prominence, disclosure legibility, absence of AI-stock aesthetics.
+- Drop licensed GT Sectra + Söhne + Berkeley Mono TTFs into `public/fonts/` (PDF still renders with Times/Helvetica/Courier fallbacks — tracked as TODO(human-action) in `fonts.ts`).
+
+## Previously completed this wave
 
 **#70 — Artifact generation pipeline + R2 storage**
 
@@ -91,16 +114,15 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #71 — deps satisfied (70 done). **Eligible — lowest id.** (USER-TEST: Photographable Readiness Report.)
-- Task #72 — eligible.
+- Task #72 — deps satisfied (71 done). **Eligible — lowest id.** (Engagement letter templates + version registry.)
 - Task #74 — eligible.
 - Task #75 — eligible.
 - Task #77 — eligible.
 
-Lowest-id eligible is **task #71**.
+Lowest-id eligible is **task #72**.
 
 ## Notes
 
-- 70/86 v1 done — 81.4% of Phase 0.
+- 71/86 v1 done — 82.6% of Phase 0. Wave 11 (Readiness Report PDF) checkpointed.
 - Post-v1 backlog includes AI-copy funnel task #401.
-- Loop will continue with #71 next iteration.
+- Loop will continue with #72 next iteration.

@@ -1426,7 +1426,7 @@
         "dependencies": [
           70
         ],
-        "status": "pending",
+        "status": "done",
         "estimateHours": 1,
         "source": [
           "validation-checkpoint"

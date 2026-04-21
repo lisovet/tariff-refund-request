@@ -3,6 +3,7 @@
   "compilerOptions": {
     "module": "esnext",
     "moduleResolution": "bundler",
+    "jsx": "react-jsx",
     "paths": {
       "@/*": ["./src/*"],
       "@contexts/*": ["./src/contexts/*"],
@@ -11,5 +12,5 @@
       "server-only": ["./tests/setup/server-only-noop.ts"]
     }
   },
-  "include": ["scripts/**/*.ts", "src/**/*.ts"]
+  "include": ["scripts/**/*.ts", "scripts/**/*.tsx", "src/**/*.ts", "src/**/*.tsx"]
 }
