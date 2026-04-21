@@ -25,6 +25,8 @@ export {
   loadStripeCatalogSnapshot,
 } from './stripe-catalog-client'
 export { createStripeCheckoutClient } from './checkout-client'
+export { createInMemoryPaymentRepo } from './in-memory-payment-repo'
+export { createDrizzlePaymentRepo } from './drizzle-payment-repo'
 
 let cachedRepo: BillingRepo | undefined
 let cachedClient: Stripe | undefined

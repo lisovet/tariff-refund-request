@@ -1,4 +1,4 @@
-import { processedStripeEvents } from './schema/billing'
+import { payments, processedStripeEvents } from './schema/billing'
 import { auditLog, cases } from './schema/cases'
 import { documents, recoverySources } from './schema/documents'
 import { customers, staffUsers } from './schema/identity'
@@ -20,6 +20,7 @@ export const schema = {
     screenerSessions,
     leads,
     processedStripeEvents,
+    payments,
     cases,
     auditLog,
     documents,
@@ -36,6 +37,7 @@ export {
   screenerSessions,
   leads,
   processedStripeEvents,
+  payments,
   cases,
   auditLog,
   documents,
@@ -43,7 +45,14 @@ export {
 }
 export type { CustomerRow, StaffUserRow } from './schema/identity'
 export type { ScreenerSessionRow, LeadRow } from './schema/screener'
-export type { ProcessedStripeEventRow } from './schema/billing'
+export type {
+  ProcessedStripeEventRow,
+  PaymentRow,
+  NewPaymentRow,
+  PaymentKind,
+  PaymentStatus,
+} from './schema/billing'
+export { PAYMENT_KINDS, PAYMENT_STATUSES } from './schema/billing'
 export type {
   CaseRow,
   NewCaseRow,

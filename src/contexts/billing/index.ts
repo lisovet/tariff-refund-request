@@ -15,6 +15,27 @@ export type {
 } from './repo'
 
 export type {
+  GenerateSuccessFeeInvoiceDeps,
+  GenerateSuccessFeeInvoiceInput,
+  GenerateSuccessFeeInvoiceResult,
+  InsertPaymentInput,
+  InsertPaymentResult,
+  PaymentRecord,
+  PaymentRepo,
+  RecordPaymentDeps,
+  RecordPaymentInput,
+  RecordPaymentResult,
+  SuccessFeeInvoiceInput,
+  SuccessFeeInvoicedPayload,
+} from './payment-aggregate'
+export {
+  PAYMENT_KINDS,
+  computeSuccessFeeInvoiceCents,
+  generateSuccessFeeInvoice,
+  recordPayment,
+} from './payment-aggregate'
+
+export type {
   HandleStripeEventInput,
   HandleStripeEventDeps,
   HandleStripeEventResult,

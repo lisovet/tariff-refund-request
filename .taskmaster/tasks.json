@@ -745,11 +745,13 @@
           33,
           50
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 5,
         "source": [
           "PRD 06"
-        ]
+        ],
+        "completedAt": "2026-04-21T11:03:00Z",
+        "completedNotes": "Payment aggregate + success-fee invoicing per PRD 06. Schema: payments table with id (pay_*), caseId (FK\u2192cases RESTRICT NOT NULL), kind (charge|refund|credit|success_fee_invoice), stripeEventId (UNIQUE for idempotency, nullable for our own invoice rows), stripeChargeId, stripeInvoiceId, sku, amountUsdCents (signed bigint \u2014 positive for charges/invoices, negative for refunds/credits), currency, status (pending|succeeded|failed|refunded|voided), metadata jsonb, occurredAt + createdAt. Indexes on (case,time) + kind. drizzle/0005_payments_aggregate.sql generated; migration name normalized in _journal.json. PaymentRepo with insertPayment (race-aware), findPaymentByEventId, listPaymentsForCase; in-memory + Drizzle implementations. computeSuccessFeeInvoiceCents pure function applies three clamps: (1) per-case $50k ladder hard cap, (2) subtract alreadyInvoicedSuccessFee (idempotent on retried paid events \u2014 PRD 06 acceptance), (3) remaining refund headroom after Stripe refunds to customer (PRD 06 edge case: refund issued before invoice \u2192 invoice clamps to remaining). Never returns negative; clamps to 0. generateSuccessFeeInvoice service composes history-lookup + computation + insert + publish; returns outcome=created with the payment row or outcome=skipped with reason=no_remaining_fee. recordPayment service is idempotent on stripeEventId. Public surface via @contexts/billing exposes types, computeSuccessFeeInvoiceCents, generateSuccessFeeInvoice, recordPayment; server.ts exports in-memory + Drizzle factories. 18 new tests covering the full clamp matrix + idempotency + happy path + zero-fee skip. 576/576 pass; lint + typecheck clean; build green (21 routes \u2014 schema is server-only)."
       },
       {
         "id": 38,

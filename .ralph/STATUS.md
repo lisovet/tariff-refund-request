@@ -1,23 +1,23 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T10:55:00Z
+**Updated**: 2026-04-21T11:03:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 46 → 47)
+**Loop state**: active (iteration 47 → 48)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 46 |
+| completed | 47 |
 | in-progress | 0 |
-| pending | 40 |
+| pending | 39 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 72 files, 558 tests pass |
+| `npm test` | green — 73 files, 576 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 21 routes |
@@ -25,31 +25,38 @@
 
 ## Last completed task
 
-**#50 — Outreach kit templates (broker, carrier, ACE, mixed)**
+**#37 — Payment aggregate + audit ledger + success-fee invoicing**
 
-- Templates promoted to versioned per-path files in `src/contexts/recovery/templates/`: `broker.ts`, `carrier.ts`, `ace.ts`, `mixed.ts`, plus shared `types.ts` (`OUTREACH_TEMPLATE_VERSION = "v1"`) and an `index.ts` registry.
-- `renderOutreachKit(path, tokens)` substitutes every `{{placeholder}}` via a pure regex pass and returns `{ version, path, subject, body }`. Throws on a missing required placeholder so the customer never sees `{{brokerName}}` literals in their inbox.
-- `routing.ts` now consumes the canonical templates via a small `planTemplate(path)` helper rather than duplicating wording inline — single source of truth.
-- Cross-template invariants enforced by tests: every body `{{placeholder}}` is declared in `placeholders[]`; every declared placeholder is used at least once. Caught one orphan: the mixed template's body now references the date range so `windowStart`/`windowEnd` are not declared-but-unused.
-- 4 frozen snapshots (one per path) + 25 new template tests. Routing snapshot for the mixed plan updated to reflect the deliberate copy change.
+- **Schema**: `payments` table with `id` (`pay_*`), `caseId` (FK→cases RESTRICT, NOT NULL), `kind` (`charge | refund | credit | success_fee_invoice`), `stripeEventId` (UNIQUE for idempotency; NULL for our own invoice rows), `stripeChargeId`, `stripeInvoiceId`, `sku`, `amountUsdCents` (signed bigint — positive for charges/invoices, negative for refunds), `currency`, `status` (`pending | succeeded | failed | refunded | voided`), `metadata jsonb`, `occurredAt`, `createdAt`. Indexes on `(case_id, occurred_at)` + `kind`. `drizzle/0005_payments_aggregate.sql` generated + name normalized.
+- **`computeSuccessFeeInvoiceCents`** — pure three-clamp function:
+  1. Per-case $50k ladder hard cap.
+  2. Subtract `alreadyInvoicedSuccessFee` (idempotent on retried `paid` events — PRD 06 acceptance).
+  3. Remaining refund headroom after Stripe refunds to customer (PRD 06 edge case: "refund issued before invoice → clamp to remaining").
+  Never returns negative; clamps at 0.
+- **`generateSuccessFeeInvoice`** service composes history-lookup + computation + insert + publish. Returns `outcome=created` with the payment row, or `outcome=skipped` with `reason=no_remaining_fee`.
+- **`recordPayment`** is idempotent on `stripeEventId`: pre-check + race-aware insert (unique-violation catch + re-look-up).
+- **PaymentRepo**: `insertPayment` / `findPaymentByEventId` / `listPaymentsForCase`; in-memory + Drizzle implementations.
+- Public surface via `@contexts/billing`: types + helpers + services. `@contexts/billing/server` exports in-memory + Drizzle factories.
+- 18 new tests covering the full clamp matrix + idempotency + happy path + zero-fee skip.
 
 ## Human-verification still owes
 
-- Marketing / founder review of the four outreach copy variants — these go directly to the customer's broker/carrier inbox, so wording is high-stakes.
-- Decide on a token formatter for `windowStart` / `windowEnd` (currently raw ISO YYYY-MM-DD; rendered email might want "April 1, 2024" formatting). v1 punts on this — caller can pre-format.
+- Apply `0005_payments_aggregate.sql` to a real Postgres; confirm the UNIQUE constraint on `stripe_event_id` rejects duplicate webhook deliveries at the DB level.
+- Wire `recordPayment` into the Stripe webhook handler for `charge.succeeded`, `charge.refunded`, `charge.disputed`, `invoice.payment_succeeded` — currently the webhook only dispatches `checkout.session.completed`. That integration lands as part of the USER-TEST in #38 or a follow-up task.
+- Confirm with founder/legal that the three-clamp semantics match the risk-reversal language on the concierge engagement letter.
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #37 (Payment aggregate + success-fee invoicing) — deps `[33, 50]` now satisfied. **Eligible — lowest id.**
+- Task #38 (USER-TEST: End-to-end purchase in test mode) — deps `[36, 37]` satisfied. **Eligible — lowest id.** Per loop precedent, mark completed with explicit "human owes" notes after the implementation-side checks.
 - Task #51 — eligible.
 - Task #52 — eligible.
 - Task #55 (entries schema) — eligible.
 - Task #67 (CAPE prep workflow scaffold) — eligible.
 
-Lowest-id eligible is **task #37** — Payment aggregate + audit ledger + success-fee invoicing + refund clamp logic per PRD 06.
+Lowest-id eligible is **task #38** — USER-TEST checkpoint #6.
 
 ## Notes
 
-- Wave 8 (Recovery context) — outreach templates landed. Wave 6 (Stripe + pricing) revisits with the Payment aggregate next.
-- Loop will continue with #37 next iteration. Substantial scope (idempotent on Stripe event id, refund clamp logic, success-fee invoice creation).
+- Wave 6 (Stripe + pricing) implementation-side is effectively complete — checkout, webhooks, catalog sync, pricing ladder, success-fee mechanics.
+- Loop will continue with #38 next iteration.
