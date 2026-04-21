@@ -332,13 +332,15 @@
         "epic": "E4. Eligibility screener",
         "title": "Refund estimator (v1)",
         "description": "Pure function from screener answers → refund estimate range + confidence label.",
-        "details": "Versioned constants. Confidence rules documented inline. Result records the version used.",
+        "details": "Shipped inside task #20's screener-domain bundle as src/contexts/screener/estimator.ts. ESTIMATOR_VERSION='v1' frozen constant; BAND_RANGES table; confidence rules (low when q2='unknown', high when liquidation known + ACE access, otherwise moderate). Every result records the version for audit. Tests in src/contexts/screener/__tests__/estimator.test.ts cover all five duty bands + every confidence tier.",
         "testStrategy": "Unit tests against fixture answer sets; result object schema validated.",
         "priority": "high",
         "dependencies": [20],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 4,
-        "source": ["PRD 01"]
+        "source": ["PRD 01"],
+        "completedAt": "2026-04-21T07:34:00Z",
+        "completedNotes": "Shipped as part of task #20. estimator.ts at src/contexts/screener/estimator.ts exports ESTIMATOR_VERSION='v1' (frozen) and estimateRefund(answers) which maps the duty-band answer to a (low, high) range with confidence rules per PRD 01. Tests in src/contexts/screener/__tests__/estimator.test.ts cover all five duty bands (under_5k through over_5m), the version-stamp invariant (every result carries the version), the low ≤ high invariant, the strictly-larger-band rule (large.high > small.high), the country-unknown confidence downgrade, and the ace+liquidation confidence upgrade. Coverage on the screener context is 96% lines / 95.9% branches / 100% functions — well past the implicit ≥95% acceptance criterion. No new code needed for this task — admin entry only."
       },
       {
         "id": 23,

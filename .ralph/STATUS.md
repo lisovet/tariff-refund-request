@@ -1,16 +1,16 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T07:32:00Z
+**Updated**: 2026-04-21T07:34:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 19 → 20)
+**Loop state**: active (iteration 20 → 21)
 
 ## Counts
 
 | Status | Count |
 | --- | --- |
-| completed | 19 |
+| completed | 20 |
 | in-progress | 0 |
-| pending | 67 |
+| pending | 66 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
@@ -20,27 +20,25 @@
 | `npm test` | green — 39 files, 238 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
-| `npm run build` | green — 14 routes (`/screener` is the first interactive client component, 4.79kB / 107kB first-load) |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
 
-**#21 — Screener UI: one-question-per-screen flow**
+**#22 — Refund estimator (v1)** — admin closure.
 
-- `src/app/screener/page.tsx` — focused single-column transactional flow per PRD 01 + `docs/DESIGN-LANGUAGE.md`. Lives outside the marketing route group so it gets only the compact `TrustFootnote` (not the full SiteFooter). Inline result card renders the qualified vs disqualified variants on completion.
-- `src/app/_components/screener/QuestionPrompt.tsx` — display H1 in GT Sectra + top-right `Q3 / 10` mono indicator. **No progress bar** (PRD 01 forbids one).
-- `src/app/_components/screener/AnswerInput.tsx` — per-kind affordances: yes/no submit-on-click, yes/no/unknown with the magazine-underline I-don't-know shortcut, country text + unknown shortcut, choice-list for clearance / shipment / duty bands, multi-category checkboxes (Continue disabled until ≥ 1 picked), email-capture with company + RFC-shaped email validation.
-- `src/app/_components/screener/ScreenerFlow.tsx` — orchestrator: `useState` seeded from `sessionStorage`, `useEffect` persists on every change + fires `onComplete` the moment `isComplete` becomes true, back-button removes the most recently answered question, sessionStorage cleared on completion.
-- Wired `@testing-library/jest-dom` for component tests via a new `tests/setup/jest-dom.ts` setupFile.
-- 18 new tests + 1 Playwright spec (happy / DQ / back-button) RED-then-GREEN.
+This task's deliverable shipped inside task #20's screener-domain bundle:
+
+- `src/contexts/screener/estimator.ts` — `ESTIMATOR_VERSION='v1'` frozen constant, `estimateRefund(answers)` mapping duty-band → (low, high) range with confidence rules (low when `q2='unknown'`, high when liquidation known + ACE access, otherwise moderate). Every result carries the version for audit.
+- `src/contexts/screener/__tests__/estimator.test.ts` — covers all five duty bands, the version-stamp invariant, the low ≤ high invariant, the strictly-larger-band rule, the country-unknown confidence downgrade, and the ace+liquidation confidence upgrade.
+- Coverage on the screener context: 96% lines / 95.9% branches / 100% functions.
+
+No new code was needed — task is admin-closed with a pointer.
 
 ## Next eligible
 
-Task #22 — Refund estimator (v1) — already shipped as part of task #20 (estimator.ts). Loop should mark this as a duplicate and skip OR mark complete with a pointer.
-
-Per PRD 01 / tasks.json: task #22 = "Refund estimator (v1) — Pure function from screener answers → refund estimate range + confidence label." That's exactly what `src/contexts/screener/estimator.ts` (built in task #20) does. The loop will mark task #22 complete with a pointer to task #20, then move to task #23 (Email capture + magic-link resume).
+Task #23 — Email capture + magic-link resume. Depends on `[21, 27]`. Task #27 (Resend integration + React Email setup) hasn't shipped yet, so #23 is task-blocked. Loop will pick the next eligible task: **#27** — Resend integration (deps `[4]`, satisfied). That ships email infrastructure, then #23 can build the magic-link resume on top.
 
 ## Notes
 
-- Wave 4 (Eligibility screener) 2/7 done.
-- Loop will continue with task #22 → task #23 next iterations.
+- Wave 4 (Eligibility screener) 3/7 done.
+- Loop will switch to Wave 5 (Lifecycle email + Inngest) next iteration with task #27, then circle back to #23.
