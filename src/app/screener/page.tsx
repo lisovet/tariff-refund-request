@@ -48,6 +48,7 @@ export default function ScreenerPage() {
   // Start as null on both server + client first render so hydration
   // matches; rehydrate from sessionStorage in an effect afterwards.
   const [result, setResult] = useState<ScreenerResult | null>(null)
+  const [sessionId, setSessionId] = useState<string | null>(null)
   const [emailSent, setEmailSent] = useState(false)
 
   useEffect(() => {
@@ -64,12 +65,21 @@ export default function ScreenerPage() {
               onComplete={(r, answers) => {
                 setResult(r)
                 saveResult(r)
-                void postCompletion(answers).then(() => setEmailSent(true))
+                void postCompletion(answers).then((res) => {
+                  if (res?.sessionId) setSessionId(res.sessionId)
+                  setEmailSent(true)
+                })
               }}
             />
           )}
 
-          {result && <ResultsDossier result={result} emailSent={emailSent} />}
+          {result && (
+            <ResultsDossier
+              result={result}
+              emailSent={emailSent}
+              sessionId={sessionId}
+            />
+          )}
         </div>
       </main>
 
@@ -78,16 +88,21 @@ export default function ScreenerPage() {
   )
 }
 
-async function postCompletion(answers: ScreenerAnswers): Promise<void> {
+async function postCompletion(
+  answers: ScreenerAnswers,
+): Promise<{ sessionId?: string } | null> {
   try {
-    await fetch('/api/screener/complete', {
+    const res = await fetch('/api/screener/complete', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ answers }),
     })
+    if (!res.ok) return null
+    return (await res.json()) as { sessionId?: string }
   } catch {
     // Best-effort. The server route logs delivery via the
     // observability adapters; a missing email is recoverable by
     // re-running the screener.
+    return null
   }
 }
