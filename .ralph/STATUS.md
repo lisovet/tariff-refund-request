@@ -1,29 +1,44 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T13:57:00Z
+**Updated**: 2026-04-21T14:04:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 70 → 71)
+**Loop state**: active (iteration 71 → 72)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 71 |
+| completed | 72 |
 | in-progress | 0 |
-| pending | 15 |
+| pending | 14 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 101 files, 847 tests pass |
+| `npm test` | green — 102 files, 870 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 24 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#72 — Engagement letter templates + version registry**
+
+New `src/contexts/billing/agreements/` package:
+
+- **`concierge-v1.body.ts`** — full Concierge engagement letter (11 sections): scope, what-we-do-not-do, trust posture, deliverables, success-fee mechanic, non-negotiable human review, confidentiality + data handling, AAA arbitration dispute clause, governing law, termination, entire agreement. Embeds `CANONICAL_TRUST_PROMISE` + `NOT_LEGAL_ADVICE_DISCLOSURE` verbatim via the shared disclosure module (single source of truth). Twin `concierge-v1.md` for legal review + out-of-band diffs.
+- **`recovery-prep-v1.body.ts`** — lightweight clickwrap for Recovery Kit + CAPE Prep (6 sections) with the 14-day refund window. Twin markdown for legal.
+- **`registry.ts`** — `AGREEMENTS` map keyed by `AgreementId`, `resolveAgreement(sku)` lookup, `renderAgreement(id, vars)` with `{{PLACEHOLDER}}` interpolation that throws on missing variables (no dangling templates shipped), `REQUIRED_CLAUSES` tripwire list (`not_legal_advice`, `not_a_customs_broker`, `canonical_trust_promise` — Concierge only, `version_stamp`).
+- Public surface: `AGREEMENTS` / `REQUIRED_CLAUSES` / `renderAgreement` / `resolveAgreement` exported from `@contexts/billing`.
+
+23 tests cover: registry shape (every SKU has coverage), resolution (concierge vs recovery-kit vs cape-prep), required-clause enforcement (every agreement passes its applicable clauses, with `applies()` gate so Concierge gets the full promise and lightweight clickwrap is correctly exempted), rendering (interpolates all six variables, throws on missing vars + unknown ids, verbatim carries the canonical trust promise + NOT_LEGAL_ADVICE_DISCLOSURE), Concierge scope assertions (success fee + dispute resolution + governing law interpolation).
+
+870/870 pass.
+
+## Previously completed this wave
 
 **#71 — USER-TEST: Photographable Readiness Report**
 
@@ -114,15 +129,15 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #72 — deps satisfied (71 done). **Eligible — lowest id.** (Engagement letter templates + version registry.)
+- Task #73 — deps satisfied (72 done). **Eligible — lowest id.** (E-sign flow integration.)
 - Task #74 — eligible.
 - Task #75 — eligible.
 - Task #77 — eligible.
 
-Lowest-id eligible is **task #72**.
+Lowest-id eligible is **task #73**.
 
 ## Notes
 
-- 71/86 v1 done — 82.6% of Phase 0. Wave 11 (Readiness Report PDF) checkpointed.
+- 72/86 v1 done — 83.7% of Phase 0.
 - Post-v1 backlog includes AI-copy funnel task #401.
-- Loop will continue with #72 next iteration.
+- Loop will continue with #73 next iteration.

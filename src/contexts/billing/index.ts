@@ -97,3 +97,17 @@ export type {
   CreateCheckoutResult,
 } from './checkout'
 export { createCheckoutForSku } from './checkout'
+
+export type {
+  Agreement,
+  AgreementId,
+  AgreementSku,
+  AgreementVariables,
+  RequiredClause,
+} from './agreements/registry'
+export {
+  AGREEMENTS,
+  REQUIRED_CLAUSES,
+  renderAgreement,
+  resolveAgreement,
+} from './agreements/registry'
