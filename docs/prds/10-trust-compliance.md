@@ -80,7 +80,7 @@ All disclosures are real text — never images, never collapsed behind a "Read m
 
 Public list at `/trust/sub-processors`:
 
-- Vercel (hosting), Neon (Postgres), Cloudflare R2 (storage), Clerk (auth), Stripe (payments), Resend (email), Inngest (workflows), Sentry (error tracking), Axiom (logs), AWS Textract / Google Document AI (Phase 2 OCR), Anthropic (Phase 2 LLM).
+- Railway (hosting + Postgres), Cloudflare R2 (storage), Clerk (auth), Stripe (payments), Resend (email), Inngest (workflows), Sentry (error tracking), Axiom (logs), AWS Textract / Google Document AI (Phase 2 OCR), Anthropic (Phase 2 LLM).
 
 Updated within 14 days of any change.
 
@@ -131,7 +131,7 @@ This list lives at `/trust` and is restated in the engagement letter.
 - Customer claims our prep work was wrong → defined dispute process with admin escalation; audit log surfaces every action.
 - Subpoena / legal request for customer data → handled per published policy at `/trust/legal-requests`; customer notified unless prohibited.
 - Sub-processor breach notification — we notify affected customers within 72 hours of confirmed exposure.
-- Staff offboarding — Clerk org membership revoked + Stripe access revoked + Vercel team removed; runbook lives in `ops/runbooks/staff-offboarding.md`.
+- Staff offboarding — Clerk org membership revoked + Stripe access revoked + Railway team removed; runbook lives in `ops/runbooks/staff-offboarding.md`.
 - Insider threat — least-privilege roles; sensitive admin actions require two-person sign-off (Phase 1).
 - Document classification — no document is treated as "less sensitive"; everything is encrypted, audited, and retention-policy-bound.
 - Cross-border data transfers — EU customer data may be processed in U.S. via standard contractual clauses; documented in DPA.

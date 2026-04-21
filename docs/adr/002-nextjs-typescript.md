@@ -26,7 +26,7 @@ TypeScript strict mode (`strict: true`, `noUncheckedIndexedAccess: true`). No `a
 - ✅ RSC keeps the ops console's heavy tables off the client bundle.
 - ✅ Marketing pages can be statically generated at build time.
 - ⚠️ Route groups are a soft boundary — middleware enforces auth and role gating per group.
-- ⚠️ Vendor lock-in to Vercel for some features (ISR, edge functions). Acceptable trade-off pre-PMF.
+- ⚠️ Deployed to Railway as a Node-runtime Next.js server (no edge runtime in v1). ISR + streaming still work; avoid calling Vercel-specific APIs (`@vercel/og`, geo headers) without a portable fallback.
 
 ## Test-impact
 

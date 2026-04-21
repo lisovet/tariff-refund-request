@@ -53,8 +53,7 @@ describe('SUB_PROCESSORS — shape + invariants', () => {
     const vendors = SUB_PROCESSORS.map((s) => s.vendor)
     expect(vendors).toEqual(
       expect.arrayContaining([
-        'Vercel',
-        'Neon',
+        'Railway',
         'Cloudflare R2',
         'Clerk',
         'Stripe',
@@ -88,10 +87,10 @@ describe('getActiveV1SubProcessors', () => {
     }
   })
 
-  it('includes the v1 baseline (Vercel, Clerk, Stripe, ...)', () => {
+  it('includes the v1 baseline (Railway, Clerk, Stripe, ...)', () => {
     const active = getActiveV1SubProcessors().map((s) => s.vendor)
     expect(active).toEqual(
-      expect.arrayContaining(['Vercel', 'Clerk', 'Stripe']),
+      expect.arrayContaining(['Railway', 'Clerk', 'Stripe']),
     )
   })
 })

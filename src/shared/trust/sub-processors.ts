@@ -40,22 +40,18 @@ export interface SubProcessor {
 /**
  * Bump this integer whenever the list content changes. Phase-1
  * lifecycle workflow keys notification idempotency on this value.
+ *
+ * v2 (2026-04-21): Neon → Railway for the Postgres sub-processor.
  */
-export const SUB_PROCESSORS_LIST_VERSION = 1
+export const SUB_PROCESSORS_LIST_VERSION = 2
 
 export const SUB_PROCESSORS: readonly SubProcessor[] = [
   // Infrastructure
   {
-    vendor: 'Vercel',
-    purpose: 'Application hosting + edge runtime.',
-    region: 'Global edge',
-    phase: 'v1',
-    category: 'infrastructure',
-  },
-  {
-    vendor: 'Neon',
-    purpose: 'Postgres database (case + entry + audit data).',
-    region: 'US-East (primary)',
+    vendor: 'Railway',
+    purpose:
+      'Application hosting + Postgres database (case + entry + audit data). Runs the Next.js server plus the managed Postgres in a single project.',
+    region: 'US-West (primary)',
     phase: 'v1',
     category: 'infrastructure',
   },

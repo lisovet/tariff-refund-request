@@ -62,6 +62,6 @@ describe('/trust/security', () => {
     // The page renders a summary count — exact number comes from the
     // shared list so drift would fail the sub-processors unit tests
     // + this render.
-    expect(screen.getByText(/9 active sub-processors/i)).toBeTruthy()
+    expect(screen.getByText(/8 active sub-processors/i)).toBeTruthy()
   })
 })

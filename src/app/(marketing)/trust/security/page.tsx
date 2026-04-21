@@ -91,7 +91,7 @@ export default function SecurityPage() {
             Storage &amp; encryption
           </h2>
           <p className="mt-4 text-ink/85">
-            Case data + audit log + entry records live in a dedicated Neon
+            Case data + audit log + entry records live in a dedicated Railway
             Postgres cluster, encrypted <em>at rest</em>. Uploaded documents
             (7501s, carrier invoices, ACE print-outs) land in Cloudflare R2
             under case-scoped keys (

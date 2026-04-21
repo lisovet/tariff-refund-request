@@ -99,7 +99,7 @@ CaseAttribution = { caseId, partnerOrgId, capturedAt }
 - Revenue-share dispute → admin override with reason + audit log.
 - Tax / 1099 reporting for partner payouts — handled via Stripe Connect or manual at v1.
 - White-label CSS conflicts — partner-supplied themes constrained to a token allowlist.
-- Custom domain for white-label — handled via Vercel domain assignment; SSL automated.
+- Custom domain for white-label — handled via Railway custom-domain assignment; SSL automated.
 - Partner mass-uploads cases (bulk lead import) — supported via CSV import endpoint in Phase 3.
 - Partner data export — full export of their attributed cases on request.
 - Anti-abuse: partner fakes referrals — rate limits + manual review for suspicious patterns.

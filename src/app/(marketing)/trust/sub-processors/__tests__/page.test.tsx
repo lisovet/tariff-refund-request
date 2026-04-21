@@ -14,8 +14,7 @@ describe('/trust/sub-processors', () => {
     render(<SubProcessorsPage />)
     // From PRD 10 §"Vendor / sub-processor list":
     const required = [
-      'Vercel',
-      'Neon',
+      'Railway',
       'Cloudflare R2',
       'Clerk',
       'Stripe',
