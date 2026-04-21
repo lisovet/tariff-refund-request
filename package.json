@@ -1,0 +1,27 @@
+{
+  "name": "tariff-refund-request",
+  "version": "0.0.0",
+  "private": true,
+  "description": "IEEPA Refund Audit, Entry Recovery & CAPE Filing-Prep Platform",
+  "scripts": {
+    "dev": "next dev --turbo",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:integration": "vitest run --dir tests/integration",
+    "test:e2e": "playwright test",
+    "test:coverage": "vitest run --coverage",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "stripe:sync": "tsx scripts/stripe-sync.ts",
+    "qa": "npm run lint && npm run typecheck && npm run test"
+  },
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "packageManager": "npm@10.0.0"
+}
