@@ -776,12 +776,14 @@
         "dependencies": [
           2
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 3,
         "source": [
           "PRD 04",
           "PRD 10"
-        ]
+        ],
+        "completedAt": "2026-04-21T09:35:00Z",
+        "completedNotes": "Drizzle schema for cases + audit_log per PRD 04. cases columns: id (cas_*), customerId (FK\u2192customers set null), screenerSessionId (FK\u2192screener_sessions set null), state (enum of all 18 PRD-04 states, default new_lead), tier (smb|mid_market), ownerStaffId (FK\u2192staff_users set null), createdAt/updatedAt. Indexes on state, owner, customer. audit_log columns: id (aud_*), caseId (FK\u2192cases RESTRICT, NOT NULL), actorId, kind (NOT NULL), fromState/toState (nullable enum), payload jsonb DEFAULT empty object, occurredAt. Indexes on (case, time) + kind. drizzle/0003_cases_audit_log.sql generated, then hand-augmented with RLS DDL: ENABLE + FORCE row level security; CREATE POLICY for SELECT (true) and INSERT (true); UPDATE and DELETE both pinned to USING (false) so the database itself rejects any modification or removal. Migration name normalized in _journal.json. 8 new tests including SQL-grep checks that the RLS policy with FOR DELETE USING (false) is present. CASE_STATES + CaseRow/AuditLogRow types re-exported from the schema barrel for downstream contexts. 368/368 pass; lint + typecheck clean; build green (17 routes \u2014 new schema is server-only, no client-bundle impact)."
       },
       {
         "id": 40,
