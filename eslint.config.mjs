@@ -28,9 +28,14 @@ const config = [
         {
           patterns: [
             {
-              group: ['@contexts/*/!(index)', '@contexts/*/**'],
+              // Allow the sanctioned public surfaces:
+              //   @contexts/<name>          — UI-safe public surface
+              //   @contexts/<name>/server   — server-only public surface
+              // Forbid everything else (e.g., @contexts/<name>/repo,
+              // @contexts/<name>/internals/...) — see ADR 001.
+              group: ['@contexts/*/*', '!@contexts/*/server'],
               message:
-                'Cross-context imports must go through the public surface (@contexts/<name>). Deep imports are forbidden — see ADR 001.',
+                'Cross-context imports must go through the public surface (@contexts/<name> or @contexts/<name>/server). Other deep imports are forbidden — see ADR 001.',
             },
           ],
         },

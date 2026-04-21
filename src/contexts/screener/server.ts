@@ -16,6 +16,20 @@ import type { ScreenerRepo } from './repo'
 
 export { createInMemoryScreenerRepo } from './in-memory-repo'
 export { createDrizzleScreenerRepo } from './drizzle-repo'
+export {
+  signToken,
+  verifyToken,
+  type MagicLinkPayload,
+  type SignOptions,
+  type VerifyOptions,
+  type VerifyResult,
+} from './magic-link'
+export {
+  finalizeScreener,
+  type FinalizeInput,
+  type FinalizeOutput,
+  type FinalizeDeps,
+} from './finalize'
 
 let cachedRepo: ScreenerRepo | undefined
 

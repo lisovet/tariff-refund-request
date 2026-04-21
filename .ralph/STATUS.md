@@ -1,52 +1,56 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T07:53:00Z
+**Updated**: 2026-04-21T08:05:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 22 → 23)
+**Loop state**: active (iteration 23 → 24)
 
 ## Counts
 
 | Status | Count |
 | --- | --- |
-| completed | 22 |
+| completed | 23 |
 | in-progress | 0 |
-| pending | 64 |
+| pending | 63 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 43 files, 254 tests pass |
+| `npm test` | green — 45 files, 263 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
-| `npm run build` | green — 14 routes, /screener still 4.79kB (no server-only code in client bundle) |
-| `npm run db:generate` | green — 4 tables tracked, drizzle/0001_screener.sql committed |
+| `npm run build` | green — 16 routes (`/api/screener/complete` + `/screener/results` added) |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
 
-**#25 — Screener persistence + lead row**
+**#23 — Email capture + magic-link resume**
 
-- `src/shared/infra/db/schema/screener.ts` adds:
-  - `screener_sessions` (id `sess_*`, `answers` jsonb, `result` jsonb, `resultVersion` text for audit, lifecycle timestamps).
-  - `leads` (id `lead_*`, FK to `screener_sessions` `ON DELETE SET NULL`, `UNIQUE(email, screener_session_id)` backing idempotency).
-- `drizzle/0001_screener.sql` generated cleanly (4 tables registered total).
-- `ScreenerRepo` contract + in-memory + Drizzle implementations.
-- Public surface **split**: `index.ts` is UI-safe (types + pure helpers); `server.ts` (with `import 'server-only'`) exposes `getScreenerRepo()` and pulls in `node:crypto` + `postgres-js`. Build verified the split: `/screener` is still 4.79 kB (server-only modules don't leak into the client bundle).
-- 12 new tests — RED-confirmed before implementation.
-- Bug caught + fixed during gates: in-memory `findLeadByEmail` used strict `>` on equal-millisecond timestamps; switched to `>=` so the later insertion wins (matches Drizzle `ORDER BY updated_at DESC`).
-- Retention (30-day incomplete sessions / 12-month leads) is documented in the schema header; the purge worker lands in Phase-1 ops scaling.
+- `src/contexts/screener/magic-link.ts` — HMAC-SHA256 token signing/verification (base64url payload.sig). `signToken` enforces ≥32-char secret + 7-day TTL per PRD 01. `verifyToken` does constant-time signature compare via `timingSafeEqual` + structured failure reasons (`malformed` / `bad_signature` / `expired`).
+- `src/contexts/screener/finalize.ts` — pure server function takes (answers, sessionId?) + deps. Persists session (creates or upserts), computes result, completes session, writes idempotent lead (skipped on DQ paths since no email captured), signs token, renders `ScreenerResultsEmail`, queues delivery with `idempotencyKey` for replay safety.
+- `POST /api/screener/complete` — Zod-validated body, optional Turnstile gate via `TURNSTILE_SECRET`, `MAGIC_LINK_SECRET` length check, structured 400/403/500 responses, observability hooks.
+- `/screener/results?token=…` — server-rendered resume page. Verifies token, loads session by id, renders qualified vs disqualified variant. Expired/tampered tokens land on a friendly resume-error page that points back to `/screener`.
+- `ScreenerFlow.onComplete` signature changed from `(result)` to `(result, answers)` so the parent can POST. Inline result still renders instantly client-side; the server round-trip is best-effort.
+- ESLint rule updated to allow `@contexts/<name>/server` as a sanctioned public surface (ADR 001 amendment).
+- 9 new tests (magic-link + finalize) — RED-confirmed before implementation.
 
-## Backlog correction
+## Bugs caught + fixed during this iteration
 
-Task #23 (magic-link resume) had implicit dependency on the tables this task ships. Updated `.taskmaster/tasks.json` to declare `#23.dependencies = [21, 25, 27]` (was `[21, 27]`).
+- `import 'server-only'` in implementation modules (`magic-link.ts`, `finalize.ts`) broke vitest because vitest treats those as client modules. Moved the directive only to `server.ts` (the actual server-only public-surface entry); implementation modules are pure functions that happen to use Node-only deps.
+- ESLint `no-restricted-imports` pattern needed to allow `@contexts/*/server` while still forbidding other deep imports.
+
+## Human-verification still owes
+
+- Set `MAGIC_LINK_SECRET` (≥32 chars) in `.env.local`.
+- Provision Cloudflare Turnstile, set `TURNSTILE_SECRET` + `NEXT_PUBLIC_TURNSTILE_SITE_KEY`.
+- Walk the live flow: complete `/screener`, receive the magic-link email, click, see results.
 
 ## Next eligible
 
-Task #23 — Email capture + magic-link resume. Now eligible (deps `[21, 25, 27]` all done).
+Task #24 — Results dossier UI. Depends on `[22, 21]` — both completed. The dossier replaces the inline result card; the new `/screener/results/page.tsx` from this iteration is a partial — task #24 makes it photographable.
 
 ## Notes
 
-- Wave 4 (Eligibility screener) 4/7 done.
-- Loop will continue with task #23 next iteration.
+- Wave 4 (Eligibility screener) 5/7 done.
+- Loop will continue with task #24 next iteration.

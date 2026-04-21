@@ -24,7 +24,7 @@ import { QuestionPrompt } from './QuestionPrompt'
 const STORAGE_KEY = 'tariff-refund:screener:v1'
 
 interface Props {
-  readonly onComplete: (result: ScreenerResult) => void
+  readonly onComplete: (result: ScreenerResult, answers: ScreenerAnswers) => void
 }
 
 export function ScreenerFlow({ onComplete }: Props) {
@@ -37,7 +37,7 @@ export function ScreenerFlow({ onComplete }: Props) {
 
   // Fire onComplete the moment the flow terminates.
   useEffect(() => {
-    if (isComplete(answers)) onComplete(computeResult(answers))
+    if (isComplete(answers)) onComplete(computeResult(answers), answers)
   }, [answers, onComplete])
 
   const current = useMemo(() => nextQuestion(answers), [answers])

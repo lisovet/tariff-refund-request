@@ -26,11 +26,13 @@ describe('<ScreenerFlow>', () => {
     const onComplete = vi.fn()
     render(<ScreenerFlow onComplete={onComplete} />)
     fireEvent.click(screen.getByRole('button', { name: 'No' }))
-    // No more questions; the result card should announce disqualification.
     expect(onComplete).toHaveBeenCalled()
-    const result = onComplete.mock.calls[0]?.[0]
+    const [result, answers] = onComplete.mock.calls[0] ?? []
     expect(result?.qualification).toBe('disqualified')
     expect(result?.disqualificationReason).toBe('no_imports_in_window')
+    // The 2-arg signature carries the answers so the parent can POST
+    // them to /api/screener/complete.
+    expect(answers?.q1).toBe('no')
   })
 
   it('persists answers to sessionStorage so a refresh resumes the flow', () => {

@@ -347,13 +347,15 @@
         "epic": "E4. Eligibility screener",
         "title": "Email capture + magic-link resume",
         "description": "Final step captures email; sends magic link via Resend that resumes the session.",
-        "details": "Cloudflare Turnstile gate on email submission. Lead row created in DB. (Dependency on #25 added during loop — the magic-link flow needs the screener_sessions + leads tables to write into.)",
+        "details": "magic-link.ts: HMAC-SHA256 token signing/verification with TTL + constant-time signature check. finalize.ts: pure server function that persists session + writes idempotent lead + queues magic-link email; disqualified paths skip the lead+email. POST /api/screener/complete handler (Zod-validated body, optional Turnstile gate via TURNSTILE_SECRET, MAGIC_LINK_SECRET length-checked, observability hooks). /screener/results?token=… server-rendered resume page (loads session by id, renders qualified vs disqualified result; expired/tampered tokens land on a friendly error). ScreenerFlow callback signature changed to pass answers along with result so the parent can POST. Inline result still renders instantly client-side; server persistence + email send happen in the background.",
         "testStrategy": "Integration: complete screener, receive magic link in dev mailbox, click, see results.",
         "priority": "high",
         "dependencies": [21, 25, 27],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 4,
-        "source": ["PRD 01"]
+        "source": ["PRD 01"],
+        "completedAt": "2026-04-21T08:05:00Z",
+        "completedNotes": "magic-link.ts: HMAC-SHA256 token (base64url payload + sig). signToken enforces ≥32-char secret + 7-day TTL ceiling per PRD 01. verifyToken does constant-time signature compare via timingSafeEqual + structured failure reasons (malformed/bad_signature/expired). 5 round-trip tests (good, wrong secret, tampered payload, expired, malformed). finalize.ts: pure server function takes (answers, sessionId?) + deps {repo, email, secret, fromAddress, resultsBaseUrl}. Persists session (creates or upserts via sessionId), computes result, completes session, writes idempotent lead (skipped on DQ paths since no email captured), signs token, renders ScreenerResultsEmail, queues delivery via the email transport with idempotencyKey for replay safety. 4 finalize tests including the REPLAY assertion. POST /api/screener/complete (Zod-validated body, optional Turnstile via TURNSTILE_SECRET if configured, MAGIC_LINK_SECRET length check, structured 400/403/500 responses, observability hooks logging success + capturing exceptions). /screener/results?token=… server-rendered (params verified, session loaded by id, renders qualified vs disqualified variant; expired/tampered tokens land on a friendly resume-error page that points back to /screener). ScreenerFlow callback signature changed from (result) to (result, answers) so the parent can POST. Inline result continues to render instantly client-side; the server round-trip is best-effort and runs in the background. ESLint rule updated to allow @contexts/<name>/server as a sanctioned public surface (ADR 001 amendment). Bug caught + fixed during gates: `import 'server-only'` in implementation modules broke vitest — moved the directive only to server.ts, kept implementation modules importable. zod installed for body validation. 9 new tests RED-then-GREEN; 263/263 pass; lint + typecheck clean; build green (16 routes; /screener client bundle still 4.94kB — server modules don't leak)."
       },
       {
         "id": 24,

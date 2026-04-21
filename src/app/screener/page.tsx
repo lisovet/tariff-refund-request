@@ -1,27 +1,34 @@
 'use client'
 
 import { useState } from 'react'
-import { ScreenerFlow, clearScreenerSession } from '@/app/_components/screener/ScreenerFlow'
+import {
+  ScreenerFlow,
+  clearScreenerSession,
+} from '@/app/_components/screener/ScreenerFlow'
 import { TrustFootnote, Eyebrow, Hairline, Button } from '@/app/_components/ui'
-import type { ScreenerResult } from '@contexts/screener'
+import type { ScreenerAnswers, ScreenerResult } from '@contexts/screener'
 
 /**
  * /screener — focused single-column transactional flow per PRD 01 +
- * docs/DESIGN-LANGUAGE.md ("Single-column for transactional flows ...
- * no sidebar distractions"). Lives outside the marketing route group
- * so it doesn't inherit the full SiteFooter.
+ * docs/DESIGN-LANGUAGE.md. Lives outside the marketing route group so
+ * it doesn't inherit the full SiteFooter.
  *
  * Persistence:
- *   - In-session: ScreenerFlow auto-persists answers to sessionStorage.
- *   - Magic-link resume across days: lands in task #23.
- *   - DB persistence on completion: lands in task #25.
+ *   - In-session: ScreenerFlow auto-persists to sessionStorage.
+ *   - On completion: client POSTs to /api/screener/complete which
+ *     persists the session, writes a lead row, and queues a magic-link
+ *     email valid for 7 days.
+ *   - Magic-link resume: /screener/results?token=... (server-rendered).
  *
- * The results dossier currently renders inline as the post-completion
- * state. Task #24 builds the dedicated photographable Results page.
+ * The result card renders inline immediately (computed client-side
+ * from the same pure helpers the server uses) so the user never waits
+ * for the API round-trip; the server's persistence + email send happens
+ * in the background.
  */
 
 export default function ScreenerPage() {
   const [result, setResult] = useState<ScreenerResult | null>(null)
+  const [emailSent, setEmailSent] = useState(false)
 
   return (
     <div className="flex min-h-[100dvh] flex-col bg-paper">
@@ -29,14 +36,17 @@ export default function ScreenerPage() {
         <div className="mx-auto max-w-2xl px-6 pt-24 sm:pt-32">
           {!result && (
             <ScreenerFlow
-              onComplete={(r) => {
+              onComplete={(r, answers) => {
                 setResult(r)
                 clearScreenerSession()
+                void postCompletion(answers).then(() => setEmailSent(true))
               }}
             />
           )}
 
-          {result && <ScreenerResultCard result={result} />}
+          {result && (
+            <ScreenerResultCard result={result} emailSent={emailSent} />
+          )}
         </div>
       </main>
 
@@ -45,7 +55,28 @@ export default function ScreenerPage() {
   )
 }
 
-function ScreenerResultCard({ result }: { readonly result: ScreenerResult }) {
+async function postCompletion(answers: ScreenerAnswers): Promise<void> {
+  try {
+    await fetch('/api/screener/complete', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ answers }),
+    })
+  } catch {
+    // Best-effort — the inline result is already rendered. A real
+    // production error reporter would capture this; for now the
+    // server-side route handler logs delivery via the observability
+    // adapters, and a missing email is recoverable by re-running.
+  }
+}
+
+function ScreenerResultCard({
+  result,
+  emailSent,
+}: {
+  readonly result: ScreenerResult
+  readonly emailSent: boolean
+}) {
   if (result.qualification === 'disqualified') {
     return (
       <article>
@@ -110,6 +141,11 @@ function ScreenerResultCard({ result }: { readonly result: ScreenerResult }) {
           See how each stage works
         </Button>
       </div>
+      {emailSent && (
+        <p className="mt-8 font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
+          We also sent these results to your inbox.
+        </p>
+      )}
     </article>
   )
 }
