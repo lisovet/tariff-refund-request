@@ -1,23 +1,23 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T13:18:00Z
+**Updated**: 2026-04-21T13:27:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 66 → 67)
+**Loop state**: active (iteration 67 → 68)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 67 |
+| completed | 68 |
 | in-progress | 0 |
-| pending | 19 |
+| pending | 18 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 96 files, 804 tests pass |
+| `npm test` | green — 97 files, 816 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 24 routes |
@@ -25,34 +25,44 @@
 
 ## Last completed task
 
-**#67 — React PDF setup + masthead component**
+**#68 — Hero metric + entry table + prerequisites**
 
-`@react-pdf/renderer@^4.5.1` installed. Four new files in `src/contexts/cape/report-pdf/`:
+Three PDF-body components under `src/contexts/cape/report-pdf/`:
 
-1. **`fonts.ts`** — `FONT_FAMILIES` (display / body / mono) + `registerReadinessFonts()` which calls `Font.register()` once (idempotent). Uses the built-in Times-Roman / Helvetica / Courier aliases as licensed-font placeholders; `TODO(human-action)` comments point to the GT Sectra + Söhne + Berkeley Mono TTF drop-in.
-2. **`Masthead.tsx`** — GT Sectra 42pt display title (`CAPE Submission Readiness Report`), customs-orange uppercase eyebrow (`Tariff Refund Platform // v1`), Berkeley Mono metadata rows (Case / Customer / Generated / Analyst). Hairline 1px bottom border in ink — honors DESIGN-LANGUAGE.md `sharp corners, single hairline, no shadow` rule.
-3. **`ReadinessReportDoc.tsx`** — `Document` (LETTER paper) with Masthead + placeholder body + `fixed` footer bearing the canonical disclosure verbatim (`Not legal advice. We prepare files; you control submission. Every artifact has been human-reviewed before reaching you.`). Re-exports `DISCLOSURE_FOOTNOTE` for tests to freeze wording.
-4. **`render.ts`** — single-exported `renderReadinessReport(props): Promise<Buffer>` using `renderToBuffer`.
+1. **`HeroMetric.tsx`** — GT Sectra 28pt "N entries reviewed" hero line + three Berkeley-Mono badges (blocking / warnings / info). State-color tokens: blocking `#8A1F1F`, warning `#7A5A1A`, positive `#1D6B3C`. Zero-count badges tint positive; non-zero tint by severity — meaning-bearing color per DESIGN-LANGUAGE.md.
+2. **`EntryTable.tsx`** — Flex-row typeset table (no DOM `<table>` in react-pdf). Columns: status glyph / entry number / date / IOR / duty USD (right-aligned, Berkeley Mono tabular figures). Rows with notes render a secondary indented row under each data row. Exports frozen `STATUS_GLYPHS = { ok: '○', warning: '△', blocking: '×' }` — real Unicode, no emoji, assistive-tech-readable.
+3. **`PrerequisitesList.tsx`** — Hairline-separated list of `PrerequisiteCheck` with ✓ / ✕ markers (green / red) + right-aligned "Met" / "Missing" mono label.
 
-7 new tests in `__tests__/report.test.ts` freeze: the canonical disclosure wording, the three font-role names, PDF metadata (title / author / subject), buffer non-emptiness (>1KB), `%PDF-` magic header, and UTF-16BE-encoded case-id byte sequence in the PDF info dictionary. 804/804 pass.
+`ReadinessReportDoc.tsx` extended: new `ReadinessReportBody` prop (totalEntries / blockingCount / warningCount / infoCount / entryRows / prerequisites). When `body` is supplied the three sections render in order; when omitted, the masthead-only scaffold from #67 still renders (backwards-compatible).
+
+10 new component tests (`body-sections.test.ts`) + 2 new integration tests (`report.test.ts` — full-body render yields >1.5KB buffer + tree-walk asserts disclosure still appears). Total PDF tests: 19.
+
+816/816 pass.
+
+## New task added this iteration
+
+**#401 — AI-assist marketing copy + explainer modules across funnel**
+
+Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the platform uses AI to maximize an importer's IEEPA refund" across the funnel without breaking the trust posture. Eight placements: homepage AI section, /how-it-works AI stage, /cape-prep AI value strip, screener-results AI-confidence line, Readiness Report PDF "How we reviewed" paragraph, engagement-letter AI clause, /trust AI disclosure, two transactional-email lines. Constraints: every surface names the human-validator-final gate; no AI-copy clichés; every claim backed by a real code path. Depends on #14, #15, #17, #24, #68, #72.
 
 ## Human-verification still owes
 
-- Drop licensed GT Sectra + Söhne + Berkeley Mono TTFs into `public/fonts/` and update `fonts.ts` to register them; the placeholder registration will still render, but the photographable typography contract isn't met until the real faces land.
-- Visual eyeball of a rendered PDF once #68 (entry table) + #69 (footnotes) layer in.
+- Drop licensed GT Sectra + Söhne + Berkeley Mono TTFs into `public/fonts/` and update `fonts.ts` to register them.
+- Eyeball a rendered PDF with a real 100-entry broker fixture once #69 layers in the sign-off block.
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #68 — deps satisfied (67 done). **Eligible — lowest id.**
+- Task #69 — deps satisfied (68 done). **Eligible — lowest id.**
 - Task #72 — eligible.
 - Task #74 — eligible.
 - Task #75 — eligible.
 - Task #77 — eligible.
 
-Lowest-id eligible is **task #68**.
+Lowest-id eligible is **task #69**.
 
 ## Notes
 
-- 67/86 v1 done — 77.9% of Phase 0.
-- Loop will continue with #68 next iteration.
+- 68/86 v1 done — 79.1% of Phase 0.
+- Post-v1 backlog now includes AI-copy funnel task #401.
+- Loop will continue with #69 next iteration.

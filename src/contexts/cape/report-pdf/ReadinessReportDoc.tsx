@@ -1,19 +1,39 @@
 import { Document, Page, StyleSheet, Text } from '@react-pdf/renderer'
 import { Masthead, type MastheadProps } from './Masthead'
+import { HeroMetric } from './HeroMetric'
+import { EntryTable, type EntryTableRow } from './EntryTable'
+import { PrerequisitesList } from './PrerequisitesList'
 import { FONT_FAMILIES, registerReadinessFonts } from './fonts'
+import type { PrerequisiteCheck } from '../schema'
 
 /**
- * Readiness Report PDF document — v1 masthead scaffold per task #67.
+ * Readiness Report PDF document — masthead + hero metric + entry
+ * table + prerequisites checklist (tasks #67 + #68). Downstream
+ * tasks add the analyst sign-off block (#69) and artifact storage
+ * (#70).
  *
- * Downstream tasks (#68+) add the summary tiles, per-entry table,
- * prerequisite checklist, analyst sign-off block, and canonical
- * disclosure footnote. This iteration ships the masthead + the
- * outer document frame so a human-walk render test passes.
+ * `body` carries the data the body sections need. It's optional so
+ * callers that only want the masthead (e.g. legacy #67 tests) still
+ * render. When omitted, the body renders a placeholder sentence.
  */
 
+export interface ReadinessReportBody {
+  readonly totalEntries: number
+  readonly blockingCount: number
+  readonly warningCount: number
+  readonly infoCount: number
+  readonly entryRows: readonly EntryTableRow[]
+  readonly prerequisites: readonly PrerequisiteCheck[]
+}
+
 export interface ReadinessReportDocProps extends MastheadProps {
-  /** Optional body text under the masthead — used by v1 for a simple
-   *  "report body renders in #68" placeholder the tests can assert. */
+  /** Optional body-section payload. When omitted, a placeholder
+   *  sentence renders in place of the hero metric + entry table +
+   *  prerequisites stack. */
+  readonly body?: ReadinessReportBody
+  /** Optional body text under the masthead — overrides the default
+   *  placeholder when `body` is also omitted. Used by task #67-era
+   *  smoke tests. */
   readonly bodyPlaceholder?: string
 }
 
@@ -67,6 +87,7 @@ const DISCLOSURE_FOOTNOTE =
 
 export function ReadinessReportDoc(props: ReadinessReportDocProps) {
   registerReadinessFonts()
+  const { body } = props
   return (
     <Document
       title={`Readiness Report — ${props.caseId}`}
@@ -76,10 +97,23 @@ export function ReadinessReportDoc(props: ReadinessReportDocProps) {
     >
       <Page size="LETTER" style={styles.page}>
         <Masthead {...props} />
-        <Text style={styles.placeholder}>
-          {props.bodyPlaceholder ??
-            'Summary tiles, entry table, prerequisites checklist, and analyst sign-off block render here in subsequent iterations.'}
-        </Text>
+        {body ? (
+          <>
+            <HeroMetric
+              totalEntries={body.totalEntries}
+              blockingCount={body.blockingCount}
+              warningCount={body.warningCount}
+              infoCount={body.infoCount}
+            />
+            <EntryTable rows={body.entryRows} />
+            <PrerequisitesList prerequisites={body.prerequisites} />
+          </>
+        ) : (
+          <Text style={styles.placeholder}>
+            {props.bodyPlaceholder ??
+              'Summary tiles, entry table, prerequisites checklist, and analyst sign-off block render here in subsequent iterations.'}
+          </Text>
+        )}
         <Text fixed style={styles.footer}>
           {DISCLOSURE_FOOTNOTE}
         </Text>

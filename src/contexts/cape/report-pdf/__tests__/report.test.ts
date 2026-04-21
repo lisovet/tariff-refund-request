@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   DISCLOSURE_FOOTNOTE,
   ReadinessReportDoc,
+  type ReadinessReportBody,
 } from '../ReadinessReportDoc'
 import { renderReadinessReport } from '../render'
 import { FONT_FAMILIES } from '../fonts'
@@ -11,6 +12,46 @@ const FIXTURE_PROPS = {
   customerName: 'Acme Imports LLC',
   generatedAtIso: '2026-04-21T13:10:00.000Z',
   analystName: 'S. Validator',
+}
+
+const FIXTURE_BODY: ReadinessReportBody = {
+  totalEntries: 3,
+  blockingCount: 1,
+  warningCount: 1,
+  infoCount: 0,
+  entryRows: [
+    {
+      id: 'ent_a',
+      entryNumber: '123-4567890-1',
+      entryDate: '2024-09-01',
+      importerOfRecord: 'Acme Imports LLC',
+      dutyAmountUsdCents: 125_000,
+      status: 'ok',
+      notes: [],
+    },
+    {
+      id: 'ent_b',
+      entryNumber: '123-4567890-2',
+      entryDate: '2024-09-02',
+      importerOfRecord: 'Acme Imports LLC',
+      dutyAmountUsdCents: 0,
+      status: 'warning',
+      notes: ['Low source confidence (broker-only).'],
+    },
+    {
+      id: 'ent_c',
+      entryNumber: '123-4567890-3',
+      entryDate: '2024-09-03',
+      importerOfRecord: 'Acme Imports LLC',
+      dutyAmountUsdCents: 750_000,
+      status: 'blocking',
+      notes: ['Missing IOR.', 'Outside IEEPA window.'],
+    },
+  ],
+  prerequisites: [
+    { id: 'ior_on_file', label: 'IOR on file', met: true },
+    { id: 'ach_on_file', label: 'ACH on file', met: false },
+  ],
 }
 
 describe('ReadinessReportDoc — component tree', () => {
@@ -74,4 +115,39 @@ describe('renderReadinessReport — buffer output', () => {
     }
     expect(buf.indexOf(utf16be)).toBeGreaterThanOrEqual(0)
   }, 15_000)
+
+  it('renders a non-empty PDF buffer when a full body is provided', async () => {
+    const buf = await renderReadinessReport({
+      ...FIXTURE_PROPS,
+      body: FIXTURE_BODY,
+    })
+    expect(buf).toBeInstanceOf(Buffer)
+    // Body sections add structure and content — the PDF should be
+    // meaningfully larger than the masthead-only scaffold (>1.5KB).
+    expect(buf.length).toBeGreaterThan(1_500)
+    expect(buf.slice(0, 5).toString('ascii')).toBe('%PDF-')
+  }, 15_000)
+
+  it('full-body render still carries the disclosure footnote wording', async () => {
+    // ReadinessReportDoc tree exposes the footer in its React
+    // element tree as a Text node — assert by walking the tree.
+    const tree = ReadinessReportDoc({
+      ...FIXTURE_PROPS,
+      body: FIXTURE_BODY,
+    })
+    const allTextStrings = collectTextStrings(tree)
+    expect(allTextStrings).toContain(DISCLOSURE_FOOTNOTE)
+  })
 })
+
+type AnyNode = { props?: { children?: unknown } } | string | number | null | undefined
+
+function collectTextStrings(node: AnyNode): string[] {
+  if (node == null) return []
+  if (typeof node === 'string') return [node]
+  if (typeof node === 'number') return [String(node)]
+  if (Array.isArray(node)) return node.flatMap(collectTextStrings as (n: AnyNode) => string[])
+  const props = typeof node === 'object' && node !== null ? node.props : undefined
+  if (!props) return []
+  return collectTextStrings(props.children as AnyNode)
+}

@@ -1371,7 +1371,7 @@
           67,
           62
         ],
-        "status": "pending",
+        "status": "done",
         "estimateHours": 6,
         "source": [
           "PRD 03"
@@ -1776,6 +1776,31 @@
         "source": [
           "PRD 09",
           "PRD 11"
+        ]
+      },
+      {
+        "id": 401,
+        "epic": "E06. Marketing + growth surfaces",
+        "title": "AI-assist marketing copy + explainer modules across funnel",
+        "description": "Author and integrate customer-facing copy that explains how the platform uses AI to maximize an importer's IEEPA refund \u2014 without compromising the 'we prepare files; you control submission' + 'not legal advice' promises. Surface placements: homepage AI-assist section, /how-it-works AI-step callout, /cape-prep AI value strip, screener-results dossier AI-confidence line, Readiness Report PDF 'How we reviewed this batch' paragraph, engagement-letter AI clause, /trust AI disclosure, transactional emails (screener results + prep ready). Every surface must stay in the editorial voice + explicitly call out the human-validator-final gate.",
+        "details": "CONTENT MODULES (exact copy to be drafted in the task):\n  1. Homepage AI section \u2014 short editorial paragraph + one dataset      stat callout (e.g., 'Every batch is inspected by our AI + a      licensed reviewer'). Single accent CTA unchanged.\n  2. /how-it-works \u2014 one new stage block 'How AI helps' sitting      between Recovery and Prep, with what-we-do / what-you-do      columns, listing the AI-assist tasks (entry-number parsing      from broker docs, HTS classification suggestions, duplicate      detection, confidence scoring) AND explicitly naming the      human validator as the final step.\n  3. /cape-prep \u2014 3-card AI value strip (parse / flag / explain)      with mono stats + hairline borders.\n  4. Screener results dossier \u2014 one-line 'AI-modeled estimate,      human-reviewed' caveat under the hero metric.\n  5. Readiness Report PDF \u2014 new 'How we reviewed this batch'      paragraph before the Entry Table: 2-3 sentences naming the      AI steps + the validator sign-off + the confidence-score      propagation.\n  6. Engagement letter \u2014 AI clause (Section 4 subclause) naming      AI usage, human validator-final, no legal advice.\n  7. /trust AI disclosure \u2014 separate short section 'How AI is      used (and limited)' with 4 bullet items: what it does, what      it doesn't do, what we log, what the customer can opt out of.      Real-text, not images; no collapsed accordions.\n  8. Transactional emails \u2014 1-sentence AI-assist line in both the      screener-results email and prep-ready email, linking to the      /trust AI section.\n\nCONSTRAINTS (cannot ship without):\n  - Every surface explicitly names the human-validator-final gate.\n  - Phrases 'we prepare files; you control submission' + 'not     legal advice' remain verbatim where the existing Disclosure     module specifies.\n  - No clich\u00e9 AI copy (Elevate / Seamless / Unleash / Game-changer).\n  - No emoji, no pastel gradients \u2014 design-language-gate still applies.\n  - Every AI claim must be testable and auditable. If a claim says     'AI catches duplicate entries,' there must be a code path (see     #57 dedupe) that backs it up. No marketing vapor.\n\nSKILLS: copywriting-strategist (outline + voice), copywriting-formatter (editorial shape), copywriting-optimizer (punch pass), ad-validator (claim-auditability pass).\n\nTEST STRATEGY:\n  - Freeze the canonical AI-assist lines in a constants module     (AI_ASSIST_COPY) with string-equality tests \u2014 same pattern as     the Disclosure module. Drift triggers test failure.\n  - Integration test: every customer-facing page listed above     renders the AI-assist module and passes the design-language     banned-pattern grep (no Inter/Roboto/rounded-full/shadow-md).\n  - One Playwright spec per surface (marketing + customer app +     trust pages) asserting the AI-assist block is visible and     in the expected DOM position.\n  - Readiness Report PDF: add 'How we reviewed this batch'     paragraph to report.test.ts's tree-walk assertion.\n  - Engagement-letter AI clause: integration-tested inside the     engagement-letter template render test (#72).\n",
+        "testStrategy": "1. AI_ASSIST_COPY module with frozen string-equality tests. 2. Page-render integration tests for every surface. 3. Playwright visibility spec per surface. 4. PDF tree-walk assertion for the new paragraph. 5. Engagement-letter template test.",
+        "priority": "medium",
+        "dependencies": [
+          14,
+          15,
+          17,
+          24,
+          68,
+          72
+        ],
+        "status": "pending",
+        "estimateHours": 8,
+        "source": [
+          "PRD 05",
+          "PRD 08",
+          "PRD 10",
+          "DESIGN-LANGUAGE.md"
         ]
       }
     ]
