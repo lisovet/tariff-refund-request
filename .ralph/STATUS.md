@@ -1,23 +1,23 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T12:13:00Z
+**Updated**: 2026-04-21T12:18:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 56 → 57)
+**Loop state**: active (iteration 57 → 58)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 57 |
+| completed | 58 |
 | in-progress | 0 |
-| pending | 29 |
+| pending | 28 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 86 files, 673 tests pass |
+| `npm test` | green — 87 files, 685 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 24 routes |
@@ -25,38 +25,34 @@
 
 ## Last completed task
 
-**#57 — Dedupe + fuzzy match**
+**#58 — Window + phase tagging**
 
-`classifyEntries(incoming, existing)` returns one `ClassifiedEntry` per incoming row with one of five outcomes:
-
-- **`exact_duplicate`** — canonical match against existing. Caller should attach a second source instead of inserting (PRD 07 acceptance).
-- **`duplicate_in_batch`** — same canonical number repeats inside the incoming list, after the first occurrence.
-- **`fuzzy_review_pair`** — matches existing on `(date + IOR)` but DIFFERENT canonical number. Both records kept; analyst review queue surfaces the pair (PRD 07: "both records are kept and a 'review pair' is queued").
-- **`new`** — no match. Insert.
-- **`invalid`** — canonicalization failed. The `canonicalResult` is attached so the manual-correction queue has the rejection reason.
-
-Pure function — composes with the entries repo in #58+. Fuzzy key is `(date + IOR-lowercase-trimmed)`; requires both halves; v1 uses exact-date match (date-window tolerance deferred to Phase 2). Exact match always wins over fuzzy match.
-
-12 new tests covering exact match (mixed case + dashes), `duplicate_in_batch` ordering, fuzzy match (case-insensitive IOR, date-mismatch → new, ior-mismatch → new, missing field → new), `invalid` (gibberish), empty input, exact-wins-over-fuzzy precedence.
+- `CURRENT_IEEPA_WINDOW` (version `"ieepa-v1-2024"`, start `2024-04-01`, end `2025-12-31`, four phases tiling the window contiguously: `phase_1_2024_h2`, `phase_2_2024_q4`, `phase_3_2025_h1`, `phase_4_2025_h2`). `TODO(human-action)` for legal/customs sign-off on the exact boundaries.
+- `IEEPA_WINDOWS` array carries every registered window (one for now; future versions append).
+- Pure `tagEntry({ entryDate }, window)` → `{ inWindow, windowVersion, phaseFlag }`. **`windowVersion` is ALWAYS the supplied window's version** so batch-level pinning works — a batch tagged today against `ieepa-v1-2024` is reproducible after the window is updated.
+- Phase boundary semantics are start-inclusive (a date sitting on a phase boundary lands in the LATER phase).
+- Out-of-window dates (before start or after end) → `inWindow=false`, `phaseFlag=null`. Malformed or missing dates → same, but `windowVersion` still pinned for audit.
+- 12 new tests covering config invariants (contiguous tiling, unique phase ids), happy paths, boundary dates (day before/after, phase-boundary start-inclusive), missing/invalid input, and version-pinning against a fake old window.
 
 ## Human-verification still owes
 
-- Tune the fuzzy tolerance against real broker spreadsheets — v1 requires exact date match; broker exports often have slightly different date formatting (epoch vs ISO vs M/D/Y), suggesting we may need a date-parser pre-pass + a small ±1-day window in Phase 2.
-- Decide whether IOR fuzzy normalization should also strip "Inc.", "LLC", "Ltd." suffixes — for v1 we only lowercase + collapse whitespace.
+- Confirm the v1 IEEPA window dates (start, end, phase boundaries) with customs counsel before launch — current values are placeholders.
+- Decide whether the phase labels should be customer-facing (e.g., "Phase 1 (Apr–Sep 2024)" appears in the Readiness Report) or analyst-only.
+- Wire `tagEntry` into the entries save service so every persisted entry carries `phaseFlag` + a window-version stamp on the audit row.
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #58 — deps satisfied. **Eligible — lowest id.**
+- Task #59 — deps satisfied. **Eligible — lowest id.**
 - Task #61 — eligible.
 - Task #67 (CAPE prep workflow scaffold) — eligible.
 - Task #72 (admin dashboard scaffold) — eligible.
 - Task #74 — eligible.
 
-Lowest-id eligible is **task #58**.
+Lowest-id eligible is **task #59**.
 
 ## Notes
 
-- 57/86 v1 done — 2/3 of Phase 0 complete.
-- Wave 9 (Entry ingestion + normalization) — schema + canonicalizer + dedupe landed.
-- Loop will continue with #58 next iteration.
+- 58/86 v1 done.
+- Wave 9 (Entry ingestion + normalization) — schema + canonicalizer + dedupe + window-tagging landed.
+- Loop will continue with #59 next iteration.

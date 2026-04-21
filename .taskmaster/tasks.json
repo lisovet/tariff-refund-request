@@ -1172,11 +1172,13 @@
         "dependencies": [
           56
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 3,
         "source": [
           "PRD 07"
-        ]
+        ],
+        "completedAt": "2026-04-21T12:18:00Z",
+        "completedNotes": "Window + phase tagging per PRD 07. CURRENT_IEEPA_WINDOW (version=\"ieepa-v1-2024\", start 2024-04-01, end 2025-12-31, four phases tiling the window contiguously: phase_1_2024_h2, phase_2_2024_q4, phase_3_2025_h1, phase_4_2025_h2 \u2014 with TODO(human-action) for legal/customs sign-off on the exact boundaries). IEEPA_WINDOWS array carries every registered window (one for now; future versions append). Pure tagEntry({entryDate}, window) \u2192 {inWindow, windowVersion, phaseFlag} \u2014 windowVersion is ALWAYS the supplied window's version so batch-level pinning works (a batch tagged today against ieepa-v1-2024 is reproducible after the window is updated). Phase boundary semantics are start-inclusive (a date sitting on a phase boundary lands in the LATER phase). Out-of-window dates (before start or after end) \u2192 inWindow=false, phaseFlag=null. Malformed or missing dates \u2192 same (inWindow=false, phaseFlag=null) but windowVersion still pinned for audit. 12 new tests covering config invariants (contiguous tiling, unique phase ids), happy paths (in-window, last day), boundary dates (day before / day after / phase boundary start-inclusive), missing/invalid input, and version-pinning. 685/685 pass; lint + typecheck clean; build green (24 routes \u2014 pure module)."
       },
       {
         "id": 59,

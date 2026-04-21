@@ -21,3 +21,15 @@ export type {
   IncomingEntry,
 } from './dedupe'
 export { classifyEntries } from './dedupe'
+
+export type {
+  EntryWindowTag,
+  IeepaPhase,
+  IeepaWindow,
+  TagEntryInput,
+} from './window'
+export {
+  CURRENT_IEEPA_WINDOW,
+  IEEPA_WINDOWS,
+  tagEntry,
+} from './window'
