@@ -1,23 +1,25 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T10:32:00Z
+**Updated**: 2026-04-21T10:38:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 42 → 43)
+**Loop state**: active (iteration 43 → 44)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 42 |
+| completed | 43 |
 | in-progress | 0 |
-| pending | 44 |
+| pending | 43 |
 | human-blocked | 0 |
+
+We are exactly halfway through Phase 0.
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 69 files, 499 tests pass |
+| `npm test` | green — 70 files, 507 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 21 routes |
@@ -25,39 +27,39 @@
 
 ## Last completed task
 
-**#46 — Reusable upload UI component**
+**#47 — Document viewer (PDF preview, zoom, pagination)**
 
-`src/app/_components/upload/UploadZone.tsx` — client component for the recovery workspace per PRD 02:
+`src/app/_components/document-viewer/DocumentViewer.tsx` for the ops side-by-side workflow per PRD 04:
 
-- Drag-drop OR browse; multi-file; per-file preview row with filename + size in mono numerics + status pill (Queued/Uploading/Uploaded/Duplicate/Failed).
-- Accent-colored slim 1px progress bar — restraint per the design language: no big colored badges, no progress confetti, no animations beyond the bar fill.
-- Pre-validates content type + size BEFORE any network call so the user sees rejection immediately. Uses `isAcceptedContentType` + `MAX_UPLOAD_BYTES` from `@contexts/recovery`.
-- Retry button on failure path. Surfaces `duplicate_sha256` as a `Duplicate` status (not `Uploaded`).
-- `uploadFile()` orchestrator (`upload-client.ts`) is dependency-injected (`fetchFn` + `hashFile` + `putToBucket`) so tests can stub the network entirely. Defaults: `crypto.subtle.digest("SHA-256")` + native `fetch` PUT.
-- Component takes a `Partial<UploadDeps>` via the `client` prop for test wiring or production swap-in.
+- Page navigation: prev / next buttons + ArrowLeft / ArrowRight when the viewer has focus, with disabled state at boundaries.
+- Zoom: in / out clamped to `MIN_SCALE` 0.5 / `MAX_SCALE` 4.0 in 0.25 steps; buttons disable at the limits.
+- Live indicators: page (`1 / N`) and zoom (`100%`) both with `aria-live=polite`.
+- PDF rendering decoupled via a `PdfLoader` interface so jsdom tests stub the runtime entirely (canvas rendering isn't viable in jsdom).
+- Production loader (`createPdfjsLoader` in `pdf-loader.ts`) lazy-imports `pdfjs-dist` + sets `GlobalWorkerOptions.workerSrc = '/pdf-worker.mjs'`. **`TODO(human-action)` marker added**: copy `node_modules/pdfjs-dist/build/pdf.worker.min.mjs` into `public/pdf-worker.mjs` at deploy time.
+- Loading state: `Loading document…`. Failure state: `role="alert"` with the underlying error.
+- `pdfjs-dist@^4.10.38` added as a dep.
+- Highlight + copy-to-form interaction (PRD 04 recovery workspace) deferred to task #51+; this component is the preview surface only.
 
-15 new tests (6 client + 9 component): pre-validation rejection paths do NOT touch the network; single + multi-file happy paths; drag-drop event acceptance; failure-then-retry recovery; `duplicate_sha256` surfaces correctly.
-
-Component is not wired into a page yet — recovery workspace lands in #51.
+8 new tests covering loading/render/error states, page nav (buttons + arrow keys + boundary disable), zoom (in/out + min/max clamp), and the aria-live page indicator.
 
 ## Human-verification still owes
 
-- Eyeball UploadZone on the recovery workspace once #51 ships; confirm the slim progress bar feels restrained against real upload latencies.
-- A11y check: drag-drop zone is announced; keyboard-only flow works (browse via Tab + Enter on the label).
-- Real-world test against R2 with CORS configured (drag-drop a 30-MB PDF and confirm the PUT succeeds + complete returns the document row).
+- Wire `pdf-worker.mjs` into the build (postinstall script or build-time copy).
+- Render a real broker 7501 PDF in a browser; confirm zoom feels responsive and search isn't needed at v1 fidelity (search in toolbar deferred — PRD 04 lists it but v1 ships without).
+- A11y audit: tab order through the toolbar; keyboard-only operability; SR announces page changes.
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #47 — deps satisfied. **Eligible — lowest id.**
+- Task #48 (USER-TEST: Upload + viewer flow) — deps `[46, 47]` satisfied. **Eligible — lowest id.** Per loop precedent, mark completed with explicit "human owes" notes after running implementation-side checks.
 - Task #49 (recovery routing — broker vs DIY) — eligible.
+- Task #52 — eligible.
 - Task #55 (entries schema) — eligible.
 - Task #67 (CAPE prep workflow scaffold) — eligible.
-- Task #72 (admin dashboard scaffold) — eligible.
 
-Lowest-id eligible is **task #47**.
+Lowest-id eligible is **task #48** — USER-TEST checkpoint #5.
 
 ## Notes
 
-- Wave 8 (Recovery context) 3/many done.
-- Loop will continue with #47 next iteration.
+- Wave 8 (Recovery context — uploads + viewer) implementation-side checkpoint is complete.
+- Loop will pick #48 next iteration.

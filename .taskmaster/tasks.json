@@ -943,11 +943,13 @@
         "dependencies": [
           45
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 6,
         "source": [
           "PRD 04"
-        ]
+        ],
+        "completedAt": "2026-04-21T10:38:00Z",
+        "completedNotes": "PDF document viewer for the ops side-by-side workflow per PRD 04. DocumentViewer client component (src/app/_components/document-viewer/DocumentViewer.tsx) with: page navigation (prev/next buttons + ArrowLeft/ArrowRight when the viewer has focus, with disabled state at boundaries), zoom (in/out clamped to MIN_SCALE 0.5 / MAX_SCALE 4.0 in 0.25 steps), live page indicator + zoom indicator both with aria-live=polite. PDF rendering decoupled via PdfLoader interface so jsdom tests stub the pdfjs runtime entirely (canvas rendering not feasible in jsdom). Production loader (createPdfjsLoader in pdf-loader.ts) lazy-imports pdfjs-dist + sets GlobalWorkerOptions.workerSrc=/pdf-worker.mjs. TODO(human-action) marker added: copy node_modules/pdfjs-dist/build/pdf.worker.min.mjs into public/pdf-worker.mjs at deploy time. Loading state shows \"Loading\u2026\", failure state shows a friendly role=alert message with the error. pdfjs-dist@^4.10.38 added as dep. Highlight + copy-to-form interaction (PRD 04 recovery workspace) deferred to #51+; this component is the preview surface only. 8 new tests covering loading/render/error states, page nav (buttons + arrow keys + boundary disable), zoom (in/out + min/max clamp), aria-live indicator. 507/507 pass; lint + typecheck clean; build green (21 routes \u2014 component is in a route group, no new routes)."
       },
       {
         "id": 48,
