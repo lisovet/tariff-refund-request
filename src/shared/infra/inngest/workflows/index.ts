@@ -5,6 +5,7 @@ import {
   nudgeCadenceWorkflow,
   screenerCompletedWorkflow,
 } from '@contexts/screener/server'
+import { funnelMirrorWorkflows } from '@shared/infra/funnel/mirror-workflow'
 import { smokeHelloWorld } from './smoke-hello-world'
 
 /**
@@ -29,6 +30,7 @@ export const workflows = [
   stalledCadenceWorkflow,
   artifactGenerationWorkflow,
   conciergeCheckoutOnSignedWorkflow,
+  ...funnelMirrorWorkflows,
 ] as const
 
 export {
