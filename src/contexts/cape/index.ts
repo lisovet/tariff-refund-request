@@ -24,3 +24,6 @@ export {
   ReadinessReportSchema,
   SEVERITIES,
 } from './schema'
+
+export type { ValidatorEntry, ValidatorInput } from './validator'
+export { validateBatch } from './validator'

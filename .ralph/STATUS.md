@@ -1,23 +1,23 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T12:38:00Z
+**Updated**: 2026-04-21T12:45:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 60 → 61)
+**Loop state**: active (iteration 61 → 62)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 61 |
+| completed | 62 |
 | in-progress | 0 |
-| pending | 25 |
+| pending | 24 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 90 files, 736 tests pass |
+| `npm test` | green — 91 files, 752 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 24 routes |
@@ -25,36 +25,40 @@
 
 ## Last completed task
 
-**#61 — CAPE Zod schemas**
+**#62 — CAPE validator with severity-leveled issues**
 
-Three top-level shapes per ADR 014 + PRD 03 in `src/contexts/cape/schema.ts`:
+`validateBatch(input)` → `ReadinessReport` per PRD 03 §Validation rules + ADR 014.
 
-- **`CapeEntryRowSchema`** — id, entryNumber matching `CANONICAL_ENTRY_NUMBER_RE`, entryDate `YYYY-MM-DD`, IOR non-empty, `dutyAmountUsdCents` non-negative integer, `htsCodes` ≥1 with 4.2.4 digit-dot pattern, phaseFlag, windowVersion, sourceConfidence (`high | medium | low`).
-- **`BatchSchema`** — id, caseId, label, `entryRecordIds` ≥1, phaseFlag, validationRunId, status from `BATCH_STATUSES` (`draft | validated | qa_pending | ready | submitted`).
-- **`ReadinessReportSchema`** — id, batchId, generatedAt ISO datetime, `entries[]` with `{entryId, status (ok|warning|blocking), notes[]}`, `prerequisites[]` `{id, label, met:bool}`, `blockingCount`/`warningCount`/`infoCount` non-negative ints, `artifactKeys {csvKey, pdfKey}`, optional `analystSignoff {staffUserId, signedAt, note}`.
-- `superRefine` cross-validates that `blockingCount` and `warningCount` match the actual entry-row totals — prevents lying about the dashboard counts.
-- `PrerequisiteCheckSchema` as a separate export. `SEVERITIES` + `ENTRY_STATUSES` enum constants.
-- 31 new tests covering happy + 5+ edge cases per shape (canonical entry-number, ISO date, integer duty, HTS pattern, batch status enum, severity enums, count-vs-entries cross-validation, prerequisite shape, optional signoff).
+- Output ALWAYS satisfies `ReadinessReportSchema` — the validator calls `.parse()` on its own output so drift between the validator and the canonical schema is caught loudly.
+- **Severity policy**:
+  - `blocking`: invalid entry-number, missing IOR, missing HTS on duty-bearing entry, outside IEEPA window, duplicate canonical number after first occurrence.
+  - `warning`: low source-confidence rows (carrier-reconstructed duty values).
+  - `info`: batch size over threshold, ACH not on file.
+- **Severity precedence**: blocking > warning > ok. When multiple rules fire on the same entry, ALL notes land in `notes[]` but `status` reflects the highest severity.
+- Batch-level notes (batch-size threshold, ACH prerequisite) attach to the first entry's `notes[]` for now — the PDF report (#65+) will render these as batch-summary chips.
+- Window defaults to `CURRENT_IEEPA_WINDOW` but can be overridden for batch-level pinning.
+- Duplicate detection runs on canonicalized entry numbers so case-only differences don't slip through.
+- 16 new tests covering happy path, every blocking rule, warning rules, info rule, severity precedence, and schema-valid output across empty / all-blocking / mixed fixtures.
 
 ## Human-verification still owes
 
-- Confirm `BATCH_STATUSES` matches the ops console state lifecycle once #82 lands; tighten the enum if status names diverge.
-- Decide whether `ReadinessReport.entries[].notes[]` should be free-text or a controlled vocabulary (PRD 03 leaves it open; v1 accepts free-text).
-- Sign off on the cross-validation invariant — `blockingCount`/`warningCount` must equal the entry-row totals; some pipelines might want to allow drift for "in-flight" reports.
+- Review the per-rule notes wording with customs counsel — the notes land on the customer-facing Readiness Report, so language matters.
+- Decide whether out-of-window entries should be auto-removed from the CSV (blocking already prevents download) or simply flagged for analyst decision — currently blocking = "analyst must resolve"; some pipelines might want silent-drop for out-of-window rows.
+- Tune the batch-size threshold (v1 placeholder: 100) once we see real customer batches.
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #62 — deps satisfied. **Eligible — lowest id.** This is the validator that consumes the schemas + produces the `ReadinessReport` aggregate.
+- Task #63 — deps satisfied. **Eligible — lowest id.** This is the CBP-compliant CSV builder that consumes the validated batch.
+- Task #64 — eligible.
+- Task #65 — eligible.
 - Task #67 — eligible.
 - Task #72 — eligible.
-- Task #74 — eligible.
-- Task #75 — eligible.
 
-Lowest-id eligible is **task #62** — CAPE validator.
+Lowest-id eligible is **task #63** — CSV builder.
 
 ## Notes
 
-- 61/86 v1 done — 70.9% of Phase 0.
-- Wave 10 (CAPE schema + validator + CSV) starts. The schema is the canonical contract; #62 builds the validator on top.
-- Loop will continue with #62 next iteration.
+- 62/86 v1 done — 72.1% of Phase 0.
+- Wave 10 (CAPE schema + validator + CSV) 2/3 done. Next: CSV builder.
+- Loop will continue with #63 next iteration.

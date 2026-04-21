@@ -1253,12 +1253,14 @@
         "dependencies": [
           61
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 8,
         "source": [
           "PRD 03",
           "ADR 014"
-        ]
+        ],
+        "completedAt": "2026-04-21T12:45:00Z",
+        "completedNotes": "CAPE validator per PRD 03 \u00a7Validation rules + ADR 014. validateBatch(input) \u2192 ReadinessReport. Output ALWAYS satisfies ReadinessReportSchema \u2014 the validator calls .parse() on its own output so drift between the validator and the canonical schema is caught loudly. Severity policy: blocking (invalid entry-number, missing IOR, missing HTS on duty-bearing entry, outside IEEPA window, duplicate canonical number after first occurrence), warning (low source-confidence rows \u2014 carrier-reconstructed duty values), info (batch size over threshold, ACH-not-on-file). Severity precedence: blocking > warning > ok. When multiple rules fire on the same entry, ALL notes land in notes[] but status reflects the highest severity. Batch-level notes (batch-size threshold, ACH prerequisite) attach to the first entry's notes[] for now \u2014 PDF report (#65+) will render these as batch-summary chips. Window defaults to CURRENT_IEEPA_WINDOW but can be overridden for batch-level pinning. Duplicate detection runs on canonicalized entry numbers so case-only differences don't slip through. 16 new tests covering happy path, every blocking rule (entry-number, window, IOR, HTS, duplicate), warning rules (low-confidence, batch size), info rule (ACH), severity precedence (blocking + warning on same row), and schema-valid output across empty/all-blocking/mixed fixtures. 752/752 pass; lint + typecheck clean; build green (24 routes \u2014 pure module)."
       },
       {
         "id": 63,
