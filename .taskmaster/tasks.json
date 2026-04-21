@@ -1134,11 +1134,13 @@
         "dependencies": [
           55
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 3,
         "source": [
           "PRD 07"
-        ]
+        ],
+        "completedAt": "2026-04-21T12:05:00Z",
+        "completedNotes": "Entry-number canonicalization function per PRD 07. canonicalizeEntryNumber(raw) accepts dashed/undashed forms, leading/trailing whitespace, en/em dashes (customers copy-paste from Excel/Word), spaces between segments, mixed case; returns canonical FFF-SSSSSSS-C uppercase or a typed rejection ({reason: empty | length | filer_code_invalid | sequence_not_digits | check_digit_not_digit}). CANONICAL_ENTRY_NUMBER_RE freezes the canonical shape; formatCanonicalEntryNumber throws loudly on non-canonical input so callers can't accidentally render raw entry numbers. Check-digit math deferred to Phase 2 (v1 validates shape only). When the caller supplied dashes (3 raw segments) a malformed filer surfaces as filer_code_invalid rather than generic length \u2014 more useful for the analyst review queue. Entries context public surface at src/contexts/entries/index.ts. 24 new tests covering 7 happy formats + 11 rejection paths + raw preservation + canonical regex shape check + display-form throw-on-non-canonical. 661/661 pass; lint + typecheck clean; build green (24 routes \u2014 pure module, no client-bundle impact)."
       },
       {
         "id": 57,
