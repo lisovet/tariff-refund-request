@@ -324,12 +324,14 @@
           14,
           36
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 4,
         "source": [
           "PRD 05",
           "PRD 06"
-        ]
+        ],
+        "completedAt": "2026-04-21T09:43:00Z",
+        "completedNotes": "/pricing \u2014 stage-by-stage ladder per PRD 05 + PRD 06. Rendered straight from PRICE_LADDER + SUCCESS_FEE_RATES + SUCCESS_FEE_HARD_CAP \u2014 no hand-typed numbers; an it.each table-test against priceFor(sku, tier) keeps that property honest. Three stage sections (00 free screener, 01 recovery, 02 prep) + a separate Concierge region with full success-fee disclosure (10\u201312% SMB, 8\u201310% mid-market, $50,000 per-case cap, against the realized refund \u2014 not the estimate). Monitoring section pinned at the bottom with /mo suffix. data-sku attributes per row + data-price-mono on figure cells so the snapshot test can resolve them deterministically. Hairline rules between stages, mono numerics in Berkeley Mono fallback chain, no popular badges, no contact-sales CTAs, free tier rendered with the same weight as paid. Added to footer-presence integration test (canonical \"Not legal advice\" disclosure asserted via the marketing layout) + Playwright spec. 25 new tests; 393/393 pass; lint + typecheck clean; build green (19 routes \u2014 /pricing static at 166B + 102kB first-load)."
       },
       {
         "id": 17,

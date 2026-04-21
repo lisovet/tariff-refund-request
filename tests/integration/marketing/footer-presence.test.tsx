@@ -4,6 +4,7 @@ import { render } from '@testing-library/react'
 
 import HomePage from '@/app/(marketing)/page'
 import HowItWorksPage from '@/app/(marketing)/how-it-works/page'
+import PricingPage from '@/app/(marketing)/pricing/page'
 import TrustPage from '@/app/(marketing)/trust/page'
 import SubProcessorsPage from '@/app/(marketing)/trust/sub-processors/page'
 import UiKitPage from '@/app/(marketing)/ui-kit/page'
@@ -20,6 +21,7 @@ import MarketingLayout from '@/app/(marketing)/layout'
 const PAGES: Array<{ name: string; node: React.ReactNode }> = [
   { name: 'HomePage', node: <HomePage /> },
   { name: 'HowItWorksPage', node: <HowItWorksPage /> },
+  { name: 'PricingPage', node: <PricingPage /> },
   { name: 'TrustPage', node: <TrustPage /> },
   { name: 'SubProcessorsPage', node: <SubProcessorsPage /> },
   { name: 'UiKitPage', node: <UiKitPage /> },
