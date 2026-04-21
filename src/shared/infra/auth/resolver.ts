@@ -1,6 +1,6 @@
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { type Actor, AnonymousActor } from './actor'
-import { isStaffRole } from './roles'
+import { isStaffRole, normalizeOrgRole } from './roles'
 
 /**
  * Clerk session → typed Actor.
@@ -32,8 +32,8 @@ export interface ClerkSessionShape {
 export function resolveActorFromSession(session: ClerkSessionShape): Actor {
   if (!session.userId) return AnonymousActor
 
-  const orgRole = session.sessionClaims.org_role
-  if (typeof orgRole === 'string' && isStaffRole(orgRole)) {
+  const orgRole = normalizeOrgRole(session.sessionClaims.org_role)
+  if (orgRole && isStaffRole(orgRole)) {
     return {
       kind: 'staff',
       id: session.userId,
