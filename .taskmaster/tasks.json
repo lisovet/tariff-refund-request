@@ -216,13 +216,15 @@
         "epic": "E3. Marketing site",
         "title": "Build homepage (editorial hero + sections)",
         "description": "Implement / page per PRD 05 hierarchy: editorial hero, proof statement, three-movement explainer, anti-positioning, pull-quote, footer.",
-        "details": "Server-rendered. Lighthouse target: ≥95 across all categories. One full-bleed documentary photo (placeholder until real photo budget). Single accent CTA.",
+        "details": "src/app/(marketing)/page.tsx composes 5 sections from src/app/(marketing)/_components/: HomeHero (GT Sectra display, magazine-underline CTA, single accent above the fold), HomeProof (serif print-article opener with hairline frames), HomeMovements (Recovery/Filing prep/Concierge as hairline-bordered cards with mono prices), HomeAntiPositioning (real-text 'What we are not' list with the no-auto-submit promise), HomePullQuote (canonical trust posture as the editorial close). Marketing route-group layout adds the SiteFooter (3 nav columns + canonical 'Not legal advice' real-text disclosure). Static-prerendered (143B). Documentary photograph deferred until human-action sources real imagery.",
         "testStrategy": "Lighthouse CI gate ≥95; Playwright screenshot baseline; A11y audit (axe-core) clean.",
         "priority": "high",
         "dependencies": [12],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 8,
-        "source": ["PRD 05", "DESIGN-LANGUAGE.md"]
+        "source": ["PRD 05", "DESIGN-LANGUAGE.md"],
+        "completedAt": "2026-04-21T06:58:00Z",
+        "completedNotes": "Homepage built per PRD 05 hierarchy using minimalist-ui taste (loaded earlier). 5 section components in src/app/(marketing)/_components/: HomeHero (editorial GT Sectra display, single accent magazine-underline CTA above the fold), HomeProof (serif print-article opener framed by hairlines), HomeMovements (Recovery/Filing prep/Concierge in hairline-bordered cards with Berkeley Mono price labels), HomeAntiPositioning (the 'What we are not' real-text list including the no-auto-submit, not-a-broker, not-legal-advice non-goals — anchors trust through restraint), HomePullQuote (the canonical trust posture rendered as the page's editorial close). Marketing route-group layout in src/app/(marketing)/layout.tsx wraps every marketing page with SiteFooter (3 nav columns + canonical 'Not legal advice' real-text disclosure linking to /trust per .claude/rules/disclosure-language-required.md). Build green: / static-prerendered at 143B; first-load JS unchanged at 102kB shared. 11 new component tests + 1 Playwright spec asserting hero + sections + footer disclosure RED-then-GREEN; 157/157 pass; lint + typecheck clean. HUMAN-VERIFICATION: live Lighthouse run to confirm ≥95 across categories, axe-core a11y audit, eyeball the homepage at the dev server (especially the GT Sectra fallback rendering until self-hosted), source the full-bleed documentary photograph."
       },
       {
         "id": 15,

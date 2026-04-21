@@ -1,51 +1,55 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T06:50:00Z
+**Updated**: 2026-04-21T06:58:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 13 → 14)
+**Loop state**: active (iteration 14 → 15)
 
 ## Counts
 
 | Status | Count |
 | --- | --- |
-| completed | 13 |
+| completed | 14 |
 | in-progress | 0 |
-| pending | 73 |
+| pending | 72 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 24 files, 146 tests pass |
+| `npm test` | green — 28 files, 157 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
-| `npm run build` | green — 10 routes registered |
+| `npm run build` | green — `/` static-prerendered at 143B |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
 
-**#13 — USER-TEST: Auth + design system reviewed (Checkpoint 2)**
+**#14 — Build homepage (editorial hero + sections)**
 
-Implementation-level verification ran:
+PRD 05 hierarchy implemented end-to-end with the design-system primitives from task #12.
 
-- Build green: 10 routes resolve (`/`, `/app`, `/ops`, `/sign-in/[[...sign-in]]`, `/sign-up/[[...sign-up]]`, `/api/health`, `/api/inngest`, `/api/webhooks/clerk`, `/ui-kit`, `/_not-found`).
-- Middleware bundle 85.1kB (with auth + role gating + sign-in redirect logic).
-- 146/146 unit tests pass; lint + typecheck clean.
-- Design-language banned-patterns grep on `src/app/_components/` confirms zero violations (no Inter/Roboto, no `shadow-md|lg|xl`, no `rounded-full` on primitives — the matches that appear are all negative-assertion tests or comments).
+- `HomeHero` — GT Sectra display headline, single accent magazine-underline CTA above the fold (per `docs/DESIGN-LANGUAGE.md` "one accent above fold" rule).
+- `HomeProof` — serif print-article opener framed by hairlines.
+- `HomeMovements` — Recovery / Filing prep / Concierge in hairline-bordered cards, prices in Berkeley Mono.
+- `HomeAntiPositioning` — the "What we are not" real-text list including the no-auto-submit, not-a-broker, and not-legal-advice non-goals. Trust through restraint.
+- `HomePullQuote` — canonical trust posture rendered verbatim as the editorial close (anchors `.claude/rules/disclosure-language-required.md`'s canonical-promise requirement).
+- `src/app/(marketing)/layout.tsx` — wraps every marketing page with `SiteFooter` (3 nav columns + canonical "Not legal advice" disclosure linking to `/trust`).
 
-### Human verification still owes
+11 new component tests + 1 Playwright spec asserting hero + each section + footer disclosure. Build green: `/` static-prerenders at 143B; first-load JS unchanged at 102kB shared.
 
-1. Live Clerk dashboard sign-up + sign-in completes against real keys.
-2. `/ops` bounce-when-not-staff confirmed with a real customer-only Clerk session.
-3. `/api/webhooks/clerk` receives + applies a real Clerk webhook with valid Svix signature.
-4. Eyeball `/ui-kit` at the dev server: verify each primitive matches `docs/DESIGN-LANGUAGE.md` intent — especially that the magazine-underline CTA reads correctly under the licensed-fallback fonts (until GT Sectra / Söhne / Berkeley Mono are self-hosted).
+## Human-verification still owes
+
+- Live Lighthouse run to confirm ≥95 across categories.
+- axe-core a11y audit (CI runs the Playwright project; live audit needs the dev server).
+- Eyeball homepage at the dev server — especially the GT Sectra fallback rendering until self-hosted.
+- Source the full-bleed documentary photograph (deferred per PRD 05).
 
 ## Next eligible
 
-Task #14 — Build homepage (editorial hero + sections) per PRD 05 hierarchy. Wave 3 marketing site begins in earnest.
+Task #15 — Build /how-it-works (depends on #14; eligible).
 
 ## Notes
 
-- Wave 3 (marketing site) starts the first customer-facing visual surface next iteration.
-- Loop will continue with task #14.
+- Wave 3 (marketing site) 2/6 done.
+- Loop will continue with task #15 next iteration.

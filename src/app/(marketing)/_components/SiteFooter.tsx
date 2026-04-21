@@ -1,0 +1,92 @@
+import { Hairline } from '@/app/_components/ui'
+
+/**
+ * Marketing-site footer. Per .claude/rules/disclosure-language-required.md:
+ * "Not legal advice" is real text on every page (not an image, not a
+ * collapsed accordion). The trust + status + contact links sit above
+ * the disclosure block.
+ */
+
+const SECTIONS: ReadonlyArray<{
+  readonly heading: string
+  readonly links: ReadonlyArray<{ readonly label: string; readonly href: string }>
+}> = [
+  {
+    heading: 'Product',
+    links: [
+      { label: 'How it works', href: '/how-it-works' },
+      { label: 'Pricing', href: '/pricing' },
+      { label: 'Recovery', href: '/recovery' },
+      { label: 'Filing prep', href: '/cape-prep' },
+      { label: 'Concierge', href: '/concierge' },
+    ],
+  },
+  {
+    heading: 'Trust',
+    links: [
+      { label: 'Trust posture', href: '/trust' },
+      { label: 'Sub-processors', href: '/trust/sub-processors' },
+      { label: 'Security', href: '/trust/security' },
+      { label: 'Legal requests', href: '/trust/legal-requests' },
+    ],
+  },
+  {
+    heading: 'For partners',
+    links: [{ label: 'Agencies & brokers', href: '/for-agencies' }],
+  },
+]
+
+export function SiteFooter() {
+  return (
+    <footer className="bg-paper-2">
+      <Hairline />
+      <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10">
+        <div className="grid gap-10 sm:grid-cols-3">
+          {SECTIONS.map((section) => (
+            <nav
+              key={section.heading}
+              aria-label={section.heading}
+              className="flex flex-col"
+            >
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
+                {section.heading}
+              </p>
+              <ul className="mt-4 space-y-2">
+                {section.links.map((link) => (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      className="text-ink underline underline-offset-[6px] decoration-ink/20 hover:decoration-ink"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
+        </div>
+
+        <div className="mt-16 border-t border-rule pt-8 text-sm text-ink/70">
+          <p>
+            <span className="font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
+              Not legal advice
+            </span>
+            {' — '}
+            This site provides software and document-prep services. It
+            is not legal advice, not a customs brokerage (unless your
+            engagement letter explicitly says otherwise), and does not
+            guarantee any outcome with U.S. Customs and Border
+            Protection.{' '}
+            <a
+              href="/trust"
+              className="text-accent underline underline-offset-[6px] decoration-accent/40 hover:decoration-accent"
+            >
+              Read the full trust posture →
+            </a>
+          </p>
+        </div>
+      </div>
+    </footer>
+  )
+}
