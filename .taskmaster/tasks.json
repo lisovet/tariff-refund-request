@@ -1273,11 +1273,13 @@
         "dependencies": [
           62
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 5,
         "source": [
           "PRD 03"
-        ]
+        ],
+        "completedAt": "2026-04-21T12:50:00Z",
+        "completedNotes": "CBP-compliant CSV builder per PRD 03 \u00a7Deliverables. buildCapeCsv({caseId, batchId, generatedAt, entries, readinessReport}) \u2192 {ok:true, csv, filename} | {ok:false, reason: blocking_issues_present | no_entries | invalid_entry, ...}. Hard rules: REJECTS when readinessReport.blockingCount > 0; REJECTS when entries is empty; REJECTS when any entry fails CapeEntryRowSchema (defense in depth). Layout: every cell quoted (Excel strips leading zeros from unquoted numeric-looking strings \u2014 CBP entry numbers and HTS codes routinely have leading zeros so quoting is non-negotiable); multi-value HTS uses semicolon separators inside the quoted cell (single row per entry); duty rendered as 2-decimal dollars from cents; CRLF line endings (CBP intake accepts CRLF; some legacy systems reject LF-only); filename pattern cape-{caseId}-{batchId}-{yyyymmdd}.csv. CAPE_CSV_HEADERS frozen array (id, entry_number, entry_date, importer_of_record, duty_amount_usd, hts_codes, phase_flag, window_version, source_confidence). 12 new tests covering header line, one-row-per-entry, leading-zero quoting (099-7654321-9), multi-HTS semicolon-join, duty 2-decimal formatting, filename pattern, CRLF lines, blocking-rejection with reason+blockingCount, no-entries rejection, invalid-entry-schema rejection (defense-in-depth), byte-for-byte golden output match, header constant snake_case shape. 764/764 pass; lint + typecheck clean; build green (24 routes \u2014 pure module)."
       },
       {
         "id": 64,

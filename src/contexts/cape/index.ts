@@ -27,3 +27,10 @@ export {
 
 export type { ValidatorEntry, ValidatorInput } from './validator'
 export { validateBatch } from './validator'
+
+export type {
+  BuildCapeCsvInput,
+  BuildCapeCsvResult,
+  CapeCsvHeader,
+} from './csv-builder'
+export { CAPE_CSV_HEADERS, buildCapeCsv } from './csv-builder'
