@@ -1,29 +1,47 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T13:36:00Z
+**Updated**: 2026-04-21T13:47:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 68 → 69)
+**Loop state**: active (iteration 69 → 70)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 69 |
+| completed | 70 |
 | in-progress | 0 |
-| pending | 17 |
+| pending | 16 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 99 files, 838 tests pass |
+| `npm test` | green — 100 files, 846 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 24 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#70 — Artifact generation pipeline + R2 storage**
+
+New Inngest workflow drives the post-sign-off delivery loop:
+
+1. **`platform/batch.signed-off` event** (`src/shared/infra/inngest/events.ts`) — carries the full readiness report + entries + customer + analyst identity so the workflow can regenerate CSV + PDF without a readiness-report repo.
+2. **`artifactGenerationHandler`** (`src/contexts/cape/workflows/artifact-generation.ts`) — pure handler that walks `step.run()` through: build-csv (respects blocking-issues gate defense-in-depth), render-pdf (with the full sign-off + prerequisites body), upload-csv (Cloudflare R2 / MinIO / memory via `StorageAdapter`), upload-pdf, sign-csv-url, sign-pdf-url, send-prep-ready-email (Resend idempotency-keyed on `batch-signed-off:${batchId}`). Keys are case-scoped: `cases/{caseId}/cape-{batchId}/readiness.{csv,pdf}`.
+3. **`artifactGenerationWorkflow`** — Inngest-wrapped entry point registered in the workflows index.
+4. **`signOffBatch` publisher hook** — `SignOffBatchDeps.publishBatchSignedOff` is optional; when supplied along with `input.artifactContext` (entries + customer + workspace URLs), sign-off publishes the event after a successful transition + audit write. Publisher failures are swallowed — the case is already in `submission_ready` and the artifact pipeline is retried externally.
+5. **New `src/contexts/cape/server.ts`** — server-only surface exposing the workflow + PDF rendering. Mirrors the pattern used by the screener/ops contexts.
+
+Handler discriminated-union results: `{ok:true, csvKey, pdfKey, csvSignedUrl, pdfSignedUrl, emailMessageId}` or `{ok:false, reason: 'blocking_issues_present' | 'csv_build_failed' | 'unexpected_error'}`.
+
+8 new tests: 5 for the handler (happy path, idempotency, blocking-refusal, empty-entries refusal, key-layout regex), 3 for sign-off publish behavior (publishes full payload, skips without artifactContext, swallows publisher error).
+
+846/846 pass.
+
+## Previously completed this wave
 
 **#69 — Footnotes, signed footer, disclosures**
 
@@ -73,16 +91,16 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #70 — deps satisfied (69 done). **Eligible — lowest id.** (Artifact generation pipeline + R2 storage.)
+- Task #71 — deps satisfied (70 done). **Eligible — lowest id.** (USER-TEST: Photographable Readiness Report.)
 - Task #72 — eligible.
 - Task #74 — eligible.
 - Task #75 — eligible.
 - Task #77 — eligible.
 
-Lowest-id eligible is **task #70**.
+Lowest-id eligible is **task #71**.
 
 ## Notes
 
-- 69/86 v1 done — 80.2% of Phase 0.
+- 70/86 v1 done — 81.4% of Phase 0.
 - Post-v1 backlog includes AI-copy funnel task #401.
-- Loop will continue with #70 next iteration.
+- Loop will continue with #71 next iteration.

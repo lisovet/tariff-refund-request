@@ -60,3 +60,33 @@ export const paymentCompleted = eventType('platform/payment.completed', {
     }
   }>(),
 })
+
+/**
+ * Fired by `signOffBatch` (task #65) after the case transitions to
+ * `submission_ready`. Drives the artifact generation pipeline
+ * (task #70): CSV + PDF rendering, R2 upload, Prep-Ready email.
+ *
+ * The payload embeds the full readiness report + entry rows so the
+ * workflow can regenerate artifacts without a readiness-report
+ * repo. Typical batches sit well under Inngest's event-size limit.
+ */
+export const batchSignedOff = eventType('platform/batch.signed-off', {
+  schema: staticSchema<{
+    data: {
+      caseId: string
+      batchId: string
+      readinessReportId: string
+      signedAtIso: string
+      analystId: string
+      analystName: string
+      analystNote: string
+      customerEmail: string
+      customerName: string
+      readinessReport: unknown // ReadinessReport — kept untyped here to
+      // avoid a schema import cycle. The workflow handler types it.
+      entries: readonly unknown[]
+      caseWorkspaceUrl: string
+      conciergeUpgradeUrl: string
+    }
+  }>(),
+})

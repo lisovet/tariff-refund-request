@@ -1,3 +1,4 @@
+import { artifactGenerationWorkflow } from '@contexts/cape/server'
 import { auditLogMirrorWorkflow, stalledCadenceWorkflow } from '@contexts/ops/server'
 import {
   nudgeCadenceWorkflow,
@@ -25,6 +26,7 @@ export const workflows = [
   nudgeCadenceWorkflow,
   auditLogMirrorWorkflow,
   stalledCadenceWorkflow,
+  artifactGenerationWorkflow,
 ] as const
 
 export {
@@ -33,4 +35,5 @@ export {
   nudgeCadenceWorkflow,
   auditLogMirrorWorkflow,
   stalledCadenceWorkflow,
+  artifactGenerationWorkflow,
 }

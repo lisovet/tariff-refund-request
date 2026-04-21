@@ -5,7 +5,8 @@ import type {
   TransitionInput,
   TransitionResult,
 } from '@contexts/ops'
-import type { ReadinessReport } from './schema'
+import type { CapeEntryRow, ReadinessReport } from './schema'
+import type { BatchSignedOffEventData } from './workflows/artifact-generation'
 
 /**
  * QA checklist + analyst sign-off gate per PRD 04 +
@@ -81,6 +82,17 @@ export interface SignOffBatchInput {
   readonly note: string
   readonly readinessReport: ReadinessReport
   readonly checklist: readonly ChecklistSubmission[]
+  /** Optional artifact-generation context. When supplied along with
+   *  `deps.publishBatchSignedOff`, the sign-off publishes a
+   *  `platform/batch.signed-off` event that drives the artifact
+   *  pipeline (task #70). */
+  readonly artifactContext?: {
+    readonly entries: readonly CapeEntryRow[]
+    readonly customer: { readonly name: string; readonly email: string }
+    readonly analystDisplayName: string
+    readonly caseWorkspaceUrl: string
+    readonly conciergeUpgradeUrl: string
+  }
 }
 
 export interface SignOffRecord {
@@ -136,6 +148,15 @@ export interface SignOffBatchDeps {
     ...rest: never[]
   ) => Promise<TransitionResult>
   readonly clock: () => Date
+  /** Optional publisher for the `platform/batch.signed-off` event
+   *  (task #70). Called after a successful transition + audit-entry
+   *  write. A thrown error from the publisher is swallowed — the
+   *  sign-off itself already succeeded and the case is already in
+   *  `submission_ready`; the artifact pipeline will be retried by
+   *  whatever published the event, or re-triggered manually. */
+  readonly publishBatchSignedOff?: (
+    event: BatchSignedOffEventData,
+  ) => Promise<void>
 }
 
 export async function signOffBatch(
@@ -214,6 +235,33 @@ export async function signOffBatch(
     },
     occurredAt: deps.clock(),
   })
+
+  // Publish the batch.signed-off event — drives the artifact
+  // generation workflow (#70). Fire-and-log: a publisher failure
+  // must NOT reverse the successful sign-off + transition (the case
+  // is already in `submission_ready`).
+  if (deps.publishBatchSignedOff && input.artifactContext) {
+    try {
+      await deps.publishBatchSignedOff({
+        caseId: input.caseId,
+        batchId: input.batchId,
+        readinessReportId: input.readinessReport.id,
+        signedAtIso: signoff.signedAt,
+        analystId: input.actor.id,
+        analystName: input.artifactContext.analystDisplayName,
+        analystNote: input.note,
+        customerEmail: input.artifactContext.customer.email,
+        customerName: input.artifactContext.customer.name,
+        readinessReport: input.readinessReport,
+        entries: input.artifactContext.entries,
+        caseWorkspaceUrl: input.artifactContext.caseWorkspaceUrl,
+        conciergeUpgradeUrl: input.artifactContext.conciergeUpgradeUrl,
+      })
+    } catch {
+      // Swallow — the case is already in submission_ready.
+      // Downstream retry is the artifact pipeline's concern.
+    }
+  }
 
   return {
     ok: true,

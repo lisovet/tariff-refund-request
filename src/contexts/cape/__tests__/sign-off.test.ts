@@ -5,7 +5,7 @@ import {
   type SignOffBatchDeps,
   type SignOffBatchInput,
 } from '../sign-off'
-import type { ReadinessReport } from '../schema'
+import type { CapeEntryRow, ReadinessReport } from '../schema'
 import { createInMemoryCaseRepo } from '@contexts/ops/server'
 import { transition } from '@contexts/ops'
 
@@ -203,6 +203,79 @@ describe('signOffBatch — actor role gate', () => {
     if (result.ok || result.reason !== 'note_empty') {
       throw new Error('unreachable')
     }
+  })
+})
+
+describe('signOffBatch — artifact-generation event publishing', () => {
+  const ENTRY: CapeEntryRow = {
+    id: 'ent_1',
+    entryNumber: '123-4567890-1',
+    entryDate: '2024-09-01',
+    importerOfRecord: 'Acme Imports LLC',
+    dutyAmountUsdCents: 125_000,
+    htsCodes: ['8501.10.4020'],
+    phaseFlag: 'phase_1_2024_h2',
+    windowVersion: 'ieepa-2024-v1',
+    sourceConfidence: 'high',
+  }
+
+  const ARTIFACT_CONTEXT: NonNullable<SignOffBatchInput['artifactContext']> = {
+    entries: [ENTRY],
+    customer: { name: 'Acme Imports LLC', email: 'finance@acme.test' },
+    analystDisplayName: 'S. Validator',
+    caseWorkspaceUrl: 'https://app.example.com/app/cases/X',
+    conciergeUpgradeUrl: 'https://example.com/concierge',
+  }
+
+  it('publishes batch.signed-off with the full event payload on success', async () => {
+    const { caseId, deps } = await setupCaseInBatchQa()
+    type PublishArg = Parameters<
+      NonNullable<SignOffBatchDeps['publishBatchSignedOff']>
+    >[0]
+    const publishBatchSignedOff = vi.fn<
+      (e: PublishArg) => Promise<void>
+    >(async () => {})
+    const result = await signOffBatch(
+      input({ artifactContext: ARTIFACT_CONTEXT }, caseId),
+      { ...deps, publishBatchSignedOff },
+    )
+    expect(result.ok).toBe(true)
+    expect(publishBatchSignedOff).toHaveBeenCalledTimes(1)
+    const payload = publishBatchSignedOff.mock.calls[0]?.[0]
+    expect(payload?.caseId).toBe(caseId)
+    expect(payload?.batchId).toBe('bat_1')
+    expect(payload?.customerEmail).toBe('finance@acme.test')
+    expect(payload?.customerName).toBe('Acme Imports LLC')
+    expect(payload?.analystName).toBe('S. Validator')
+    expect(payload?.analystNote).toContain('Verified')
+    expect(payload?.entries).toEqual([ENTRY])
+    expect(payload?.readinessReport.id).toBe('rdy_1')
+  })
+
+  it('does NOT publish when the artifact context is missing (sign-off still succeeds)', async () => {
+    const { caseId, deps } = await setupCaseInBatchQa()
+    const publishBatchSignedOff = vi.fn(async () => {})
+    const result = await signOffBatch(input({}, caseId), {
+      ...deps,
+      publishBatchSignedOff,
+    })
+    expect(result.ok).toBe(true)
+    expect(publishBatchSignedOff).not.toHaveBeenCalled()
+  })
+
+  it('swallows publisher errors (sign-off stays successful; the case is already submission_ready)', async () => {
+    const { caseId, deps } = await setupCaseInBatchQa()
+    const publishBatchSignedOff = vi.fn(async () => {
+      throw new Error('inngest down')
+    })
+    const result = await signOffBatch(
+      input({ artifactContext: ARTIFACT_CONTEXT }, caseId),
+      { ...deps, publishBatchSignedOff },
+    )
+    expect(result.ok).toBe(true)
+    expect(publishBatchSignedOff).toHaveBeenCalledTimes(1)
+    const c = await deps.caseRepo.findCase(caseId)
+    expect(c?.state).toBe('submission_ready')
   })
 })
 
