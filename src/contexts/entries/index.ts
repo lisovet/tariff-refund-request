@@ -13,3 +13,11 @@ export {
   canonicalizeEntryNumber,
   formatCanonicalEntryNumber,
 } from './canonicalize'
+
+export type {
+  ClassifiedEntry,
+  DedupeOutcome,
+  ExistingEntry,
+  IncomingEntry,
+} from './dedupe'
+export { classifyEntries } from './dedupe'

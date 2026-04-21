@@ -1153,11 +1153,13 @@
         "dependencies": [
           56
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 5,
         "source": [
           "PRD 07"
-        ]
+        ],
+        "completedAt": "2026-04-21T12:13:00Z",
+        "completedNotes": "Dedupe + fuzzy match per PRD 07. classifyEntries(incoming, existing) returns one ClassifiedEntry per incoming row with one of five outcomes: exact_duplicate (canonical match against existing \u2014 caller should attach a second source instead of inserting), duplicate_in_batch (same canonical number repeats inside the incoming list after the first occurrence), fuzzy_review_pair (matches existing on date+IOR but DIFFERENT canonical number \u2014 both records kept; analyst review queue surfaces the pair per PRD 07 acceptance), new (no match, insert), invalid (canonicalization failed \u2014 surface in manual-correction queue with the canonicalResult attached). Pure function \u2014 composes with the entries repo in #58+. Fuzzy key is (date + IOR-lowercase-trimmed); requires both halves; v1 uses exact-date match (date-window tolerance deferred to Phase 2). Exact match always wins over fuzzy match. 12 new tests covering exact match (mixed case + dashes), duplicate_in_batch ordering, fuzzy match (case-insensitive IOR, date-mismatch \u2192 new, ior-mismatch \u2192 new, missing field \u2192 new), invalid (gibberish), empty input, exact-wins-over-fuzzy precedence. 673/673 pass; lint + typecheck clean; build green (24 routes \u2014 pure module, no client-bundle impact)."
       },
       {
         "id": 58,

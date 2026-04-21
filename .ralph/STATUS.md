@@ -1,23 +1,23 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T12:05:00Z
+**Updated**: 2026-04-21T12:13:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 55 → 56)
+**Loop state**: active (iteration 56 → 57)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 56 |
+| completed | 57 |
 | in-progress | 0 |
-| pending | 30 |
+| pending | 29 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 85 files, 661 tests pass |
+| `npm test` | green — 86 files, 673 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 24 routes |
@@ -25,35 +25,38 @@
 
 ## Last completed task
 
-**#56 — Entry-number canonicalization function**
+**#57 — Dedupe + fuzzy match**
 
-- `canonicalizeEntryNumber(raw)` accepts dashed/undashed forms, leading/trailing whitespace, en/em dashes (customers copy-paste from Excel/Word), spaces between segments, mixed case.
-- Returns canonical `FFF-SSSSSSS-C` uppercase OR a typed rejection: `{ reason: empty | length | filer_code_invalid | sequence_not_digits | check_digit_not_digit }`.
-- `CANONICAL_ENTRY_NUMBER_RE` freezes the canonical shape; `formatCanonicalEntryNumber` throws loudly on non-canonical input so callers can't accidentally render raw entry numbers.
-- Check-digit math deferred to Phase 2 (v1 validates shape only).
-- When the caller supplied dashes (3 raw segments), a malformed filer surfaces as `filer_code_invalid` rather than generic `length` — more useful for the analyst review queue.
-- Entries context public surface at `src/contexts/entries/index.ts`.
-- 24 new tests covering 7 happy formats + 11 rejection paths + raw preservation + canonical regex shape check + display-form throw-on-non-canonical.
+`classifyEntries(incoming, existing)` returns one `ClassifiedEntry` per incoming row with one of five outcomes:
+
+- **`exact_duplicate`** — canonical match against existing. Caller should attach a second source instead of inserting (PRD 07 acceptance).
+- **`duplicate_in_batch`** — same canonical number repeats inside the incoming list, after the first occurrence.
+- **`fuzzy_review_pair`** — matches existing on `(date + IOR)` but DIFFERENT canonical number. Both records kept; analyst review queue surfaces the pair (PRD 07: "both records are kept and a 'review pair' is queued").
+- **`new`** — no match. Insert.
+- **`invalid`** — canonicalization failed. The `canonicalResult` is attached so the manual-correction queue has the rejection reason.
+
+Pure function — composes with the entries repo in #58+. Fuzzy key is `(date + IOR-lowercase-trimmed)`; requires both halves; v1 uses exact-date match (date-window tolerance deferred to Phase 2). Exact match always wins over fuzzy match.
+
+12 new tests covering exact match (mixed case + dashes), `duplicate_in_batch` ordering, fuzzy match (case-insensitive IOR, date-mismatch → new, ior-mismatch → new, missing field → new), `invalid` (gibberish), empty input, exact-wins-over-fuzzy precedence.
 
 ## Human-verification still owes
 
-- Confirm with a customs-broker contact that the FFF-SSSSSSS-C shape matches what they actually see in CBP exports today (some legacy systems emit 11-digit-only).
-- Decide whether check-digit MOD-7 validation lands in v1 or Phase 2 — currently deferred.
-- Wire `canonicalizeEntryNumber` into the `POST /api/cases/[id]/entries` route so the persisted `entryNumber` is always canonical (currently the route accepts the raw client value; canonicalization is a one-line change but lives in #57+ ingest pipeline).
+- Tune the fuzzy tolerance against real broker spreadsheets — v1 requires exact date match; broker exports often have slightly different date formatting (epoch vs ISO vs M/D/Y), suggesting we may need a date-parser pre-pass + a small ±1-day window in Phase 2.
+- Decide whether IOR fuzzy normalization should also strip "Inc.", "LLC", "Ltd." suffixes — for v1 we only lowercase + collapse whitespace.
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #57 — deps satisfied. **Eligible — lowest id.**
-- Task #58 — eligible.
+- Task #58 — deps satisfied. **Eligible — lowest id.**
 - Task #61 — eligible.
 - Task #67 (CAPE prep workflow scaffold) — eligible.
 - Task #72 (admin dashboard scaffold) — eligible.
+- Task #74 — eligible.
 
-Lowest-id eligible is **task #57**.
+Lowest-id eligible is **task #58**.
 
 ## Notes
 
-- 56/86 v1 done.
-- Wave 9 (Entry ingestion + normalization) — schema + canonicalizer landed.
-- Loop will continue with #57 next iteration.
+- 57/86 v1 done — 2/3 of Phase 0 complete.
+- Wave 9 (Entry ingestion + normalization) — schema + canonicalizer + dedupe landed.
+- Loop will continue with #58 next iteration.
