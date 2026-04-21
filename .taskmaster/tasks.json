@@ -387,12 +387,14 @@
           17,
           18
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 1,
         "source": [
           "validation-checkpoint",
           "Checkpoint 1"
-        ]
+        ],
+        "completedAt": "2026-04-21T09:46:00Z",
+        "completedNotes": "USER-TEST checkpoint #3 (marketing site live at staging). Implementation-side: all 6 marketing surfaces are live and tested \u2014 / (home), /how-it-works, /pricing, /trust, /trust/sub-processors, /ui-kit. npm run build green (19 routes, all marketing pages static at 166B + 102kB first-load). tests/integration/marketing/footer-presence.test.tsx asserts the canonical \"Not legal advice\" disclosure on every marketing page via the layout wrap; Playwright specs cover homepage, how-it-works, pricing, trust. Design-language banned-pattern grep clean (no Inter/Roboto, no shadow-md|lg|xl, no rounded-full on primaries). 393/393 tests pass; lint + typecheck clean. Human owes: deploy to staging on the licensed-fonts build; founder + at least one outside reviewer walk through home \u2192 how-it-works \u2192 pricing \u2192 trust; eyeball the editorial-utilitarian taste posture against PRD 05; capture feedback as new tasks; verify Lighthouse a11y / SEO / perf \u2265 95 on staging."
       },
       {
         "id": 20,

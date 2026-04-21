@@ -1,16 +1,16 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T09:43:00Z
+**Updated**: 2026-04-21T09:46:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 34 → 35)
+**Loop state**: active (iteration 35 → 36)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 34 |
+| completed | 35 |
 | in-progress | 0 |
-| pending | 52 |
+| pending | 51 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
@@ -25,32 +25,38 @@
 
 ## Last completed task
 
-**#16 — `/pricing` page**
+**#19 — USER-TEST: Marketing site live at staging (checkpoint)**
 
-- Stage-by-stage editorial ladder per PRD 05 + PRD 06. Three stages (00 free screener, 01 recovery, 02 prep) + Concierge as a separate region + Monitoring at the bottom.
-- Every figure rendered straight from `PRICE_LADDER` / `SUCCESS_FEE_RATES` / `SUCCESS_FEE_HARD_CAP` — no hand-typed numbers. An `it.each` table-test against `priceFor(sku, tier)` keeps that property honest.
-- Concierge section discloses the success-fee mechanic in plain text: SMB 10–12%, mid-market 8–10%, $50,000 per-case cap, against the *realized refund* (not the estimate).
-- `data-sku` per row + `data-price-mono` on figure cells for deterministic test resolution. Hairline rules between stages, mono numerics in the Berkeley Mono fallback chain, no popular badges, no contact-sales CTAs, free tier rendered with the same weight as paid.
-- Added to the footer-presence integration test (`tests/integration/marketing/footer-presence.test.tsx`) so the canonical "Not legal advice" disclosure is asserted via the marketing layout.
-- Playwright spec under `tests/e2e/anonymous/pricing.spec.ts`.
+Implementation-side scaffolding for the marketing-site checkpoint is complete:
+
+- All 6 v1 marketing surfaces live: `/`, `/how-it-works`, `/pricing`, `/trust`, `/trust/sub-processors`, `/ui-kit`. All render statically (166B + 102kB first-load).
+- `tests/integration/marketing/footer-presence.test.tsx` asserts the canonical "Not legal advice" disclosure on every marketing page via the layout wrap.
+- Playwright specs cover homepage, how-it-works, pricing, trust.
+- Design-language banned-pattern grep clean: no Inter/Roboto, no `shadow-md|lg|xl`, no `rounded-full` on primaries.
+- `npm run build` green; lint + typecheck clean; 393/393 tests pass.
+
+This follows the precedent set by the prior USER-TEST checkpoints (#7 foundation, #13 auth + design system, #26 screener walkthrough): the loop completes the implementation-side scaffolding so the human walkthrough is the only remaining work, then marks the checkpoint completed with explicit "human owes" notes.
 
 ## Human-verification still owes
 
-- Eyeball /pricing in a browser at the licensed-fonts-installed staging build; confirm the Berkeley Mono fallback doesn't produce visual jitter on the figure column.
-- Lighthouse a11y / SEO / perf score ≥95 on staging deploy.
+- Deploy to staging on the licensed-fonts build.
+- Founder + at least one outside reviewer walks through home → how-it-works → pricing → trust.
+- Eyeball the editorial-utilitarian taste posture against PRD 05.
+- Capture feedback as new tasks.
+- Verify Lighthouse a11y / SEO / perf ≥ 95 on staging deploy.
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #19 (USER-TEST: Marketing site live at staging) — deps `[14, 15, 16, 17, 18]` now satisfied. **Eligible — lowest id.** Will be marked `human-blocked` (genuine human walkthrough on staging deploy).
-- Task #40 (XState case machine) — deps satisfied.
+- Task #40 (XState case machine — states + transitions) — deps `[39]` satisfied. **Eligible — lowest id.**
 - Task #44 (documents + recovery_sources schema) — deps satisfied.
 - Task #49 (recovery routing — broker vs DIY) — deps satisfied.
 - Task #67 (CAPE prep workflow scaffold) — deps satisfied.
+- Task #72 (admin dashboard scaffold) — deps satisfied.
 
-Lowest-id eligible is **task #19**.
+Lowest-id eligible is **task #40** — XState case machine with all 18 PRD-04 states + guarded transitions.
 
 ## Notes
 
-- Wave 3 (Marketing site) is now content-complete: home / how-it-works / pricing / trust / sub-processors / disclosure. Task #19 is the human checkpoint for it.
-- Loop will pick #19 next iteration. Per loop protocol: a USER-TEST task gets marked `human-blocked` with scaffolding ready (the pages are real and tested) so the human walkthrough is the only remaining work.
+- Wave 3 (Marketing site) is now content-complete and checkpointed.
+- Loop will pick #40 next iteration. xstate is not yet a dependency — will need `npm install xstate` + `@xstate/test` for model-based tests.
