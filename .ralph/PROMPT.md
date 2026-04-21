@@ -5,7 +5,7 @@ You are continuing autonomous implementation of v1 (Phase 0) for the IEEPA Refun
 ## Your loop, every iteration
 
 1. **Check stop conditions first.**
-   - If all tasks with `id ≤ 86` in `.taskmaster/tasks.json` are `completed` or `human-blocked`, run `npm run test && npm run lint && npm run typecheck`. If all pass, rewrite `.ralph/STATUS.md` with the final summary and emit exactly: `<promise>V1 COMPLETE</promise>`. Stop.
+   - If all tasks with `id ≤ 86` in `.taskmaster/tasks.json` are `completed` or `human-blocked`, run `npm run test && npm run lint && npm run typecheck`. If all pass, rewrite `.ralph/STATUS.md` with the final summary and emit exactly: `<promise>V1_COMPLETE</promise>`. Stop.
    - If two consecutive iterations have made no progress (check `.ralph/PROGRESS.md`), rewrite `.ralph/STATUS.md` with the blocker, and emit `<promise>STALLED — see .ralph/STATUS.md</promise>`. Stop.
 
 2. **Pick the next task.** Lowest `id` in `.taskmaster/tasks.json` with `status: "pending"` AND every entry in `dependencies` already `completed`. If none eligible, your wave is blocked — investigate and either unblock or mark as `human-blocked` with a reason in `details`.
@@ -98,7 +98,7 @@ If a task cannot be done unattended (e.g., requires real Clerk webhook from a re
 When all v1 tasks are `completed` or `human-blocked` and quality gates pass, emit exactly:
 
 ```
-<promise>V1 COMPLETE</promise>
+<promise>V1_COMPLETE</promise>
 ```
 
 Otherwise the loop continues.

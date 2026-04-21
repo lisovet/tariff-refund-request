@@ -109,7 +109,7 @@ USER-TEST tasks are **completed without skipping** by the loop — but with a no
 - `npm run lint` exits clean.
 - `npm run typecheck` exits clean.
 - `.ralph/STATUS.md` lists every completed task and every human-blocked task with reason.
-- The loop emits `<promise>V1 COMPLETE</promise>`.
+- The loop emits `<promise>V1_COMPLETE</promise>`.
 
 ## Loop emergency stops
 
