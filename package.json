@@ -45,6 +45,7 @@
     "server-only": "^0.0.1",
     "stripe": "^22.0.2",
     "svix": "^1.91.1",
+    "xstate": "^5.30.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
