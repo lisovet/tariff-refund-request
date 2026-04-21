@@ -610,11 +610,13 @@
           28,
           51
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 4,
         "source": [
           "PRD 04"
-        ]
+        ],
+        "completedAt": "2026-04-21T11:24:00Z",
+        "completedNotes": "Stalled-case cadence Inngest workflow per PRD 04. STALLED_CADENCE_STAGES = [48h, 96h, day-7] (timeouts as additive 48h, 48h, 72h windows). stalledCadenceWorkflow listens on platform/case.state.transitioned; handler short-circuits when event.data.to !== \"stalled\" so unrelated transitions burn no cadence work. For each stage, step.waitForEvent listens for the same event type with filter expression `async.data.caseId == \"<id>\" && async.data.from == \"stalled\"`; if no resumption arrives in the timeout window, step.run fires the cadence by appending a stalled_cadence:<stage> audit row (kind discriminator; fromState=null, toState=null). Resumption in any window stops the cadence with a stage-specific cancelledBy reason. CaseRepo extended with appendAuditEntry(input) \u2014 both in-memory and Drizzle implementations; the Drizzle path inserts directly without a transition (no UPDATE on cases.state). Workflow registered in shared/infra/inngest/workflows + re-exported from @contexts/ops/server. 7 new tests covering happy path (3 fires + 3 audit rows), per-window cancellation, audit shape (fromState/toState null), and the caseId-scoped filter expression. 599/599 pass; lint + typecheck clean; build green (22 routes \u2014 workflow is server-only)."
       },
       {
         "id": 31,

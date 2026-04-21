@@ -13,6 +13,7 @@ import type { CaseRepo } from './repo'
 export { createInMemoryCaseRepo } from './in-memory-repo'
 export { createDrizzleCaseRepo } from './drizzle-repo'
 export { auditLogMirrorWorkflow } from './workflows/audit-log-mirror'
+export { stalledCadenceWorkflow } from './workflows/stalled-cadence'
 
 let cachedRepo: CaseRepo | undefined
 

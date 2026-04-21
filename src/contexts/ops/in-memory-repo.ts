@@ -1,4 +1,6 @@
 import {
+  type AppendAuditEntryInput,
+  type AppendAuditEntryResult,
   type AuditEntry,
   type CaseRecord,
   type CaseRepo,
@@ -72,6 +74,20 @@ export function createInMemoryCaseRepo(): CaseRepo {
         fromState: input.from,
         toState: input.to,
         payload: stripActor(input.event),
+        occurredAt: input.occurredAt,
+      }
+      audit.push(entry)
+      return { auditId: entry.id }
+    },
+    async appendAuditEntry(input: AppendAuditEntryInput): Promise<AppendAuditEntryResult> {
+      const entry: AuditEntry = {
+        id: auditId(),
+        caseId: input.caseId,
+        actorId: input.actorId,
+        kind: input.kind,
+        fromState: null,
+        toState: null,
+        payload: input.payload,
         occurredAt: input.occurredAt,
       }
       audit.push(entry)

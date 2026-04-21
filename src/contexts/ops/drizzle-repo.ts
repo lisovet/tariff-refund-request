@@ -4,6 +4,8 @@ import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import { auditLog, cases, type Schema } from '@shared/infra/db/schema'
 import type { CaseEvent, CaseState } from './case-machine'
 import {
+  type AppendAuditEntryInput,
+  type AppendAuditEntryResult,
   type AuditEntry,
   type CaseRecord,
   type CaseRepo,
@@ -77,6 +79,24 @@ export function createDrizzleCaseRepo(
         if (!auditRow) throw new Error('recordTransition: audit insert returned no rows')
         return { auditId: auditRow.id }
       })
+    },
+
+    async appendAuditEntry(input: AppendAuditEntryInput): Promise<AppendAuditEntryResult> {
+      const inserted = await db
+        .insert(auditLog)
+        .values({
+          caseId: input.caseId,
+          actorId: input.actorId,
+          kind: input.kind,
+          fromState: null,
+          toState: null,
+          payload: input.payload as Record<string, unknown>,
+          occurredAt: input.occurredAt,
+        })
+        .returning({ id: auditLog.id })
+      const row = inserted[0]
+      if (!row) throw new Error('appendAuditEntry: insert returned no rows')
+      return { auditId: row.id }
     },
 
     async listAudit(caseId: string): Promise<readonly AuditEntry[]> {

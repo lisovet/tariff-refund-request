@@ -49,6 +49,18 @@ export interface AuditEntry {
   readonly occurredAt: Date
 }
 
+export interface AppendAuditEntryInput {
+  readonly caseId: string
+  readonly kind: string
+  readonly actorId: string | null
+  readonly payload: unknown
+  readonly occurredAt: Date
+}
+
+export interface AppendAuditEntryResult {
+  readonly auditId: string
+}
+
 export interface CaseRepo {
   /** Insert a fresh case. Always starts in `new_lead`. */
   createCase(input: NewCaseInput): Promise<CaseRecord>
@@ -59,6 +71,12 @@ export interface CaseRepo {
    * MUST run both writes in a single transaction.
    */
   recordTransition(input: RecordTransitionInput): Promise<RecordTransitionResult>
+  /**
+   * Append a non-state-transition audit row (cadence fires, system
+   * events, admin notes). fromState / toState are null on the
+   * resulting row; `kind` carries the discriminator.
+   */
+  appendAuditEntry(input: AppendAuditEntryInput): Promise<AppendAuditEntryResult>
   /** Read-only audit history. Used by tests + the ops console. */
   listAudit(caseId: string): Promise<readonly AuditEntry[]>
 }

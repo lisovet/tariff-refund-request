@@ -1,23 +1,25 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T11:17:00Z
+**Updated**: 2026-04-21T11:24:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 49 → 50)
+**Loop state**: active (iteration 50 → 51)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 49 |
+| completed | 50 |
 | in-progress | 0 |
-| pending | 37 |
+| pending | 36 |
 | human-blocked | 0 |
+
+**50/86 v1 done.**
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 76 files, 592 tests pass |
+| `npm test` | green — 77 files, 599 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 22 routes |
@@ -25,39 +27,34 @@
 
 ## Last completed task
 
-**#51 — Customer recovery workspace UI (3-pane)**
+**#30 — Stalled-case cadence (48h, 96h, day-7)**
 
-`/app/case/[id]/recovery` — server component at `src/app/(app)/app/case/[id]/recovery/page.tsx`:
-
-- Resolves the recovery path by loading the case (`getCaseRepo`), the screener session (`findSessionById`), running `determineRecoveryPath`, and calling `recoveryPlanFor` + `renderOutreachKit`.
-- **Left** — `RecoveryStatusPanel`: case id, status banner with path label + SLA, document checklist (one row per `plan.acceptedDocs`), prerequisite checks (required vs optional), uploaded list when docs exist.
-- **Center** — `OutreachKitPanel`: rendered subject + body verbatim, `CopyButton` client subcomponent writes `"Subject: …\n\n<body>"` to `navigator.clipboard` with "Copied" feedback, attachments-needed list, template version footer.
-- **Right** — `UploadPanel` wraps the existing `UploadZone` with the case-id binding.
-- **Zero UI conditionals on `path` per ADR 015** — the workspace reads everything from the plan + the rendered outreach kit.
-- 404 paths (via `notFound()`): case doesn't exist; case has no resolvable recovery path (no screener session OR disqualified). `not-found.tsx` renders an editorial fallback page.
-- Auth: middleware gates `/app`; finer customer-to-case ownership scoping is a follow-up with #52 (case lifecycle workflow).
-
-16 new tests: 6 `RecoveryStatusPanel` + 5 `OutreachKitPanel` (including clipboard write verification) + 5 integration-page via stubbed repos (broker happy path, uploaded list, three 404 paths).
+- `STALLED_CADENCE_STAGES = [stalled-48h (48h), stalled-96h (48h), stalled-day-7 (72h)]` — additive timeouts hitting cumulative 48h / 96h / 168h milestones per PRD 04.
+- `stalledCadenceWorkflow` listens on `platform/case.state.transitioned`. The handler short-circuits when `event.data.to !== "stalled"` so unrelated transitions burn no cadence work.
+- For each stage: `step.waitForEvent` listens for the same event filtered by `async.data.caseId == "<id>" && async.data.from == "stalled"`. If no resumption arrives in the timeout window, `step.run` fires the cadence by appending a `stalled_cadence:<stage>` audit row (kind discriminator; `fromState=null`, `toState=null`).
+- Resumption in any window stops the cadence with a stage-specific `cancelledBy` reason (`resumed-during-48h-window` / `…-96h-window` / `…-day-7-window`).
+- `CaseRepo` extended with `appendAuditEntry(input)` — both in-memory and Drizzle implementations. The Drizzle path inserts directly without an UPDATE on `cases.state` (audit-only, no transition).
+- Workflow registered in `shared/infra/inngest/workflows` + re-exported from `@contexts/ops/server`.
+- 7 new tests covering happy path (3 fires + 3 audit rows), per-window cancellation, audit shape (fromState/toState null), and the caseId-scoped filter expression.
 
 ## Human-verification still owes
 
-- End-to-end walk once #52 wires case creation into the `platform/payment.completed` workflow: purchase → case created → workspace opens at the correct URL.
-- Real upload flow through the workspace once R2 + worker asset are provisioned.
-- Eyeball the three-pane layout at multiple breakpoints; confirm the right pane collapses under the center on narrow viewports (currently a single-column grid below `lg`).
-- Copy-to-clipboard feedback against Safari + a non-HTTPS local context.
+- Live workflow test in Inngest dev UI: detect → wait → fire → audit-row write end-to-end; replay to confirm idempotency (each `step.run` is named so retries are no-ops).
+- Decide whether the 48h/96h/day-7 cadence should also send customer email nudges (PRD 04 only specifies "follow-up action queued"; v1 only writes the audit row — email content is a future task).
+- Tune the timeout windows once we have real stall data.
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #30 — deps satisfied. **Eligible — lowest id.**
+- Task #32 — deps satisfied. **Eligible — lowest id.**
 - Task #52 — eligible.
 - Task #55 (entries schema) — eligible.
 - Task #67 (CAPE prep workflow scaffold) — eligible.
 - Task #72 (admin dashboard scaffold) — eligible.
 
-Lowest-id eligible is **task #30**.
+Lowest-id eligible is **task #32**.
 
 ## Notes
 
-- Wave 8 (Recovery workspace) 4/many done — routing + templates + upload component + workspace page landed.
-- Loop will continue with #30 next iteration.
+- Wave 12 (Lifecycle email + Inngest) — stalled cadence landed.
+- Loop will continue with #32 next iteration.
