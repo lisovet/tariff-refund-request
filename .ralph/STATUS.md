@@ -1,23 +1,23 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T13:05:00Z
+**Updated**: 2026-04-21T13:10:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 64 → 65)
+**Loop state**: active (iteration 65 → 66)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 65 |
+| completed | 66 |
 | in-progress | 0 |
-| pending | 21 |
+| pending | 20 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 94 files, 792 tests pass |
+| `npm test` | green — 95 files, 797 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 24 routes |
@@ -25,41 +25,36 @@
 
 ## Last completed task
 
-**#65 — QA checklist + analyst sign-off gate**
+**#66 — USER-TEST checkpoint #10 (validator passes/fails on real fixtures)**
 
-Honors `.claude/rules/human-qa-required.md` — **no automated path produces a customer-facing artifact labeled `submission_ready` without a validator-role staff member having signed off.**
+Implementation-side composition check codified as a permanent integration test (`tests/integration/cape/validator-pipeline.test.ts`) exercising `validator → CSV builder → sign-off` as a single pipeline against five fixture-type batches per ADR 014's testing mandate:
 
-- `QA_CHECKLIST_ITEMS` — 5 non-bypassable items per PRD 04:
-  - `entries_match_source_documents`, `no_blocking_issues`, `prerequisites_reviewed`, `warnings_reviewed`, `csv_spot_checked`.
-  - Each item carries `id` + `label` + `description` for the analyst surface.
-- `signOffBatch({ caseId, batchId, actor, note, readinessReport, checklist }, deps)` runs four gates in order:
-  1. `actor.role === 'validator'` — analyst / coordinator / admin all rejected (`reason=not_validator_role` with `attemptedRole`).
-  2. `note` non-empty — sign-off appears on the customer-facing Readiness Report.
-  3. `readinessReport.blockingCount === 0` — no unresolved blocking issues (`reason=blocking_issues_present` with `blockingCount`).
-  4. Every `QA_CHECKLIST_ITEMS` item submitted AND checked — `reason=checklist_incomplete` with `missingItems[]`.
-- On success: calls `transition()` with `VALIDATOR_SIGNED_OFF` + actor. The **XState machine guard double-checks the role** as defense in depth — if a caller bypasses this service, the machine still refuses. Then writes a `qa.sign_off` audit row with `{ batchId, note, checklistItemIds, readinessReportId }`.
-- Case advances `batch_qa → submission_ready`.
-- 13 new tests covering checklist-items shape, happy path, checklist-incomplete (unchecked + missing), blocking-issues rejection, role gate (analyst, admin), empty-note rejection, wrong-state rejection.
+1. **Clean batch** — validator returns 0/0/0, CSV builds byte-clean, `signOffBatch` transitions the case to `submission_ready`.
+2. **Duplicate-entry batch** — canonical-match dedupe fires as blocking, `buildCapeCsv` refuses, `signOffBatch` refuses with `reason=blocking_issues_present + blockingCount=1`.
+3. **Mixed-phase batch** — `tagEntry` assigns entries into distinct phases (`phase_1_2024_h2` + `phase_2_2024_q4`), validator passes.
+4. **Out-of-window batch** — 2023 entry date → blocking, notes mention window.
+5. **ACH-not-on-file batch** — info note surfaces on first entry via ACH prerequisite check, no blocking, sign-off still transitions (info-level is not a gate).
+
+5 new tests; 797/797 pass.
 
 ## Human-verification still owes
 
-- Confirm the v1 checklist wording with ops staff — items should read like analyst self-audit prompts, not legal boilerplate.
-- Decide whether sign-off should require the ops console's keyboard shortcut (`s` per PRD 04) or a Cmd+Enter form-submit pattern.
-- Surface the checklist + sign-off UI in the ops console once the CAPE prep workspace lands (deferred to v1-launch wave).
+- Run an anonymized REAL broker-extraction fixture (100+ entries) through this pipeline to confirm performance + note wording land correctly on a customer-facing Readiness Report once #70+ renders the PDF.
+- Confirm with customs counsel that the severity policy (blocking / warning / info) matches the CBP expectations for a submission-ready artifact.
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #66 (USER-TEST: Validator passes/fails on real fixtures) — deps `[62, 65]` satisfied. **Eligible — lowest id.**
-- Task #67 — eligible.
+- Task #67 — deps satisfied. **Eligible — lowest id.**
 - Task #72 — eligible.
 - Task #74 — eligible.
 - Task #75 — eligible.
+- Task #77 — eligible.
 
-Lowest-id eligible is **task #66** — USER-TEST checkpoint #10 (validator on real fixtures).
+Lowest-id eligible is **task #67**.
 
 ## Notes
 
-- 65/86 v1 done — 75.6% of Phase 0.
-- Wave 10 (CAPE schema + validator + CSV + sign-off) complete. The human-QA gate is binding + tested.
-- Loop will continue with #66 next iteration.
+- 66/86 v1 done — 76.7% of Phase 0.
+- Wave 10 (CAPE) checkpointed.
+- Loop will continue with #67 next iteration.
