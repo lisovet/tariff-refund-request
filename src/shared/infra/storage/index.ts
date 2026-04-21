@@ -15,7 +15,13 @@ import type { StorageAdapter } from './types'
  */
 
 export type { StorageAdapter, StorageKey, CaseScopedKeyParts } from './types'
-export { caseScopedKey, isStorageKey } from './types'
+export {
+  caseScopedKey,
+  isStorageKey,
+  MAX_UPLOAD_URL_EXPIRY_SECONDS,
+  DEFAULT_READ_URL_EXPIRY_SECONDS,
+  MAX_READ_URL_EXPIRY_SECONDS,
+} from './types'
 export { createMemoryStorage, type MemoryStorageAdapter } from './memory'
 export { createS3Storage, type S3StorageConfig } from './s3'
 
