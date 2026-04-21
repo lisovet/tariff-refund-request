@@ -1,64 +1,62 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T11:34:00Z
+**Updated**: 2026-04-21T11:43:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 51 → 52)
+**Loop state**: active (iteration 52 → 53)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 51 |
+| completed | 52 |
 | in-progress | 0 |
-| pending | 35 |
+| pending | 34 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 78 files, 606 tests pass |
+| `npm test` | green — 82 files, 624 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
-| `npm run build` | green — 22 routes |
+| `npm run build` | green — 23 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
 
-**#32 — USER-TEST checkpoint #7 (lifecycle emails reviewed)**
+**#52 — Ops case workspace at `/ops/case/[id]`**
 
-Implementation-side governance baseline codified as a permanent test (`tests/integration/governance/lifecycle-templates.test.tsx`), enforced on every CI run:
+Three-pane staff workspace per PRD 04:
 
-1. Every v1 lifecycle template file exists.
-2. Every template imports `EmailLayout` (so the canonical "Not legal advice" disclosure wraps every send).
-3. No template contains AI copywriting clichés (Elevate, Seamless, Unleash, Next-Gen, Game-changer, Delve) or ad-style imperatives (Click here, Limited time, Act now).
-4. Rendered HTML carries the disclosure for every template.
-5. No image-only bodies — real-text content >200 chars per template.
-6. Plain-text rendering is non-empty.
-7. Plain-text rendering also carries the disclosure (so non-HTML clients still see it).
+- **Left** — `CaseHeaderPanel`: case id, state pill (`data-state` attr the CSS targets), tier, recovery path, owner, queue, SLA hours; action panel with Claim + Mark stalled stubs.
+- **Center** — `ExtractionFormPanel`: entry-extraction form (entry number / entry date / IOR / duty / HTS codes) with local-state save and an `onSave` seam. Persistence lands with the entries schema (#55+).
+- **Right** — `DocumentViewerPanel`: selectable doc list + the existing `DocumentViewer` for the focused PDF. Keyboard `j` / `k` step between docs with boundary clamps; ArrowLeft / ArrowRight inside the viewer page within the focused doc.
+- Server component resolves recovery path via `getCaseRepo` → `findSessionById` → `determineRecoveryPath`. 404 via `notFound()` for missing case or no resolvable path. `not-found.tsx` fallback.
+- Industrial-brutalist Swiss Industrial Print mode per PRD 04 — mono dominance, dense tabular `<dl>`, hairline borders, zero `border-radius`, uppercase tracking on headers; no banned theatrics (no CRT scanlines, no halftone, no hazard red).
+- Auth: middleware enforces /ops requires staff role; finer per-case ownership scoping lands with #82+.
 
-Also fixed a flaky DocumentViewer zoom test that asserted scale before the initial `useEffect` render landed — now waits for both the page indicator AND `renderCalls.length > 0`.
+18 new tests (5 header-panel + 5 extraction-form + 5 viewer-panel + 3 integration-page via stubbed repos).
 
 ## Human-verification still owes
 
-- Founder + ops top-to-bottom read of all 9 templates: ScreenerResults, ScreenerNudge24h, ScreenerNudge72h, RecoveryPurchased, RecoveryMissingDocs, EntryListReady, PrepReady, ConciergeUpsell, Reengagement.
-- Check that the tone is restrained, the wording sounds like a serious operator (not a SaaS bot), and the placeholders make sense for real-customer cases.
-- Capture rewrites as new tasks.
-- The governance test catches structural drift; the human catches editorial drift.
+- Eyeball the workspace at multiple breakpoints; confirm the right pane stacks under the center on narrow viewports.
+- Real keyboard pass with j/k/v/e/s vocabulary once an analyst is paired (PRD 04 lists v/e/s as future shortcuts; v1 covers j/k for doc nav and the form's submit-on-enter).
+- Real ops-staff walk-through once cases exist end-to-end (#82 admin queue + Stripe webhook → case creation wiring).
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #52 — deps satisfied. **Eligible — lowest id.**
+- Task #53 — deps satisfied. **Eligible — lowest id.**
 - Task #55 (entries schema) — eligible.
 - Task #67 (CAPE prep workflow scaffold) — eligible.
 - Task #72 (admin dashboard scaffold) — eligible.
 - Task #74 — eligible.
 
-Lowest-id eligible is **task #52**.
+Lowest-id eligible is **task #53**.
 
 ## Notes
 
-- 51/86 v1 done.
-- Wave 12 (Lifecycle email + Inngest) is structurally complete — checkpointed.
-- Loop will continue with #52 next iteration.
+- 52/86 v1 done — past 60% of Phase 0.
+- Wave 8 (Recovery context — customer + ops workspaces) substantially complete.
+- Loop will continue with #53 next iteration.

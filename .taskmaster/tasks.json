@@ -1053,11 +1053,13 @@
           41,
           12
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 10,
         "source": [
           "PRD 04"
-        ]
+        ],
+        "completedAt": "2026-04-21T11:43:00Z",
+        "completedNotes": "Ops case workspace at /ops/case/[id] per PRD 04 \u2014 three-pane: Left CaseHeaderPanel (case id, state pill with data-state attr the CSS targets, tier, path, owner, queue, SLA hours, action panel with Claim + Mark stalled stubs); Center ExtractionFormPanel (entry-extraction form: entry number / entry date / IOR / duty / HTS codes; local-state save with onSave seam \u2014 persistence lands with #55 entries schema); Right DocumentViewerPanel (selectable doc list + the existing DocumentViewer for the focused PDF; j/k keyboard nav between docs with boundary clamps; \u2191\u2193 inside the viewer pages within the doc). Server component resolves recovery path via getCaseRepo \u2192 findSessionById \u2192 determineRecoveryPath; 404 paths via notFound() for missing case or no resolvable path. not-found.tsx editorial fallback. Industrial-brutalist Swiss Industrial Print mode per PRD 04 \u2014 mono dominance, dense tabular dl, hairline borders, zero border-radius, uppercase tracking on headers, no banned theatrics (no scanlines/halftone/hazard red). Auth: middleware enforces /ops requires staff role; finer per-case ownership scoping lands with #82+. 18 new tests (5 header-panel + 5 extraction-form + 5 viewer-panel + 3 integration-page via stubbed repos). 624/624 pass; lint + typecheck clean; build green (23 routes \u2014 /ops/case/[id] at 3.08kB + 105kB first-load, dynamic)."
       },
       {
         "id": 53,
