@@ -1,29 +1,43 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T14:47:00Z
+**Updated**: 2026-04-21T14:54:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 76 → 77)
+**Loop state**: active (iteration 77 → 78)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 77 |
+| completed | 78 |
 | in-progress | 0 |
-| pending | 9 |
+| pending | 8 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 110 files, 949 tests pass |
+| `npm test` | green — 112 files, 964 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 25 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#78 — Case workspace shell (3-pane layout)**
+
+Two new components promote the /ops/case/[id] workspace from a state-agnostic 3-pane to a state-adaptive one per PRD 04:
+
+- **`WorkSurface.tsx`** — center pane dispatcher. Picks the right surface per `CaseState`: `awaiting_docs` / `entry_recovery_in_progress` → ExtractionFormPanel; `entry_list_ready` → entry-list card; `cape_prep_in_progress` → CAPE-prep card; `batch_qa` → validator-signoff card; `submission_ready` → ready-for-filing card; `concierge_active` → concierge-coordination card; `filed` / `pending_cbp` → pending-CBP card; `deficient` → deficiency-response card; `stalled` → stalled card; `paid` / `closed` / `disqualified` → terminal read-only card; intake states (`new_lead`, `qualified`, `awaiting_purchase`, `awaiting_prep_purchase`) → pre-purchase placeholder. Every surface includes the eyebrow with the literal state id for orientation.
+- **`CaseSidePanel.tsx`** — right pane becomes a tabbed `Documents` / `Audit` widget (real `role="tab"` / `role="tabpanel"` semantics, keyboard-operable). Docs tab reuses `DocumentViewerPanel` (task #47); Audit tab is the placeholder that the full audit-log viewer lands into via task #79.
+- `/ops/case/[id]/page.tsx` wired to consume both — the 3-pane grid layout was already in place, now drives state-adaptive center + tabbed right.
+
+15 new tests (9 WorkSurface state-dispatch + 6 CaseSidePanel tabbed-shell).
+
+964/964 pass.
+
+## Previously completed this wave
 
 **#77 — Queue list page + filters + saved views**
 
@@ -226,12 +240,12 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 
 ## Next eligible
 
-- Task #78 — deps satisfied. **Eligible — lowest id.** (Case workspace shell — 3-pane layout.)
-- Tasks #79..#82 — ops-console workstream continues.
+- Task #79 — deps satisfied. **Eligible — lowest id.** (Case timeline + audit log viewer.)
+- Tasks #80..#82 — ops-console workstream continues.
 - Tasks #83 (USER-TEST ops staff), #84 (cross-context lint rule), #85 (funnel metrics), #86 (final USER-TEST) follow.
 
 ## Notes
 
-- 77/86 v1 done — 89.5% of Phase 0.
+- 78/86 v1 done — 90.7% of Phase 0.
 - Post-v1 backlog includes AI-copy funnel task #401.
-- Loop will continue with #78 next iteration.
+- Loop will continue with #79 next iteration.

@@ -8,8 +8,9 @@ import {
 import { getDocumentRepo } from '@contexts/recovery/server'
 import { getScreenerRepo } from '@contexts/screener/server'
 import { CaseHeaderPanel } from './_components/CaseHeaderPanel'
-import { DocumentViewerPanel, type CaseDocumentSummary } from './_components/DocumentViewerPanel'
-import { ExtractionFormPanel } from './_components/ExtractionFormPanel'
+import { CaseSidePanel } from './_components/CaseSidePanel'
+import type { CaseDocumentSummary } from './_components/DocumentViewerPanel'
+import { WorkSurface } from './_components/WorkSurface'
 
 /**
  * /ops/case/[id] — staff-side three-pane case workspace per PRD 04.
@@ -61,8 +62,8 @@ export default async function OpsCasePage({
     <main className="min-h-screen bg-paper">
       <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)_minmax(360px,1fr)]">
         <CaseHeaderPanel caseRecord={caseRecord} plan={plan} />
-        <ExtractionFormPanel caseId={caseRecord.id} />
-        <DocumentViewerPanel documents={docSummaries} />
+        <WorkSurface caseId={caseRecord.id} state={caseRecord.state} />
+        <CaseSidePanel caseId={caseRecord.id} documents={docSummaries} />
       </div>
     </main>
   )
