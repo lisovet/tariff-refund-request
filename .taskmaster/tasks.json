@@ -1214,11 +1214,13 @@
           58,
           59
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 1,
         "source": [
           "validation-checkpoint"
-        ]
+        ],
+        "completedAt": "2026-04-21T12:30:00Z",
+        "completedNotes": "USER-TEST checkpoint #9 (ingestion handles real-world ACE export). Implementation-side composition check codified as a permanent integration test (tests/integration/ingestion/ace-pipeline.test.ts) that exercises parseAceCsv \u2192 classifyEntries \u2192 tagEntry as a single pipeline against a synthetic 6-row ACE fixture: (1) brand-new in-window row \u2192 outcome=new + phaseFlag set; (2) duplicates an existing entry \u2192 outcome=exact_duplicate; (3) fuzzy match on (date+IOR) against existing \u2192 outcome=fuzzy_review_pair; (4) pre-window date \u2192 outcome=new but inWindow=false + phaseFlag=null; (5) post-window date \u2192 same shape as (4); (6) gibberish entry number + bad date \u2192 parser drops + records AceParseError on CSV row 7 (header is row 1). Asserts every parsed row stamps sourceConfidence=high and every tagEntry result pins the windowVersion (whether in-window or out). 4 new tests; 705/705 pass; lint + typecheck clean. Human owes: run an anonymized REAL ACE export from a customer through this pipeline; verify header coverage (add synonyms if missing); confirm analyst review queue surfaces fuzzy_review_pair + invalid + out-of-window correctly once the workspace UI for ingestion lands (#62+)."
       },
       {
         "id": 61,
