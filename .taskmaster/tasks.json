@@ -185,13 +185,15 @@
         "epic": "E3. Marketing site",
         "title": "Theme tokens + design system primitives",
         "description": "Tailwind config with design-language tokens; shadcn/ui components themed (button, dialog, input, etc.); custom typography stack loaded.",
-        "details": "Custom @font-face for GT Sectra, Söhne, Berkeley Mono (with proper fallbacks). Component primitives in src/app/_components/ui/. CTA pattern (magazine underline) implemented as a reusable component.",
+        "details": "7 primitives in src/app/_components/ui/: Button (solid + magazine-underline variants, button|anchor), Card (hairline border + optional display title), StatusBanner (anchored case-id+status+next-action), Eyebrow (uppercase mono label), Hairline (rule with optional chapter-break label), Footnote + FootnoteContent (real superscript pattern per .claude/rules/disclosure-language-required.md), KbdShortcut (kbd chip per minimalist-ui directive). /ui-kit page (noindex) renders every primitive — the 'Storybook alternative' the acceptance asks for. Playwright spec captures the baseline. Tailwind tokens already encoded in tailwind.config.ts (task #1); fonts use the licensed-fallback chain — TODO(human-action): self-host GT Sectra / Söhne / Berkeley Mono once licensed.",
         "testStrategy": "Storybook (or simple /ui-kit page) renders each primitive; visual diff baseline captured.",
         "priority": "high",
         "dependencies": [1],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 6,
-        "source": ["DESIGN-LANGUAGE.md", "ADR 010"]
+        "source": ["DESIGN-LANGUAGE.md", "ADR 010"],
+        "completedAt": "2026-04-21T06:46:00Z",
+        "completedNotes": "Loaded /taste-skill → minimalist-ui per docs/SKILLS-ROUTING.md mapping for design-system primitives. Built 7 primitives in src/app/_components/ui/: Button (solid ink-on-paper + magazine-underline accent variants, polymorphic button|anchor with disabled handling), Card (hairline border, no shadow, optional display-face title with aria-labelledby), StatusBanner (anchored top-of-page case-id mono + status + next-action link with severity colors per design language status palette), Eyebrow (uppercase mono tracking label), Hairline (rule with optional chapter-break label), Footnote + FootnoteContent (real superscript pattern + footer block per .claude/rules/disclosure-language-required.md), KbdShortcut (kbd chip per minimalist-ui directive). /ui-kit page at src/app/(marketing)/ui-kit/page.tsx renders every primitive with realistic content (no Lorem Ipsum per minimalist-ui rules) — noindex'd, the visual review surface for the design language. Playwright baseline spec at tests/e2e/anonymous/ui-kit-baseline.spec.ts. Wired @vitejs/plugin-react for vitest's TSX parsing (vitest 4 needed it). Switched component tests from removed environmentMatchGlobs to the per-file `// @vitest-environment jsdom` pragma. Tightened ESLint no-unused-vars to also ignore `_`-prefixed destructured vars + rest siblings. 16 new tests RED-then-GREEN; 146/146 pass; lint + typecheck clean; build green (/ui-kit static at 141B). Per docs/SKILLS-ROUTING.md, minimalist-ui rules applied (warm monochrome, hairline borders, no shadows, kbd as physical keys, no rounded-full pills) with our overrides (single customs-orange accent, GT Sectra display, magazine-underline CTA pattern). HUMAN-VERIFICATION: design-taste review of /ui-kit against docs/DESIGN-LANGUAGE.md before marketing pages land in task #14."
       },
       {
         "id": 13,

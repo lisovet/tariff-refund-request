@@ -1,10 +1,16 @@
 import { defineConfig } from 'vitest/config'
+import react from '@vitejs/plugin-react'
 import path from 'node:path'
 
 export default defineConfig({
+  plugins: [react()],
   test: {
     globals: true,
     environment: 'node',
+    // Component / DOM-touching tests opt in via a per-file
+    // `// @vitest-environment jsdom` pragma. Vitest 4 removed
+    // environmentMatchGlobs; the per-file pragma is the documented
+    // replacement.
     include: ['src/**/*.{test,spec}.{ts,tsx}', 'tests/**/*.{test,spec}.{ts,tsx}'],
     exclude: ['node_modules', '.next', 'tests/e2e/**'],
     coverage: {
