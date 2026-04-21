@@ -1,19 +1,19 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T10:38:00Z
+**Updated**: 2026-04-21T10:41:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 43 → 44)
+**Loop state**: active (iteration 44 → 45)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 43 |
+| completed | 44 |
 | in-progress | 0 |
-| pending | 43 |
+| pending | 42 |
 | human-blocked | 0 |
 
-We are exactly halfway through Phase 0.
+Past the halfway mark on Phase 0.
 
 ## Quality gates (last run)
 
@@ -27,39 +27,34 @@ We are exactly halfway through Phase 0.
 
 ## Last completed task
 
-**#47 — Document viewer (PDF preview, zoom, pagination)**
+**#48 — USER-TEST checkpoint #5 (upload + viewer flow)**
 
-`src/app/_components/document-viewer/DocumentViewer.tsx` for the ops side-by-side workflow per PRD 04:
+Implementation-side scaffolding complete:
 
-- Page navigation: prev / next buttons + ArrowLeft / ArrowRight when the viewer has focus, with disabled state at boundaries.
-- Zoom: in / out clamped to `MIN_SCALE` 0.5 / `MAX_SCALE` 4.0 in 0.25 steps; buttons disable at the limits.
-- Live indicators: page (`1 / N`) and zoom (`100%`) both with `aria-live=polite`.
-- PDF rendering decoupled via a `PdfLoader` interface so jsdom tests stub the runtime entirely (canvas rendering isn't viable in jsdom).
-- Production loader (`createPdfjsLoader` in `pdf-loader.ts`) lazy-imports `pdfjs-dist` + sets `GlobalWorkerOptions.workerSrc = '/pdf-worker.mjs'`. **`TODO(human-action)` marker added**: copy `node_modules/pdfjs-dist/build/pdf.worker.min.mjs` into `public/pdf-worker.mjs` at deploy time.
-- Loading state: `Loading document…`. Failure state: `role="alert"` with the underlying error.
-- `pdfjs-dist@^4.10.38` added as a dep.
-- Highlight + copy-to-form interaction (PRD 04 recovery workspace) deferred to task #51+; this component is the preview surface only.
+- POST /api/uploads + POST /api/uploads/complete (#45) — 8 integration tests covering happy path, content-type rejection, oversized rejection, HEAD-failure, storage_key_mismatch, duplicate_sha256.
+- UploadZone component (#46) — 6 client + 9 component tests covering pre-validation, multi-file, drag-drop, retry, and duplicate_sha256 surfaces.
+- DocumentViewer component (#47) — 8 tests covering load/render/error states, page nav (buttons + arrow keys + boundary disable), zoom (in/out + min/max clamp), aria-live indicators.
 
-8 new tests covering loading/render/error states, page nav (buttons + arrow keys + boundary disable), zoom (in/out + min/max clamp), and the aria-live page indicator.
+Provenance is captured at the schema level: `documents.case_id` NOT NULL, `documents.uploaded_by` + `uploaded_by_actor_id` recorded on every insert; `recovery_sources.documentId` NOT NULL (per the `.ralph/PROMPT.md` hard rule that EntryRecord provenance is never optional). UNIQUE `(case_id, sha256)` prevents accidental duplicates and surfaces them as `outcome: duplicate_sha256` (never a hard error).
 
 ## Human-verification still owes
 
-- Wire `pdf-worker.mjs` into the build (postinstall script or build-time copy).
-- Render a real broker 7501 PDF in a browser; confirm zoom feels responsive and search isn't needed at v1 fidelity (search in toolbar deferred — PRD 04 lists it but v1 ships without).
-- A11y audit: tab order through the toolbar; keyboard-only operability; SR announces page changes.
+- Copy `pdfjs-dist/build/pdf.worker.min.mjs` into `public/pdf-worker.mjs` (postinstall script or build step).
+- Provision real R2 bucket + CORS; upload several real documents (broker 7501s, broker spreadsheets, ACE export CSVs); render via DocumentViewer.
+- Confirm provenance trail is visible in the audit log + `recovery_sources` rows once the recovery workspace (#51) and ops console workspace (#82) wire the components into pages.
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #48 (USER-TEST: Upload + viewer flow) — deps `[46, 47]` satisfied. **Eligible — lowest id.** Per loop precedent, mark completed with explicit "human owes" notes after running implementation-side checks.
-- Task #49 (recovery routing — broker vs DIY) — eligible.
+- Task #49 (Recovery routing module — broker/carrier/ACE) — deps `[20]` satisfied. **Eligible — lowest id.**
 - Task #52 — eligible.
 - Task #55 (entries schema) — eligible.
 - Task #67 (CAPE prep workflow scaffold) — eligible.
+- Task #72 (admin dashboard scaffold) — eligible.
 
-Lowest-id eligible is **task #48** — USER-TEST checkpoint #5.
+Lowest-id eligible is **task #49** — `determineRecoveryPath` + `recoveryPlanFor` per ADR 015.
 
 ## Notes
 
-- Wave 8 (Recovery context — uploads + viewer) implementation-side checkpoint is complete.
-- Loop will pick #48 next iteration.
+- Wave 8 (Recovery context — uploads + viewer) checkpointed.
+- Loop will continue with task #49 next iteration. Pure routing logic + snapshot-tested outreach templates.

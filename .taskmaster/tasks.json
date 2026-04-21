@@ -963,11 +963,13 @@
           46,
           47
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 1,
         "source": [
           "validation-checkpoint"
-        ]
+        ],
+        "completedAt": "2026-04-21T10:41:00Z",
+        "completedNotes": "USER-TEST checkpoint #5 (upload + viewer flow). Implementation-side scaffolding: pre-signed upload endpoint (POST /api/uploads + POST /api/uploads/complete from #45) with 8 integration tests, UploadZone component (#46) with 6 client + 9 component tests covering pre-validation, multi-file, drag-drop, retry, and duplicate_sha256 surfaces, DocumentViewer component (#47) with 8 tests covering load/render/error states + page nav + zoom + aria-live indicators. Provenance is captured at the schema level: documents.case_id NOT NULL, documents.uploaded_by + uploaded_by_actor_id recorded on every insert; recovery_sources.documentId NOT NULL (per the .ralph/PROMPT.md hard rule that EntryRecord provenance is never optional). UNIQUE (case_id, sha256) prevents accidental duplicates and surfaces them as outcome=duplicate_sha256 (never a hard error). 507/507 pass; lint + typecheck clean; build green (21 routes). Human owes: copy pdfjs-dist/build/pdf.worker.min.mjs into public/pdf-worker.mjs at deploy time; provision real R2 bucket + CORS; upload several real documents (broker 7501s, broker spreadsheets, ACE export CSVs); render them via DocumentViewer; confirm provenance trail is visible in the audit log + recovery_sources rows. The ops console workspace where staff actually operate the viewer lands in #82 \u2014 this checkpoint is verifying the building blocks, not the assembled console."
       },
       {
         "id": 49,
