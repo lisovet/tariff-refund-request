@@ -30,6 +30,13 @@ export {
   type FinalizeOutput,
   type FinalizeDeps,
 } from './finalize'
+export {
+  screenerCompletedWorkflow,
+  screenerCompletedHandler,
+  type ScreenerCompletedHandlerInput,
+  type ScreenerCompletedHandlerDeps,
+  type ScreenerCompletedResult,
+} from './workflows/screener-completed'
 
 let cachedRepo: ScreenerRepo | undefined
 

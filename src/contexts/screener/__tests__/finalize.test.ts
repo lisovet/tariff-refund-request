@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { finalizeScreener } from '../finalize'
 import { createInMemoryScreenerRepo } from '../in-memory-repo'
-import { createConsoleTransport } from '@shared/infra/email/console-transport'
 import type { ScreenerAnswers } from '../types'
 
 const happyAnswers: ScreenerAnswers = {
@@ -21,20 +20,27 @@ const dqAnswers: ScreenerAnswers = { q1: 'no' }
 
 const SECRET = 'test-secret-32-chars-min-padding-1234'
 
-function deps() {
+type PublishArgs = Parameters<
+  Parameters<typeof finalizeScreener>[1]['publishCompleted']
+>
+
+function makePublish() {
+  return vi.fn<(...args: PublishArgs) => Promise<void>>(async () => {})
+}
+
+function deps(publish: ReturnType<typeof makePublish> = makePublish()) {
   return {
     repo: createInMemoryScreenerRepo(),
-    email: createConsoleTransport(),
+    publishCompleted: publish,
     secret: SECRET,
-    fromAddress: 'noreply@dev.test',
     resultsBaseUrl: 'https://app.example.test/screener/results',
   }
 }
 
 describe('finalizeScreener — happy path', () => {
-  it('creates a session, writes a lead, and queues a magic-link email', async () => {
-    const sendSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
-    const d = deps()
+  it('creates a session, writes a lead, signs a magic-link, publishes the completion event', async () => {
+    const publish = makePublish()
+    const d = deps(publish)
     const out = await finalizeScreener({ answers: happyAnswers }, d)
 
     expect(out.session.id).toMatch(/^sess_/)
@@ -45,9 +51,15 @@ describe('finalizeScreener — happy path', () => {
     expect(out.result.qualification).toBe('qualified')
     expect(out.magicLink).toMatch(/^https:\/\/app\.example\.test\/screener\/results\?token=/)
 
-    // The console transport logged a delivery — proves the email path was invoked.
-    expect(sendSpy).toHaveBeenCalled()
-    sendSpy.mockRestore()
+    // The publish callback fires with the same payload the workflow handler expects.
+    expect(publish).toHaveBeenCalledTimes(1)
+    const payload = publish.mock.calls[0]?.[0]
+    expect(payload).toMatchObject({
+      sessionId: out.session.id,
+      email: 'alex@acme.test',
+      company: 'Acme Imports',
+      magicLink: out.magicLink,
+    })
 
     // Lead is retrievable by email.
     const found = await d.repo.findLeadByEmail('alex@acme.test')
@@ -61,23 +73,22 @@ describe('finalizeScreener — happy path', () => {
       { answers: happyAnswers, sessionId: a.session.id },
       d,
     )
-    // Same lead, idempotent on (email, sessionId).
     expect(a.lead).not.toBeNull()
     expect(b.lead?.id).toBe(a.lead?.id)
-    // Same session reused.
     expect(b.session.id).toBe(a.session.id)
   })
 })
 
 describe('finalizeScreener — disqualified path', () => {
-  it('still writes a session but does NOT create a lead (no email captured at q10)', async () => {
-    const d = deps()
+  it('still writes a session but does NOT create a lead or publish (no email captured at q10)', async () => {
+    const publish = makePublish()
+    const d = deps(publish)
     const out = await finalizeScreener({ answers: dqAnswers }, d)
     expect(out.result.qualification).toBe('disqualified')
     expect(out.lead).toBeNull()
     expect(out.magicLink).toBeNull()
-    // Session is recorded so we can re-engage if the user opts in later.
     expect(out.session.completedAt).not.toBeNull()
+    expect(publish).not.toHaveBeenCalled()
   })
 })
 

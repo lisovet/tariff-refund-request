@@ -38,6 +38,15 @@ export default defineConfig({
       '@contexts': path.resolve(__dirname, './src/contexts'),
       '@shared': path.resolve(__dirname, './src/shared'),
       '@app': path.resolve(__dirname, './src/app'),
+      // The `server-only` package throws if imported into a client
+      // module. Vitest is neither client nor server in that sense, so
+      // we alias it to an empty module so server-only entry points
+      // (@contexts/<name>/server) remain importable in tests.
+      // Production builds see the real `server-only` package.
+      'server-only': path.resolve(
+        __dirname,
+        './tests/setup/server-only-noop.ts',
+      ),
     },
   },
 })

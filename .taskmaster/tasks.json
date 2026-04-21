@@ -423,13 +423,15 @@
         "epic": "E12. Lifecycle email + Inngest",
         "title": "Lifecycle workflow #1 — screener-completed",
         "description": "Inngest workflow fires on screener completion; sends results dossier email.",
-        "details": "Email links back to results page. Workflow is idempotent.",
+        "details": "Email links back to results page. Workflow is idempotent. finalize.ts publishes platform/screener.completed via a publishCompleted callback the route handler wires to inngest.send. The screener-completed workflow handler renders + sends the email with idempotencyKey 'screener-results:<sessionId>' so Inngest retries are safe. Workflows registry updated.",
         "testStrategy": "Workflow test: trigger event → assert email step ran with correct payload.",
         "priority": "high",
         "dependencies": [27, 24],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 3,
-        "source": ["PRD 05"]
+        "source": ["PRD 05"],
+        "completedAt": "2026-04-21T08:27:00Z",
+        "completedNotes": "platform/screener.completed event added to the typed catalog (eventType + staticSchema). screener-completed workflow handler in src/contexts/screener/workflows/screener-completed.ts: 2 step.run calls (render-email + send-email), idempotencyKey 'screener-results:<sessionId>' so Inngest retries are safe. Wrapped via inngest.createFunction with triggers:[screenerCompleted]; handler exported separately so unit tests bypass the Inngest wrapper. Workflows registry now includes screenerCompletedWorkflow alongside the smoke workflow. finalize.ts REFACTORED: previously rendered+sent the email inline; now publishes via a publishCompleted callback and the route handler wires inngest.send into it. The change makes delivery durable, replayable, AND the trigger for downstream cadences (24h/72h nudges in tasks #29/#30). 2 new workflow handler tests + finalize tests refactored to assert the publish payload shape; 273/273 pass; lint + typecheck clean; build green (16 routes). server-only package aliased to a no-op module in vitest config so server-only entry points (@contexts/<name>/server) remain importable in tests; production builds see the real package."
       },
       {
         "id": 29,

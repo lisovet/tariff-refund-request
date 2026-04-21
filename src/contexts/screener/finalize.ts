@@ -1,13 +1,6 @@
-// Server-only in spirit (uses node:crypto via magic-link + email
-// transport with Node-only deps), but the `server-only` directive
-// lives on `@contexts/screener/server` so this module remains
-// importable in vitest.
-import {
-  ScreenerResultsEmail,
-  renderEmail,
-  type EmailTransport,
-} from '@shared/infra/email'
-import { isComplete } from './branching'
+// Server-only in spirit (uses node:crypto + Inngest publish), but the
+// `server-only` directive lives on `@contexts/screener/server` so this
+// module remains importable in vitest.
 import { signToken } from './magic-link'
 import { computeResult } from './qualification'
 import type {
@@ -16,6 +9,7 @@ import type {
   ScreenerSessionRecord,
 } from './repo'
 import type { ScreenerAnswers, ScreenerResult } from './types'
+import { isComplete } from './branching'
 
 /**
  * Server-side screener finalization. Triggered when the client
@@ -23,13 +17,23 @@ import type { ScreenerAnswers, ScreenerResult } from './types'
  *
  *   1. Persist the session (or update an existing one).
  *   2. If the user reached q10 with an email-capture, write a lead
- *      row (idempotent on email + sessionId) and queue the magic-link
- *      results email.
- *   3. Return the computed result + magic-link URL so the client can
- *      both render the result inline and confirm delivery.
+ *      row (idempotent on email + sessionId).
+ *   3. Sign a magic-link token good for 7 days.
+ *   4. Publish `platform/screener.completed` to Inngest. The lifecycle
+ *      workflow #1 (task #28) sends the results email; downstream
+ *      cadences (24h, 72h, day-7 — tasks #29/#30) chain off the same
+ *      event.
+ *   5. Return the computed result + magic-link URL so the client can
+ *      render the result inline immediately.
+ *
+ * Per ADR 007: by publishing instead of sending inline, the email
+ * delivery becomes durable + replayable + the trigger for future
+ * cadences. Inngest persists the event and retries on failure.
  *
  * Disqualified paths (q1=no, q3=no) record the session but do NOT
- * write a lead — there's no email-capture to pair them with.
+ * write a lead or publish a completion event — there's no email to
+ * pair them with. The 'screener.disqualified' event lands later if
+ * we want a re-engagement cadence.
  */
 
 export interface FinalizeInput {
@@ -40,9 +44,14 @@ export interface FinalizeInput {
 
 export interface FinalizeDeps {
   readonly repo: ScreenerRepo
-  readonly email: EmailTransport
+  /** Publishes the screener-completed event for downstream workflows. */
+  readonly publishCompleted: (payload: {
+    sessionId: string
+    email: string
+    company: string | null
+    magicLink: string
+  }) => Promise<void>
   readonly secret: string
-  readonly fromAddress: string
   readonly resultsBaseUrl: string
 }
 
@@ -72,7 +81,7 @@ export async function finalizeScreener(
   const result = computeResult(input.answers)
   const completed = await deps.repo.completeSession(session.id, result)
 
-  // 3. Disqualified paths skip lead + email; we recorded the session.
+  // 3. Disqualified paths skip lead + publish; we recorded the session.
   if (result.qualification === 'disqualified' || !input.answers.q10) {
     return { session: completed, lead: null, result, magicLink: null }
   }
@@ -85,27 +94,20 @@ export async function finalizeScreener(
     source: input.source ?? 'screener',
   })
 
-  // 4. Sign the magic-link + send the email.
+  // 4. Sign the magic-link.
   const token = signToken(
     { sessionId: completed.id, email },
     { secret: deps.secret, ttlSeconds: MAGIC_LINK_TTL_SECONDS },
   )
   const magicLink = `${deps.resultsBaseUrl}?token=${encodeURIComponent(token)}`
 
-  const rendered = await renderEmail(
-    ScreenerResultsEmail({
-      firstName: firstNameOf(company),
-      resultsUrl: magicLink,
-    }),
-  )
-
-  await deps.email.send({
-    from: deps.fromAddress,
-    to: email,
-    subject: 'Your screener results.',
-    html: rendered.html,
-    text: rendered.text,
-    idempotencyKey: `screener-results:${completed.id}`,
+  // 5. Publish — workflow #1 sends the results email; future workflows
+  //    chain off the same event for cadenced nudges.
+  await deps.publishCompleted({
+    sessionId: completed.id,
+    email,
+    company,
+    magicLink,
   })
 
   return { session: completed, lead, result, magicLink }
@@ -121,14 +123,4 @@ async function ensureSession(
     return repo.updateAnswers(sessionId, answers)
   }
   return repo.createSession({ answers })
-}
-
-function firstNameOf(company: string | null | undefined): string | undefined {
-  // We don't capture the customer's name in v1 — the company string is
-  // the closest substitute for a personalized greeting, and even that's
-  // optional. Returning undefined falls back to a generic salutation.
-  if (!company) return undefined
-  // Heuristic: if the company looks like "Acme Imports", surface "Acme".
-  const first = company.trim().split(/\s+/u)[0]
-  return first && first.length <= 24 ? first : undefined
 }

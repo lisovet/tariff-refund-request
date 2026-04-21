@@ -4,7 +4,7 @@ import {
   finalizeScreener,
   getScreenerRepo,
 } from '@contexts/screener/server'
-import { getEmailFrom, getEmailTransport } from '@shared/infra/email'
+import { inngest } from '@shared/infra/inngest/client'
 import { getErrorTracker, getLogger } from '@shared/infra/observability'
 import type { ScreenerAnswers } from '@contexts/screener'
 
@@ -71,9 +71,15 @@ export async function POST(req: Request): Promise<Response> {
       { answers: parsed.answers, sessionId: parsed.sessionId },
       {
         repo: getScreenerRepo(),
-        email: getEmailTransport(),
+        publishCompleted: async (payload) => {
+          // Inngest persists + retries on failure; the workflow handles
+          // the email send durably.
+          await inngest.send({
+            name: 'platform/screener.completed',
+            data: payload,
+          })
+        },
         secret,
-        fromAddress: getEmailFrom(),
         resultsBaseUrl,
       },
     )

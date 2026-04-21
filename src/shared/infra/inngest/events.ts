@@ -23,3 +23,19 @@ export const caseStateTransitioned = eventType('platform/case.state.transitioned
     }
   }>(),
 })
+
+/**
+ * Fired by /api/screener/complete after the lead row is written.
+ * Triggers the screener-results email + downstream lifecycle cadences
+ * (24h nudge, 72h nudge — tasks #29 + #30).
+ */
+export const screenerCompleted = eventType('platform/screener.completed', {
+  schema: staticSchema<{
+    data: {
+      sessionId: string
+      email: string
+      company: string | null
+      magicLink: string
+    }
+  }>(),
+})
