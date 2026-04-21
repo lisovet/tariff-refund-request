@@ -9,18 +9,23 @@ import type { CaseRepo } from '../repo'
  * to satisfy (single-transaction case+audit write).
  */
 
+interface PublishCall {
+  caseId: string
+  auditId: string
+  kind: string
+  from: string
+  to: string
+  actorId: string
+  occurredAt: string
+}
+
 function makeDeps(): {
   deps: TransitionDeps
   repo: CaseRepo
-  publishCalls: Array<{ caseId: string; from: string; to: string; actorId: string }>
+  publishCalls: PublishCall[]
 } {
   const repo = createInMemoryCaseRepo()
-  const publishCalls: Array<{
-    caseId: string
-    from: string
-    to: string
-    actorId: string
-  }> = []
+  const publishCalls: PublishCall[] = []
   return {
     repo,
     publishCalls,
@@ -29,9 +34,12 @@ function makeDeps(): {
       publishCaseTransitioned: vi.fn(async (payload) => {
         publishCalls.push({
           caseId: payload.caseId,
+          auditId: payload.auditId,
+          kind: payload.kind,
           from: payload.from,
           to: payload.to,
           actorId: payload.actorId,
+          occurredAt: payload.occurredAt,
         })
       }),
       clock: () => new Date('2026-04-21T10:00:00Z'),
@@ -68,13 +76,16 @@ describe('transition() — happy path', () => {
     expect(audit[0]?.toState).toBe('qualified')
     expect(audit[0]?.kind).toBe('SCREENER_RESULT_QUALIFIED')
 
-    // publish fired
+    // publish fired with full context for the audit mirror
     expect(publishCalls).toHaveLength(1)
     expect(publishCalls[0]).toEqual({
       caseId: c.id,
+      auditId: result.auditId,
+      kind: 'SCREENER_RESULT_QUALIFIED',
       from: 'new_lead',
       to: 'qualified',
       actorId: 'system',
+      occurredAt: '2026-04-21T10:00:00.000Z',
     })
   })
 

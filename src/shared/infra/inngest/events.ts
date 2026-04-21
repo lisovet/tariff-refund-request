@@ -17,9 +17,12 @@ export const caseStateTransitioned = eventType('platform/case.state.transitioned
   schema: staticSchema<{
     data: {
       caseId: string
+      auditId: string
+      kind: string
       from: string
       to: string
       actorId: string
+      occurredAt: string // ISO 8601
     }
   }>(),
 })

@@ -842,11 +842,13 @@
           41,
           5
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 3,
         "source": [
           "ADR 013"
-        ]
+        ],
+        "completedAt": "2026-04-21T10:08:00Z",
+        "completedNotes": "Audit log mirror to Axiom per ADR 013. auditLogMirrorWorkflow listens on platform/case.state.transitioned and emits a structured info-level log entry \"audit_log.mirror\" with caseId/auditId/kind/from/to/actorId/occurredAt \u2014 the Axiom logger ingests these into the observability dataset for compliance + analytics queries. Best-effort: when AXIOM_TOKEN is missing the no-op logger short-circuits the mirror to mirrored=false (workflow succeeds, no retry); when the logger throws (real Axiom outage), the workflow rethrows so Inngest retries with backoff. NEVER blocks the transactional case-state write \u2014 task #41 commits the DB write before publishing the event. caseStateTransitioned event schema extended with auditId, kind, occurredAt; transition() threads them into the publish payload. Workflow registered in shared/infra/inngest/workflows + re-exported from @contexts/ops/server. 3 new tests (info-level emit + structured attrs; no-op logger short-circuit; logger-throw rethrow). 436/436 pass; lint + typecheck clean; build green (19 routes; workflow is server-only \u2014 discovered by Inngest dev server at /api/inngest)."
       },
       {
         "id": 43,

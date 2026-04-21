@@ -51,9 +51,12 @@ export interface TransitionInput {
 
 export interface CaseTransitionedPayload {
   readonly caseId: string
+  readonly auditId: string
+  readonly kind: string
   readonly from: CaseState
   readonly to: CaseState
   readonly actorId: string
+  readonly occurredAt: string // ISO 8601
 }
 
 export interface TransitionDeps {
@@ -92,9 +95,12 @@ export async function transition(
 
   await deps.publishCaseTransitioned({
     caseId: input.caseId,
+    auditId,
+    kind: enriched.type,
     from,
     to,
     actorId: input.actor?.id ?? 'system',
+    occurredAt: now.toISOString(),
   })
 
   return { ok: true, caseId: input.caseId, from, to, auditId }

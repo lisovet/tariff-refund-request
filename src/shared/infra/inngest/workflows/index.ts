@@ -1,3 +1,4 @@
+import { auditLogMirrorWorkflow } from '@contexts/ops/server'
 import {
   nudgeCadenceWorkflow,
   screenerCompletedWorkflow,
@@ -22,6 +23,12 @@ export const workflows = [
   smokeHelloWorld,
   screenerCompletedWorkflow,
   nudgeCadenceWorkflow,
+  auditLogMirrorWorkflow,
 ] as const
 
-export { smokeHelloWorld, screenerCompletedWorkflow, nudgeCadenceWorkflow }
+export {
+  smokeHelloWorld,
+  screenerCompletedWorkflow,
+  nudgeCadenceWorkflow,
+  auditLogMirrorWorkflow,
+}
