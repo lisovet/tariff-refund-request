@@ -1,8 +1,12 @@
 import type { Metadata } from 'next'
+import { ClerkProvider } from '@clerk/nextjs'
 import './globals.css'
 
 /*
  * Root layout. Marketing, app, and ops route groups all inherit from this.
+ * ClerkProvider must wrap everything so useUser/auth() helpers work in
+ * RSC + client components alike. Per ADR 004.
+ *
  * TODO(human-action): wire real font files for GT Sectra / Söhne / Berkeley
  * Mono once licensed; today the fallback chain in tailwind.config.ts handles it.
  */
@@ -26,8 +30,10 @@ export default function RootLayout({
   readonly children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body>{children}</body>
+      </html>
+    </ClerkProvider>
   )
 }

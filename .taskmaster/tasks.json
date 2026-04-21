@@ -125,13 +125,15 @@
         "epic": "E2. Auth + roles",
         "title": "Wire Clerk for customer accounts",
         "description": "Install Clerk, configure middleware for (app) route group, set up sign-in / sign-up pages.",
-        "details": "Email + Google OAuth. Sign-in/up pages themed to design language (override Clerk default styling). Middleware redirects unauthed (app) traffic to sign-in.",
+        "details": "@clerk/nextjs + @clerk/testing installed. ClerkProvider wraps the root layout. src/middleware.ts gates protected routes (/app, /ops, /api/cases, /api/uploads) and redirects unauthed users to /sign-in with returnBackUrl. Pure route-gating predicates in src/shared/infra/auth/route-gating.ts. Themed sign-in / sign-up pages at src/app/sign-in/[[...sign-in]]/page.tsx and src/app/sign-up/[[...sign-up]]/page.tsx with appearance overrides (ink/paper canvas, GT Sectra display, magazine-underline links). Actor type surface in src/shared/infra/auth/actor.ts (CustomerActor | StaffActor | AnonymousActor + discriminants); full Clerk → Actor resolver lands in task #10.",
         "testStrategy": "Playwright: sign up → sign in → access (app); unauth user is redirected.",
         "priority": "high",
         "dependencies": [1],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 4,
-        "source": ["ADR 004"]
+        "source": ["ADR 004"],
+        "completedAt": "2026-04-21T06:16:30Z",
+        "completedNotes": "@clerk/nextjs + @clerk/testing installed. ClerkProvider wraps root layout. src/middleware.ts uses clerkMiddleware + isProtectedRoute predicate to gate /app/**, /ops/**, /api/cases/**, /api/uploads/**; unauthed → redirectToSignIn with returnBackUrl. Pure predicates (isPublicRoute / isProtectedRoute) live in src/shared/infra/auth/route-gating.ts so they're unit-testable without the middleware runtime. Themed sign-in/sign-up pages with Clerk appearance override pointing at our token system (bg-paper, font-display GT Sectra, ink CTA, accent footer link). Actor type surface (CustomerActor | StaffActor | AnonymousActor with isAnonymous/isCustomer/isStaff discriminants) ready for the resolver in task #10. Playwright protected-redirect spec at tests/e2e/anonymous/protected-redirect.spec.ts (skips when Clerk env unset). 29 new tests RED-then-GREEN: all 81 tests pass; lint + typecheck clean. Build verified end-to-end with stub Clerk env (sign-in/sign-up routes compile, middleware bundle 85kB). Bug caught + fixed during gates: PUBLIC_PREFIXES used trailing-slash patterns that didn't match nested webhook paths; removed trailing slashes. HUMAN-VERIFICATION: real Clerk dashboard signup, real CLERK_SECRET_KEY + NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY in .env.local, Google OAuth provider configured, end-to-end Playwright sign-up→sign-in→access /app flow."
       },
       {
         "id": 9,

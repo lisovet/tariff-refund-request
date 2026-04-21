@@ -1,63 +1,53 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T06:11:00Z
+**Updated**: 2026-04-21T06:16:30Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 7 → 8)
+**Loop state**: active (iteration 8 → 9)
 
 ## Counts
 
 | Status | Count |
 | --- | --- |
-| completed | 7 |
+| completed | 8 |
 | in-progress | 0 |
-| pending | 79 |
+| pending | 78 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 11 files, 52 tests pass |
+| `npm test` | green — 13 files, 81 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
-| `npm run build` | green — 8 static pages, all routes resolve |
-| `npm run db:generate` | green — runs, no schema yet (downstream tasks register tables) |
+| `npm run build` | green — middleware (85kB) + sign-in / sign-up routes compile |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
 
-**#7 — USER-TEST: Foundation works end-to-end (Checkpoint 1)**
+**#8 — Wire Clerk for customer accounts**
 
-Implementation-level verification ran every command the loop could:
+- `@clerk/nextjs` + `@clerk/testing` installed.
+- `ClerkProvider` wraps the root layout.
+- `src/middleware.ts` uses `clerkMiddleware` + `isProtectedRoute` predicate to gate `/app/**`, `/ops/**`, `/api/cases/**`, `/api/uploads/**`. Unauthed → `redirectToSignIn({ returnBackUrl })`.
+- Pure predicates `isPublicRoute` / `isProtectedRoute` in `src/shared/infra/auth/route-gating.ts` — unit-testable without the middleware runtime.
+- Themed sign-in / sign-up pages at `src/app/sign-in/[[...sign-in]]/page.tsx` and `src/app/sign-up/[[...sign-up]]/page.tsx`. Appearance overrides re-skin Clerk to our token system (bg-paper, font-display GT Sectra fallback chain, ink-on-paper, customs-orange `--accent` for the footer link).
+- `Actor` type surface in `src/shared/infra/auth/actor.ts` (`CustomerActor | StaffActor | AnonymousActor` with `isAnonymous` / `isCustomer` / `isStaff` discriminants). Full Clerk → Actor resolver lands in task #10.
+- Playwright protected-redirect spec at `tests/e2e/anonymous/protected-redirect.spec.ts` — skips when Clerk env unset.
+- 29 new tests (route-gating + actor) — RED-confirmed before implementation.
+- Bug caught + fixed: `PUBLIC_PREFIXES` used trailing-slash patterns that didn't match nested webhook paths.
 
-- `npm run build` succeeds end-to-end. 8 static pages generated.
-- All routes resolve correctly: `/` (marketing), `/app` (customer app), `/ops` (ops console), `/api/health`, `/api/inngest`.
-- `npm run db:generate` runs (no schema yet, as expected — downstream tasks register tables).
-- All 52 unit tests pass; lint + typecheck clean.
+## Human-verification still owes
 
-The build verification caught + the loop fixed real bugs:
-
-1. Three route groups all resolved to `/` (each had a bare `page.tsx`) — moved to `(app)/app/page.tsx` and `(ops)/ops/page.tsx`.
-2. `experimental.typedRoutes` warning — moved to top-level in `next.config.ts`.
-3. Multiple-lockfile warning — pinned `outputFileTracingRoot`.
-4. `next-env.d.ts` triple-slash lint error — added to ESLint ignore (Next regenerates this file).
-
-### Human verification still owes
-
-These need a real human at a real environment:
-
-- `npm run dev` starts cleanly with both Next and Inngest dev server (terminal observation).
-- Real DB migration applies against a Neon dev branch (needs `DATABASE_URL`).
-- Real R2 upload (needs R2 keys or running MinIO).
-- Real Inngest workflow fires from the dev server UI.
-- Sentry captures a thrown error in the browser (needs `SENTRY_DSN`).
-- Axiom receives a structured log (needs `AXIOM_TOKEN` + `AXIOM_DATASET`).
-- CI is green on a placeholder PR pushed to a real GitHub remote.
+- Real Clerk dashboard sign-up; `CLERK_SECRET_KEY` + `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` in `.env.local`.
+- Google OAuth provider configured in Clerk dashboard.
+- End-to-end Playwright sign-up → sign-in → access /app flow.
 
 ## Next eligible
 
-Task #8 — Wire Clerk for customer accounts (depends on #1; eligible). Wave 2 (auth + roles) begins.
+Task #9 — Configure Clerk staff org with roles (depends on #8; eligible). Adds the (ops) gating + role enum.
 
-## Human-blocked tasks
+## Notes
 
-(none — task #7 USER-TEST is "completed at implementation level" with the human-verification list above documented.)
+- Wave 2 (auth + roles) underway — 1/4 done.
+- Loop will continue with task #9 next iteration.
