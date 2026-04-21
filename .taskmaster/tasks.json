@@ -114,9 +114,11 @@
         "testStrategy": "Manual checklist; no production code yet.",
         "priority": "high",
         "dependencies": [1, 2, 3, 4, 5, 6],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 1,
-        "source": ["validation-checkpoint"]
+        "source": ["validation-checkpoint"],
+        "completedAt": "2026-04-21T06:11:00Z",
+        "completedNotes": "Implementation-level verification: `npm run build` succeeds end-to-end (8 static pages generated, all routes resolve correctly: / from (marketing), /app from (app)/app, /ops from (ops)/ops, /api/health, /api/inngest). `npm run db:generate` runs (no schema yet, expected — downstream tasks register tables). `npm test` 52/52 pass. `npm run lint` clean. `npm run typecheck` clean. `npm run qa` (combined) green. The build verification caught and the loop fixed: (a) three route groups all resolved to `/` because each had a bare `page.tsx` — fixed by nesting `(app)/app/page.tsx` and `(ops)/ops/page.tsx`; (b) `experimental.typedRoutes` warning — moved to top-level; (c) parent-directory lockfile warning — pinned `outputFileTracingRoot`; (d) `next-env.d.ts` triple-slash lint error — added to ESLint ignore (Next regenerates this file). HUMAN-VERIFICATION STILL OWES: `npm run dev` starts cleanly with both Next and Inngest dev server (needs human-watched terminal); real DB migration applies against a Neon dev branch (needs DATABASE_URL); real R2 upload (needs R2 keys or running MinIO); real Inngest workflow fires from the dev server UI; Sentry captures a thrown error in the browser; Axiom receives a structured log; CI is green on a placeholder PR pushed to a real GitHub remote."
       },
       {
         "id": 8,

@@ -14,11 +14,12 @@ const root = process.cwd()
 
 describe('scaffold: route groups', () => {
   it.each([
-    ['marketing', 'src/app/(marketing)/page.tsx'],
-    ['app', 'src/app/(app)/page.tsx'],
-    ['ops', 'src/app/(ops)/page.tsx'],
-    ['api', 'src/app/api/health/route.ts'],
-  ])('exposes the %s route group', (_label, path) => {
+    ['marketing /', 'src/app/(marketing)/page.tsx'],
+    ['app /app', 'src/app/(app)/app/page.tsx'],
+    ['ops /ops', 'src/app/(ops)/ops/page.tsx'],
+    ['api /api/health', 'src/app/api/health/route.ts'],
+    ['api /api/inngest', 'src/app/api/inngest/route.ts'],
+  ])('exposes the %s route', (_label, path) => {
     expect(existsSync(join(root, path))).toBe(true)
   })
 

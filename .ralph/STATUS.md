@@ -1,51 +1,63 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T06:06:30Z
+**Updated**: 2026-04-21T06:11:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 6 → 7)
+**Loop state**: active (iteration 7 → 8)
 
 ## Counts
 
 | Status | Count |
 | --- | --- |
-| completed | 6 |
+| completed | 7 |
 | in-progress | 0 |
-| pending | 80 |
+| pending | 79 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 11 files, 51 tests pass |
+| `npm test` | green — 11 files, 52 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
+| `npm run build` | green — 8 static pages, all routes resolve |
+| `npm run db:generate` | green — runs, no schema yet (downstream tasks register tables) |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
 
-**#6 — Configure Vitest + Playwright + Testing Library**
+**#7 — USER-TEST: Foundation works end-to-end (Checkpoint 1)**
 
-- `@playwright/test` installed (browser binaries are a one-time `npx playwright install --with-deps` per env, kept out of the repo).
-- `playwright.config.ts` with three role-scoped projects: anonymous (testing `/`), customer + ops-staff (storageState placeholders for tasks #8 / #9).
-- Sample spec: `tests/e2e/anonymous/marketing-loads.spec.ts`.
-- `tests/setup/per-worker-schema.ts` wires per-worker DB schema isolation into `vitest.config.ts setupFiles`. No-op when `DATABASE_URL` is missing.
-- `test-isolation.ts` exposes `workerSchemaName` (with SQL-injection guard) + `applyTestIsolation` + `dropTestIsolation`.
-- `.github/workflows/ci.yml` runs lint + typecheck + test on every PR/push, plus an `e2e` job that installs Chromium and runs the anonymous Playwright project. Integration job stub commented in.
-- 6 new tests (test-isolation) — RED-confirmed before implementation.
+Implementation-level verification ran every command the loop could:
 
-## Foundation wave complete
+- `npm run build` succeeds end-to-end. 8 static pages generated.
+- All routes resolve correctly: `/` (marketing), `/app` (customer app), `/ops` (ops console), `/api/health`, `/api/inngest`.
+- `npm run db:generate` runs (no schema yet, as expected — downstream tasks register tables).
+- All 52 unit tests pass; lint + typecheck clean.
 
-Tasks #1–#6 all done. Foundation infrastructure (Next + TS + Drizzle + R2 + Inngest + Sentry/Axiom + Vitest + Playwright + CI) is in place. Next: USER-TEST checkpoint #7, then the auth wave (tasks 8–11) begins.
+The build verification caught + the loop fixed real bugs:
+
+1. Three route groups all resolved to `/` (each had a bare `page.tsx`) — moved to `(app)/app/page.tsx` and `(ops)/ops/page.tsx`.
+2. `experimental.typedRoutes` warning — moved to top-level in `next.config.ts`.
+3. Multiple-lockfile warning — pinned `outputFileTracingRoot`.
+4. `next-env.d.ts` triple-slash lint error — added to ESLint ignore (Next regenerates this file).
+
+### Human verification still owes
+
+These need a real human at a real environment:
+
+- `npm run dev` starts cleanly with both Next and Inngest dev server (terminal observation).
+- Real DB migration applies against a Neon dev branch (needs `DATABASE_URL`).
+- Real R2 upload (needs R2 keys or running MinIO).
+- Real Inngest workflow fires from the dev server UI.
+- Sentry captures a thrown error in the browser (needs `SENTRY_DSN`).
+- Axiom receives a structured log (needs `AXIOM_TOKEN` + `AXIOM_DATASET`).
+- CI is green on a placeholder PR pushed to a real GitHub remote.
 
 ## Next eligible
 
-Task #7 — USER-TEST: Foundation works end-to-end (deps 1–6 all completed; eligible).
+Task #8 — Wire Clerk for customer accounts (depends on #1; eligible). Wave 2 (auth + roles) begins.
 
 ## Human-blocked tasks
 
-(none yet — but task #7 is a USER-TEST that ultimately requires human verification of `npm run dev`, real DB migration against Neon, real R2 upload, real Inngest workflow firing, real Sentry/Axiom event delivery, and CI green on a placeholder PR. The loop will mark the test as completed at the implementation level and document what human verification still owes.)
-
-## Notes
-
-- Loop will continue with task #7 next iteration. Per `.ralph/PROMPT.md`, USER-TEST tasks are completed by the loop — the loop attests to *implementation* readiness; human attests to *experience* readiness.
+(none — task #7 USER-TEST is "completed at implementation level" with the human-verification list above documented.)

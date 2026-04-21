@@ -30,7 +30,15 @@ const config = [
     },
   },
   {
-    ignores: ['.next/**', 'node_modules/**', 'drizzle/meta/**', 'coverage/**'],
+    ignores: [
+      '.next/**',
+      'node_modules/**',
+      'drizzle/meta/**',
+      'coverage/**',
+      'next-env.d.ts', // Next.js owns + regenerates this file
+      'playwright-report/**',
+      'test-results/**',
+    ],
   },
 ]
 
