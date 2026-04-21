@@ -23,6 +23,12 @@ export { renderEmail, type RenderedEmail } from './render'
 export { ScreenerResultsEmail } from './templates/ScreenerResultsEmail'
 export { ScreenerNudge24hEmail } from './templates/ScreenerNudge24hEmail'
 export { ScreenerNudge72hEmail } from './templates/ScreenerNudge72hEmail'
+export { RecoveryPurchasedEmail } from './templates/RecoveryPurchasedEmail'
+export { RecoveryMissingDocsEmail } from './templates/RecoveryMissingDocsEmail'
+export { EntryListReadyEmail } from './templates/EntryListReadyEmail'
+export { PrepReadyEmail } from './templates/PrepReadyEmail'
+export { ConciergeUpsellEmail } from './templates/ConciergeUpsellEmail'
+export { ReengagementEmail } from './templates/ReengagementEmail'
 
 let cached: EmailTransport | undefined
 

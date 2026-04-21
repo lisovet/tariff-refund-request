@@ -466,13 +466,16 @@
         "epic": "E12. Lifecycle email + Inngest",
         "title": "Lifecycle templates 4–9",
         "description": "Build remaining lifecycle templates: recovery purchased, missing docs, entry list ready, prep ready, concierge upsell, day-14 re-engagement.",
-        "details": "All in React Email; restrained typography; inline accent links.",
+        "details": "Six new React Email templates wrapping the canonical EmailLayout (so the 'Not legal advice' disclosure rides on every send). Shared editorial primitives (H1, P, PrimaryCta, SecondaryLink, greetingFor) extracted to templates/_components.tsx so the templates stay short and consistent. Each template carries the right CTA URL + a per-template preview line.",
         "testStrategy": "Snapshot tests per template.",
         "priority": "medium",
         "dependencies": [27],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 6,
-        "source": ["PRD 05"]
+        "source": ["PRD 05"],
+        "completedAt": "2026-04-21T08:42:00Z",
+        "completedNotes": "Six new templates per PRD 05 lifecycle table (#4–#9): RecoveryPurchasedEmail (#4 — welcome + first task), RecoveryMissingDocsEmail (#5 — 96h check-in with 15-min call offer), EntryListReadyEmail (#6 — restrained celebration + entry count + Prep next step), PrepReadyEmail (#7 — Readiness Report delivered + Concierge upsell), ConciergeUpsellEmail (#8 — at-the-moment-of-need framing with success-fee mechanic), ReengagementEmail (#9 — day-14 soft re-entry, no pressure). Shared editorial primitives extracted to templates/_components.tsx (H1, P with size/muted variants, PrimaryCta ink-on-paper button, SecondaryLink accent-underlined, greetingFor helper). Every template wraps EmailLayout so the canonical NOT_LEGAL_ADVICE_DISCLOSURE rides on every send (single source of truth per .claude/rules/disclosure-language-required.md). Each carries a per-template preview line for inbox preview. 6 new render-snapshot tests RED-then-GREEN; 283/283 pass; lint + typecheck clean; build green. The lifecycle workflows that publish these emails (recovery-purchased trigger, prep-ready trigger, etc.) land in their respective Phase-1 ops-scaling tasks; templates are ready when those workflows arrive."
+
       },
       {
         "id": 32,

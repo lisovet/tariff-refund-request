@@ -1,23 +1,23 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T08:35:00Z
+**Updated**: 2026-04-21T08:42:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 27 → 28)
+**Loop state**: active (iteration 28 → 29)
 
 ## Counts
 
 | Status | Count |
 | --- | --- |
-| completed | 27 |
+| completed | 28 |
 | in-progress | 0 |
-| pending | 59 |
+| pending | 58 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 48 files, 277 tests pass |
+| `npm test` | green — 49 files, 283 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 16 routes |
@@ -25,30 +25,43 @@
 
 ## Last completed task
 
-**#29 — Lifecycle nudge cadence (24h, 72h)**
+**#31 — Lifecycle templates 4–9**
 
-- `nudgeCadenceWorkflow` triggered by `platform/screener.completed` (runs in parallel with the screener-completed workflow — results email goes out instantly, nudges wait).
-- Two `step.waitForEvent` windows (24h then 48h more) listening for `platform/payment.completed` filtered to the same `sessionId` via Inngest's `if` expression.
-- On purchase: cadence stops with `cancelledBy` (`purchase-during-24h-window` or `...-72h-window`).
-- On timeout: send nudge with sessionId-scoped `idempotencyKey` for retry safety.
-- Two new email templates: `ScreenerNudge24hEmail` (soft-recovery framing) + `ScreenerNudge72hEmail` (founder-style records framing). Both wrap in `EmailLayout` so the canonical disclosure rides on every send.
-- `platform/payment.completed` event added to the typed catalog — Stripe webhook in task #33 will publish it.
-- 4 new workflow tests (no-purchase fires both, purchase-in-window-1 cancels both, purchase-in-window-2 sends nudge 1 only, idempotencyKey assertions).
+Six new React Email templates, each wrapping `EmailLayout` so the canonical "Not legal advice" disclosure rides on every send.
 
-## Human-verification still owes
+- `RecoveryPurchasedEmail` (#4) — welcome + first task framing.
+- `RecoveryMissingDocsEmail` (#5) — 96h check-in with a 15-minute call offer.
+- `EntryListReadyEmail` (#6) — restrained celebration + entry count + Prep next step.
+- `PrepReadyEmail` (#7) — Readiness Report delivered + Concierge upsell secondary link.
+- `ConciergeUpsellEmail` (#8) — at-the-moment-of-need framing with the success-fee mechanic spelled out.
+- `ReengagementEmail` (#9) — day-14 soft re-entry; "we don't auto-renew anything; the case stays in your account either way."
 
-- Walk the cadence in the Inngest dev UI — observe the two `waitForEvent` steps; simulate a `platform/payment.completed` event mid-window; confirm the cadence cancels.
+Shared editorial primitives extracted to `templates/_components.tsx` (`H1`, `P` with size/muted variants, `PrimaryCta` ink-on-paper button, `SecondaryLink` accent-underlined, `greetingFor` helper) so the templates stay short and consistent.
+
+6 new render-snapshot tests RED-then-GREEN.
+
+## Workflows that publish these emails
+
+The templates are ready when their publishing workflows land:
+
+- `recovery-purchased` workflow → fires on the Stripe webhook (task #33) for Recovery SKUs.
+- `recovery-missing-docs` cadence → 96h after recovery purchase, no documents (Phase-1 ops scaling).
+- `entry-list-ready` → fires when an analyst marks the entry list ready (task #41 case state machine + the recovery context).
+- `prep-ready` → fires on validator sign-off (task #65).
+- `concierge-upsell` → fires when prep is ready and Concierge isn't already active.
+- `re-engagement` → day-14 stalled-case sweep (Phase-1 ops scaling).
 
 ## Next eligible
 
-Task #30 — Stalled-case cadence (48h, 96h, day-7). Deps `[28, 51]` — task #51 (recovery workspace UI) is later. Task #30 is task-blocked.
+Per dependency check:
+- Task #32 (USER-TEST: Lifecycle emails reviewed) — deps `[28, 29, 30, 31]`. Task #30 is task-blocked on #51, so #32 is task-blocked too.
+- Task #33 (Stripe SDK + webhook handler) — deps `[2]` satisfied. Eligible.
+- Task #34 (pricing.ts) — deps `[1]` satisfied. Eligible.
+- Task #39 (cases + audit_log schema) — deps `[2]` satisfied. Eligible.
 
-Lowest-id eligible:
-- Task #31 (Lifecycle templates 4–9) — deps `[27]` satisfied. Eligible.
-
-Loop will pick **task #31** next iteration.
+Lowest-id eligible is **task #33** — Wave 6 (Stripe + pricing) begins next iteration.
 
 ## Notes
 
-- Wave 5 (Lifecycle email + Inngest) 3/5 done.
-- Loop will continue with task #31 next iteration.
+- Wave 5 (Lifecycle email + Inngest) 4/5 done; #30 + #32 blocked on #51.
+- Loop will pivot to Wave 6 (Stripe + pricing) next iteration with task #33.
