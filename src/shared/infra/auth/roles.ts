@@ -26,6 +26,13 @@ export function isStaffRole(value: unknown): value is StaffRole {
   return typeof value === 'string' && (STAFF_ROLES as readonly string[]).includes(value)
 }
 
+// Clerk emits org_role as "org:<key>" for both system roles (org:admin)
+// and custom roles (org:analyst). Strip the namespace before matching.
+export function normalizeOrgRole(claim: unknown): string | null {
+  if (typeof claim !== 'string' || claim.length === 0) return null
+  return claim.startsWith('org:') ? claim.slice(4) : claim
+}
+
 export function staffRoleRank(role: StaffRole): number {
   return RANK[role]
 }

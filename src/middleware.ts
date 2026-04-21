@@ -1,7 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { isProtectedRoute } from '@shared/infra/auth/route-gating'
-import { isStaffRole } from '@shared/infra/auth/roles'
+import { isStaffRole, normalizeOrgRole } from '@shared/infra/auth/roles'
 
 /**
  * Edge middleware. Per ADR 004 + PRD 04:
@@ -28,7 +28,7 @@ export default clerkMiddleware(async (auth, req) => {
     return session.redirectToSignIn({ returnBackUrl: req.url })
   }
   if (isOpsRoute(req)) {
-    const role = session.sessionClaims?.org_role
+    const role = normalizeOrgRole(session.sessionClaims?.org_role)
     if (!isStaffRole(role)) {
       // Authed but not staff — bounce to /app (their customer surface).
       const url = new URL('/app', req.url)

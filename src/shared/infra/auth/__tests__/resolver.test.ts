@@ -33,9 +33,10 @@ describe('resolveActorFromSession', () => {
   })
 
   it('returns a StaffActor when org_role matches a known staff role', () => {
+    // Clerk emits the "org:" prefix — real prod sessions look like this.
     const actor = resolveActorFromSession({
       ...baseSession,
-      sessionClaims: { org_role: 'analyst', org_name: 'Tariff Refund Staff' },
+      sessionClaims: { org_role: 'org:analyst', org_name: 'Tariff Refund Staff' },
       fullName: 'A. Analyst',
     })
     expect(isStaff(actor)).toBe(true)
@@ -44,11 +45,21 @@ describe('resolveActorFromSession', () => {
     expect(actor.name).toBe('A. Analyst')
   })
 
+  it('accepts a bare org_role without the "org:" prefix (defense in depth)', () => {
+    const actor = resolveActorFromSession({
+      ...baseSession,
+      sessionClaims: { org_role: 'analyst' },
+    })
+    expect(isStaff(actor)).toBe(true)
+    if (!isStaff(actor)) throw new Error('type guard failed')
+    expect(actor.role).toBe('analyst')
+  })
+
   it('falls back to CustomerActor when org_role is set but unrecognized', () => {
     // Defensive: Clerk org could have any role; we only honor known ones.
     const actor = resolveActorFromSession({
       ...baseSession,
-      sessionClaims: { org_role: 'spectator' },
+      sessionClaims: { org_role: 'org:spectator' },
     })
     expect(isCustomer(actor)).toBe(true)
   })
@@ -56,7 +67,7 @@ describe('resolveActorFromSession', () => {
   it('falls back to "Unknown" name when fullName is missing', () => {
     const actor = resolveActorFromSession({
       ...baseSession,
-      sessionClaims: { org_role: 'admin' },
+      sessionClaims: { org_role: 'org:admin' },
       fullName: null,
     })
     if (!isStaff(actor)) throw new Error('type guard failed')
