@@ -9,7 +9,7 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 })
 
-export default [
+const config = [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
     rules: {
@@ -33,3 +33,5 @@ export default [
     ignores: ['.next/**', 'node_modules/**', 'drizzle/meta/**', 'coverage/**'],
   },
 ]
+
+export default config

@@ -1,0 +1,61 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens — bound to docs/DESIGN-LANGUAGE.md.
+ * RGB triplets so Tailwind's <alpha-value> syntax works.
+ */
+
+:root {
+  /* Light mode — ink on paper */
+  --ink: 14 14 12; /* #0E0E0C */
+  --paper: 244 241 234; /* #F4F1EA */
+  --paper-2: 236 231 220; /* #ECE7DC */
+  --rule: 31 31 27; /* #1F1F1B at 12% via opacity utility */
+  --accent: 184 67 27; /* #B8431B — customs orange */
+  --accent-ink: 59 22 6; /* #3B1606 */
+  --positive: 31 86 65; /* #1F5641 — deep filing green */
+  --warning: 165 122 31; /* #A57A1F */
+  --blocking: 122 31 31; /* #7A1F1F */
+}
+
+.dark {
+  /* Dark mode — designed Swiss Industrial Print on dark, NOT phosphor green */
+  --ink: 244 241 234;
+  --paper: 14 14 12;
+  --paper-2: 26 26 24;
+  --rule: 244 241 234;
+  --accent: 212 97 47; /* #D4612F */
+  --accent-ink: 244 241 234;
+  --positive: 63 139 107;
+  --warning: 214 168 82;
+  --blocking: 194 85 85;
+}
+
+@theme inline {
+  --color-ink: rgb(var(--ink));
+  --color-paper: rgb(var(--paper));
+  --color-paper-2: rgb(var(--paper-2));
+  --color-rule: rgb(var(--rule));
+  --color-accent: rgb(var(--accent));
+  --color-accent-ink: rgb(var(--accent-ink));
+  --color-positive: rgb(var(--positive));
+  --color-warning: rgb(var(--warning));
+  --color-blocking: rgb(var(--blocking));
+}
+
+html,
+body {
+  background-color: rgb(var(--paper));
+  color: rgb(var(--ink));
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+/* Numerics always tabular per design language */
+[data-numeric],
+output,
+samp,
+data,
+kbd {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+}

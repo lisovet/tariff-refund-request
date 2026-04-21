@@ -49,7 +49,7 @@ next-env.d.ts
 drizzle/meta/_journal.json.bak
 
 # claude / ralph
-.claude/.ralph-loop.local.md
+.claude/ralph-loop.local.md
 .claude/settings.local.json
 
 # docker / minio test data

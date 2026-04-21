@@ -20,11 +20,7 @@ export default defineConfig({
       },
     },
     pool: 'threads',
-    poolOptions: {
-      threads: {
-        singleThread: false,
-      },
-    },
+    isolate: true,
   },
   resolve: {
     alias: {

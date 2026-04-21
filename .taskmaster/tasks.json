@@ -24,9 +24,11 @@
         "testStrategy": "Build succeeds; `npm run lint` and `npm run typecheck` exit clean.",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 4,
-        "source": ["ADR 002", "ADR 010", "DESIGN-LANGUAGE.md"]
+        "source": ["ADR 002", "ADR 010", "DESIGN-LANGUAGE.md"],
+        "completedAt": "2026-04-21T05:42:00Z",
+        "completedNotes": "Next 15.5, React 19.2, TypeScript 6, Tailwind 4, Vitest 4 installed. Route groups (marketing|app|ops|api) scaffolded with placeholder pages. Design-language tokens encoded in tailwind.config.ts + src/app/globals.css (light + dark). Custom no-restricted-imports ESLint rule enforces context-public-surface boundary. Smoke test (12 assertions) verifies route groups and configs exist. All three quality gates pass."
       },
       {
         "id": 2,
