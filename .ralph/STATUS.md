@@ -1,29 +1,45 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T15:23:00Z
+**Updated**: 2026-04-21T15:28:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 81 → 82)
+**Loop state**: active (iteration 82 → 83)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 82 |
+| completed | 83 |
 | in-progress | 0 |
-| pending | 4 |
+| pending | 3 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 117 files, 1014 tests pass |
+| `npm test` | green — 118 files, 1016 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 25 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#83 — USER-TEST: Ops staff complete a full case**
+
+Codified the "two real cases end-to-end in the ops console" walkthrough as a permanent composition test (`tests/integration/ops/full-case-walkthrough.test.ts`):
+
+- **Scenario A** — case created → walked to `batch_qa` → analyst claims (#80) → coordinator reassigns to validator (#80) → validator signs off (#65, publishes `platform/batch.signed-off`) → artifact generation handler (#70) produces CSV + PDF + Prep-Ready email. Asserts full audit chain: `SCREENER_RESULT_QUALIFIED` → `case.claimed` → `case.reassigned` → `VALIDATOR_SIGNED_OFF` → `qa.sign_off` in chronological order; artifact storage has both keys; email sent once.
+- **Scenario B** — claim / release / reassign-to-unowned sequence. Asserts audit kinds are `['case.claimed', 'case.released', 'case.reassigned']` in exact order.
+
+2 new integration tests.
+
+## Human-verification still owes (task #83 subjective side)
+
+- Two staff members run cases end-to-end in the live ops console; time-track each stage (claim → work → validator sign-off → artifact delivery); capture friction points as new tasks. The composition test proves the plumbing holds; the human test discovers UX drift.
+- Observe: keyboard shortcut `?` discoverability, queue filter fluency, SLA badge legibility, audit-tab timeline readability, case-workspace state-adaptive surfaces match operator expectation.
+
+## Previously completed this wave
 
 **#82 — Keyboard shortcut overlay (?)**
 
@@ -306,13 +322,12 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 
 ## Next eligible
 
-- Task #83 — deps satisfied. **Eligible — lowest id.** (USER-TEST: Ops staff complete a full case in console.)
-- Task #84 — eligible (cross-context lint rule + CI gate).
+- Task #84 — deps satisfied. **Eligible — lowest id.** (Cross-context lint rule + CI gate.)
 - Task #85 — eligible (Internal funnel metrics instrumentation).
-- Task #86 — (final USER-TEST: Phase 0 launch readiness review).
+- Task #86 — final USER-TEST (Phase 0 launch readiness review).
 
 ## Notes
 
-- 82/86 v1 done — 95.3% of Phase 0. Ops-console feature wave complete — next is USER-TEST + cross-cutting.
+- 83/86 v1 done — 96.5% of Phase 0. Only cross-cutting + launch-readiness remain.
 - Post-v1 backlog: AI-copy funnel task **#401**, and now **#402 — Production deploy** (full checklist: Vercel + Neon migrations + R2 buckets + Clerk prod org + Stripe live + Resend DKIM/SPF + Inngest prod + Sentry + Axiom + E-sign provider wiring + 12-step staging smoke + launch gates). Depends on #86 (final USER-TEST launch readiness review).
 - Loop will continue with #82 next iteration.
