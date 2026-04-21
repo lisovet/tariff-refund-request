@@ -1517,7 +1517,7 @@
           75,
           71
         ],
-        "status": "pending",
+        "status": "done",
         "estimateHours": 2,
         "source": [
           "validation-checkpoint"

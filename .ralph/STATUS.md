@@ -1,29 +1,54 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T14:31:00Z
+**Updated**: 2026-04-21T14:37:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 74 → 75)
+**Loop state**: active (iteration 75 → 76)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 75 |
+| completed | 76 |
 | in-progress | 0 |
-| pending | 11 |
+| pending | 10 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 107 files, 910 tests pass |
+| `npm test` | green — 108 files, 925 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 25 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#76 — USER-TEST: Trust posture review**
+
+Codified the trust-posture consistency bar as a permanent integration test (`tests/integration/trust/posture-review.test.tsx`). One composite walkthrough exercises every trust surface and asserts:
+
+1. `/trust` renders the canonical promise clauses verbatim + non-goals + disclosure.
+2. `/trust/security` renders the six required sections AND the active v1 sub-processor count sourced from `@shared/trust/sub-processors` (drift-proof).
+3. `/trust/sub-processors` renders every vendor + the list-version stamp.
+4. Every registered engagement letter passes every `REQUIRED_CLAUSES` probe that applies to its SKU.
+5. `concierge-v1` carries `CANONICAL_TRUST_PROMISE` + `NOT_LEGAL_ADVICE_DISCLOSURE` verbatim after interpolation.
+6. Readiness Report PDF end-to-end: `%PDF-` magic header + the case id appears UTF-16BE encoded in the info dictionary.
+7. Prep-ready email carries `NOT_LEGAL_ADVICE_DISCLOSURE` via `EmailLayout`.
+8. Deletion worker audit payload is content-free — no `email`, `fullName`, or `name` keys; serialized JSON does not contain the fixture PII values.
+9. Canonical trust promise paraphrase tripwire — the four stable clauses + `SUBMISSION_CONTROL_CLAUSE` checked against their frozen strings.
+
+15 new tests. Wave 12 (Trust posture + engagement letter) + Wave 11 surface checks all green on the same fixture path.
+
+925/925 pass.
+
+## Human-verification still owes (task #76 subjective side)
+
+- Founder + outside reviewer (customs / contract lawyer if available) read `/trust`, `/trust/security`, `/trust/sub-processors`, the rendered `concierge-v1` engagement letter (via `renderAgreement`), and a real Readiness Report (`npm run report:sample` produces a sample) top to bottom. Assess: are the legal commitments acceptable, is the tone appropriate for customer + their counsel, are there ambiguities in the success-fee mechanic, does the retention language match what the product actually does.
+- Legal sign-off on the AAA arbitration clause + governing-law state choice before the first real Concierge purchase.
+
+## Previously completed this wave
 
 **#75 — Customer data export + deletion endpoints**
 
@@ -186,13 +211,13 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #76 — deps satisfied (75 done). **Eligible — lowest id.** (USER-TEST: Trust posture review.)
-- Task #77 — eligible.
+- Task #77 — deps satisfied. **Eligible — lowest id.** (Queue list page + filters + saved views.)
+- Tasks #78..#86 — in the ops-console wave (#77 through #82), then cross-cutting (#84, #85), then final USER-TEST (#83, #86).
 
-Lowest-id eligible is **task #76**.
+Lowest-id eligible is **task #77**.
 
 ## Notes
 
-- 75/86 v1 done — 87.2% of Phase 0.
+- 76/86 v1 done — 88.4% of Phase 0. Wave 12 (Trust posture + engagement letter) checkpointed.
 - Post-v1 backlog includes AI-copy funnel task #401.
-- Loop will continue with #76 next iteration.
+- Loop will continue with #77 next iteration — the final wave (ops console) begins.
