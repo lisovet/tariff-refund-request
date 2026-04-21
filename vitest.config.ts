@@ -21,6 +21,7 @@ export default defineConfig({
     },
     pool: 'threads',
     isolate: true,
+    setupFiles: ['./tests/setup/per-worker-schema.ts'],
   },
   resolve: {
     alias: {

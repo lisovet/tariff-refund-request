@@ -95,13 +95,15 @@
         "epic": "E1. Foundation",
         "title": "Configure Vitest + Playwright + Testing Library",
         "description": "Install test stack, configure parallel-safe Postgres schemas, add CI workflow.",
-        "details": "vitest.config.ts with global setup/teardown for per-worker schemas. Playwright config with three role-scoped projects (anonymous, customer, ops). GitHub Actions workflow runs unit + integration on PR.",
+        "details": "@playwright/test installed. playwright.config.ts wires three role-scoped projects (anonymous + customer + ops-staff). tests/setup/per-worker-schema.ts (referenced from vitest.config.ts setupFiles) creates tr_test_<workerId> per Vitest worker against DATABASE_URL when set; no-op otherwise. GitHub Actions workflow at .github/workflows/ci.yml runs lint + typecheck + test + Playwright (anonymous project) on PR/push. Integration job stub commented in for future Neon GHA wiring.",
         "testStrategy": "`npm test` runs in parallel without DB conflicts; sample Playwright spec passes on CI.",
         "priority": "high",
         "dependencies": [2],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 5,
-        "source": ["ADR 011"]
+        "source": ["ADR 011"],
+        "completedAt": "2026-04-21T06:06:30Z",
+        "completedNotes": "@playwright/test installed. playwright.config.ts with three role-scoped projects (anonymous testing /, customer + ops with placeholder storageState for tasks #8/#9). Sample anonymous spec at tests/e2e/anonymous/marketing-loads.spec.ts. Per-worker schema setup at tests/setup/per-worker-schema.ts wired into vitest.config.ts setupFiles; no-op when DATABASE_URL missing. test-isolation.ts module exposes workerSchemaName + applyTestIsolation + dropTestIsolation. SQL-injection guard rejects non-alphanumeric worker ids. .github/workflows/ci.yml runs qa job (lint/typecheck/test) on every PR/push to main, plus an e2e job that installs Chromium and runs the anonymous Playwright project. 6 new tests (test-isolation) RED-then-GREEN. All qa gates green: 51/51 tests, lint + typecheck clean. Browser binaries (`npx playwright install`) and GHA secrets are human-action."
       },
       {
         "id": 7,

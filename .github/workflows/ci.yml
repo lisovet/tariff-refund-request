@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Cancel in-flight runs on the same ref to save CI minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qa:
+    name: lint + typecheck + unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+
+  e2e:
+    name: playwright (anonymous project)
+    runs-on: ubuntu-latest
+    needs: qa
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Run anonymous e2e
+        # The anonymous project doesn't need auth — runs against a
+        # locally-built Next server (Playwright's webServer block).
+        # Customer/ops projects depend on Clerk wiring (task #8/9) and
+        # are gated until that lands.
+        run: npx playwright test --project=anonymous
+      - name: Upload report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  # Integration tests with a real Postgres land once Neon's GitHub
+  # action is wired (per drizzle/README.md). Stub for now:
+  # integration:
+  #   name: integration tests
+  #   runs-on: ubuntu-latest
+  #   needs: qa
+  #   services:
+  #     postgres:
+  #       image: postgres:16
+  #       env: { POSTGRES_PASSWORD: test }
+  #       ports: ['5432:5432']
+  #       options: --health-cmd pg_isready
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with: { node-version: '20', cache: 'npm' }
+  #     - run: npm ci
+  #     - run: npm run db:migrate
+  #       env: { DATABASE_URL: postgres://postgres:test@localhost:5432/postgres }
+  #     - run: npm run test:integration
+  #       env: { DATABASE_URL: postgres://postgres:test@localhost:5432/postgres }
