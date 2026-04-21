@@ -28,7 +28,6 @@ const SECTIONS: ReadonlyArray<{
       { label: 'How we handle your data', href: '/trust' },
       { label: 'Sub-processors', href: '/trust/sub-processors' },
       { label: 'Security', href: '/trust/security' },
-      { label: 'Legal requests', href: '/trust/legal-requests' },
     ],
   },
   {
