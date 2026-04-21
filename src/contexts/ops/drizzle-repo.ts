@@ -135,6 +135,25 @@ export function createDrizzleCaseRepo(
         return { auditRowsRemoved: removedAudit.length }
       })
     },
+
+    async listCases(input?: { readonly limit?: number; readonly offset?: number }) {
+      const q = db
+        .select()
+        .from(cases)
+        .orderBy(desc(cases.updatedAt))
+      const limit = input?.limit
+      const offset = input?.offset
+      if (limit !== undefined && offset !== undefined) {
+        const rows = await q.limit(limit).offset(offset)
+        return rows.map(mapCase)
+      }
+      if (limit !== undefined) {
+        const rows = await q.limit(limit)
+        return rows.map(mapCase)
+      }
+      const rows = await q
+      return rows.map(mapCase)
+    },
   }
 }
 

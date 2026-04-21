@@ -115,6 +115,14 @@ export function createInMemoryCaseRepo(): CaseRepo {
       }
       return { auditRowsRemoved: removed }
     },
+    async listCases(input) {
+      const all = Array.from(cases.values()).sort(
+        (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime(),
+      )
+      const offset = input?.offset ?? 0
+      const limit = input?.limit ?? all.length
+      return all.slice(offset, offset + limit)
+    },
   }
 }
 

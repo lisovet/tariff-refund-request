@@ -93,4 +93,14 @@ export interface CaseRepo {
    * BEFORE calling this.
    */
   deleteCaseAndAudit(caseId: string): Promise<{ auditRowsRemoved: number }>
+  /**
+   * Ops-console queue read. Passthrough filter shape lives in
+   * `@contexts/ops/queue`; the repo kept standalone to avoid a
+   * structural import cycle — callers apply the pure filter after
+   * fetching the raw cases.
+   */
+  listCases(input?: {
+    readonly limit?: number
+    readonly offset?: number
+  }): Promise<readonly CaseRecord[]>
 }

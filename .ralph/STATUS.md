@@ -1,29 +1,45 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T14:37:00Z
+**Updated**: 2026-04-21T14:47:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 75 → 76)
+**Loop state**: active (iteration 76 → 77)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 76 |
+| completed | 77 |
 | in-progress | 0 |
-| pending | 10 |
+| pending | 9 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 108 files, 925 tests pass |
+| `npm test` | green — 110 files, 949 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 25 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#77 — Queue list page + filters + saved views**
+
+Ops-console queue surface per PRD 04:
+
+- **`src/contexts/ops/queue.ts`** — pure helpers: `SLA_TARGETS_BY_STATE` (per-state millisecond budgets; terminal states undefined), `computeQueueRow(case, now)` derives `{id, state, tier, ownerStaffId, ageMs, ageHumanized, isSlaBreach, updatedAtIso}`, `filterQueue(cases, filter)` composes state / owner / tier filters (ownerStaffId `null` filters unassigned), `SAVED_VIEWS` (Unassigned / My batch QA / Stalled / All active) + `resolveSavedView(id, viewer)` that binds `my_batch_qa` to the authenticated staff id.
+- **`CaseRepo.listCases(input?)`** method added on both in-memory + Drizzle impls (updatedAt desc, optional limit + offset).
+- **`src/app/(ops)/ops/page.tsx`** — server-rendered queue page. Guards via `requireStaff(await resolveCurrentActor())`. URL-params drive filtering: `?view=<saved-view-id>` wins over `?state` / `?owner`. Saved-view chips render above the table; active view underlined via the magazine-underline pattern.
+- **`QueueTable.tsx`** — dense editorial-industrial table with Berkeley-Mono case id + age columns, state chips, hairline dividers, SLA breach accent on the age cell + a right-aligned `SLA` badge. Empty state renders "Queue empty" with the italic mono voice.
+- Public surface on `@contexts/ops`: queue helpers exported.
+
+24 new tests (19 queue helpers + 5 QueueTable component).
+
+949/949 pass.
+
+## Previously completed this wave
 
 **#76 — USER-TEST: Trust posture review**
 
@@ -210,14 +226,12 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 
 ## Next eligible
 
-Per dependency check (v1 only):
-- Task #77 — deps satisfied. **Eligible — lowest id.** (Queue list page + filters + saved views.)
-- Tasks #78..#86 — in the ops-console wave (#77 through #82), then cross-cutting (#84, #85), then final USER-TEST (#83, #86).
-
-Lowest-id eligible is **task #77**.
+- Task #78 — deps satisfied. **Eligible — lowest id.** (Case workspace shell — 3-pane layout.)
+- Tasks #79..#82 — ops-console workstream continues.
+- Tasks #83 (USER-TEST ops staff), #84 (cross-context lint rule), #85 (funnel metrics), #86 (final USER-TEST) follow.
 
 ## Notes
 
-- 76/86 v1 done — 88.4% of Phase 0. Wave 12 (Trust posture + engagement letter) checkpointed.
+- 77/86 v1 done — 89.5% of Phase 0.
 - Post-v1 backlog includes AI-copy funnel task #401.
-- Loop will continue with #77 next iteration — the final wave (ops console) begins.
+- Loop will continue with #78 next iteration.

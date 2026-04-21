@@ -36,3 +36,12 @@ export type {
   TransitionResult,
 } from './transition'
 export { transition } from './transition'
+
+export type { QueueFilter, QueueRow, SavedView, ViewerContext } from './queue'
+export {
+  SAVED_VIEWS,
+  SLA_TARGETS_BY_STATE,
+  computeQueueRow,
+  filterQueue,
+  resolveSavedView,
+} from './queue'
