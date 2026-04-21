@@ -1,13 +1,17 @@
 import { Eyebrow, Hairline } from '@/app/_components/ui'
+import {
+  SUB_PROCESSORS,
+  SUB_PROCESSORS_LIST_VERSION,
+} from '@/shared/trust/sub-processors'
 
 /**
  * /trust/sub-processors — typeset table of every third party that
  * touches customer data, what they do, and where. Per PRD 10:
  * updated within 14 days of any change.
  *
- * The list ships sorted by category. Phase-2 vendors (OCR + LLM)
- * are flagged so a current reader does not assume they receive
- * customer data today.
+ * The list is sourced from `@/shared/trust/sub-processors` — the
+ * single module that feeds this page, the /trust summary table,
+ * and the Phase-1 lifecycle notification workflow.
  */
 
 export const metadata = {
@@ -15,89 +19,6 @@ export const metadata = {
   description:
     'Every third-party service that touches your data, what it does, and where.',
 }
-
-interface SubProcessor {
-  readonly vendor: string
-  readonly purpose: string
-  readonly region: string
-  readonly phase: 'v1' | 'Phase 2'
-}
-
-const SUB_PROCESSORS: readonly SubProcessor[] = [
-  // Infrastructure
-  {
-    vendor: 'Vercel',
-    purpose: 'Application hosting + edge runtime.',
-    region: 'Global edge',
-    phase: 'v1',
-  },
-  {
-    vendor: 'Neon',
-    purpose: 'Postgres database (case + entry + audit data).',
-    region: 'US-East (primary)',
-    phase: 'v1',
-  },
-  {
-    vendor: 'Cloudflare R2',
-    purpose: 'Document storage (uploaded source records + artifacts).',
-    region: 'Global, primary US',
-    phase: 'v1',
-  },
-  // Auth + payments
-  {
-    vendor: 'Clerk',
-    purpose: 'Authentication + organization / role management.',
-    region: 'US',
-    phase: 'v1',
-  },
-  {
-    vendor: 'Stripe',
-    purpose: 'Payments + invoicing for the success-fee model.',
-    region: 'US',
-    phase: 'v1',
-  },
-  // Workflow + comms
-  {
-    vendor: 'Inngest',
-    purpose: 'Durable workflow execution (lifecycle email, reminders).',
-    region: 'US',
-    phase: 'v1',
-  },
-  {
-    vendor: 'Resend',
-    purpose: 'Transactional + lifecycle email delivery.',
-    region: 'US',
-    phase: 'v1',
-  },
-  // Observability
-  {
-    vendor: 'Sentry',
-    purpose: 'Error tracking + performance monitoring.',
-    region: 'US',
-    phase: 'v1',
-  },
-  {
-    vendor: 'Axiom',
-    purpose: 'Structured logs + audit-log mirror.',
-    region: 'US',
-    phase: 'v1',
-  },
-  // Phase 2 — explicitly flagged
-  {
-    vendor: 'AWS Textract / Google Document AI',
-    purpose:
-      'OCR for 7501s and carrier invoices. Active only when Phase-2 OCR is enabled.',
-    region: 'US',
-    phase: 'Phase 2',
-  },
-  {
-    vendor: 'Anthropic',
-    purpose:
-      'LLM-assisted document extraction + Readiness Report drafting. Active only when Phase-2 AI assist is enabled.',
-    region: 'US',
-    phase: 'Phase 2',
-  },
-]
 
 export default function SubProcessorsPage() {
   return (
@@ -181,6 +102,9 @@ export default function SubProcessorsPage() {
               the trust posture page
             </a>
             .
+          </p>
+          <p className="mt-4 font-mono text-xs uppercase tracking-[0.2em] text-ink/50">
+            List version v{SUB_PROCESSORS_LIST_VERSION}
           </p>
         </div>
       </section>

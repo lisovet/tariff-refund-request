@@ -1,29 +1,44 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T14:13:00Z
+**Updated**: 2026-04-21T14:22:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 72 → 73)
+**Loop state**: active (iteration 73 → 74)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 73 |
+| completed | 74 |
 | in-progress | 0 |
-| pending | 13 |
+| pending | 12 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 104 files, 883 tests pass |
+| `npm test` | green — 106 files, 901 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
-| `npm run build` | green — 24 routes |
+| `npm run build` | green — 25 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#74 — /trust/security page + sub-processor automation**
+
+Single-source extraction + new security page per PRD 10:
+
+- **`src/shared/trust/sub-processors.ts`** — promoted the inlined list on the existing sub-processors page into a shared module. `SUB_PROCESSORS` (11 entries: 9 v1 + 2 Phase-2), `SUB_PROCESSOR_CATEGORIES` (infrastructure / auth_payments / workflow_comms / observability / ai_ocr), `SUB_PROCESSORS_LIST_VERSION` integer (bumping triggers Phase-1 lifecycle notification), `getActiveV1SubProcessors()` / `getSubProcessorsByCategory()` helpers. 9 new unit tests freeze shape, uniqueness, category enumeration, Phase-2 flagging, and version discipline.
+- **`/trust/sub-processors` page** — refactored to import from the shared module. Renders a "List version vN" footer (surfaced so customers + security auditors see the version they're reading).
+- **`/trust/security` page** — new editorial page with six sections per PRD 10 §Security posture: Authentication (Clerk + MFA + scoped middleware), Storage & encryption (Neon + R2, case-scoped keys, at-rest), Retention (case data / uploads / marketing / deletion timelines), Access control (full staff role table — coordinator / analyst / validator / admin with scope statements), Incident response (72-hour notification, 4-hour RTO backup restore), Sub-processors summary (reads the active v1 count from the shared module so drift is impossible). 9 component tests.
+- Route metadata exposes `title: 'Security'` + description; SEO-legible.
+
+Link from /trust/security to /trust/sub-processors keeps the documents navigable as a pair.
+
+901/901 pass; lint + typecheck clean; build green (25 routes — `/trust/security` at 174B).
+
+## Previously completed this wave
 
 **#73 — E-sign flow integration**
 
@@ -155,14 +170,13 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #74 — deps satisfied (73 done). **Eligible — lowest id.** (/trust/security + sub-processor automation.)
-- Task #75 — eligible.
+- Task #75 — deps satisfied (74 done). **Eligible — lowest id.** (Customer data export + deletion endpoints.)
 - Task #77 — eligible.
 
-Lowest-id eligible is **task #74**.
+Lowest-id eligible is **task #75**.
 
 ## Notes
 
-- 73/86 v1 done — 84.9% of Phase 0.
+- 74/86 v1 done — 86.0% of Phase 0.
 - Post-v1 backlog includes AI-copy funnel task #401.
-- Loop will continue with #74 next iteration.
+- Loop will continue with #75 next iteration.
