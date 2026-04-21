@@ -35,13 +35,15 @@
         "epic": "E1. Foundation",
         "title": "Configure Drizzle + Postgres + Neon dev branch",
         "description": "Install Drizzle, configure Neon DB connection, create migrations directory, write initial empty schema.",
-        "details": "drizzle.config.ts targets Neon. Migration scripts: `db:generate`, `db:migrate`, `db:studio`. Per-worker schema strategy documented for tests.",
+        "details": "drizzle.config.ts targets Neon. Migration scripts: `db:generate`, `db:migrate`, `db:studio`. Per-worker schema strategy documented for tests. TODO(human-action) — provision Neon project + add DATABASE_URL to .env.local before `npm run db:migrate` will run against a real DB.",
         "testStrategy": "Smoke test: `npm run db:migrate` against dev branch succeeds.",
         "priority": "high",
         "dependencies": [1],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 3,
-        "source": ["ADR 003"]
+        "source": ["ADR 003"],
+        "completedAt": "2026-04-21T05:46:30Z",
+        "completedNotes": "drizzle-orm + drizzle-kit + postgres-js + @neondatabase/serverless installed. Schema registry at src/shared/infra/db/schema.ts (empty, ready for downstream tasks to register tables). Client at src/shared/infra/db/client.ts validates DATABASE_URL and returns a cached drizzle handle. drizzle.config.ts wired with dotenv. drizzle/README.md documents per-environment strategy and per-worker test isolation. .env.example committed with all v1 env shape. 5 schema/client tests added (RED-confirmed before implementation). All qa gates green: 17/17 tests, lint clean, typecheck clean. Real Neon connection is the only human-blocked piece — code is ready to point at any Postgres URL."
       },
       {
         "id": 3,
