@@ -297,5 +297,5 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 ## Notes
 
 - 81/86 v1 done — 94.2% of Phase 0.
-- Post-v1 backlog includes AI-copy funnel task #401.
+- Post-v1 backlog: AI-copy funnel task **#401**, and now **#402 — Production deploy** (full checklist: Vercel + Neon migrations + R2 buckets + Clerk prod org + Stripe live + Resend DKIM/SPF + Inngest prod + Sentry + Axiom + E-sign provider wiring + 12-step staging smoke + launch gates). Depends on #86 (final USER-TEST launch readiness review).
 - Loop will continue with #82 next iteration.
