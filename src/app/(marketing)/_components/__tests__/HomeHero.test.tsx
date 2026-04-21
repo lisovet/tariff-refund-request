@@ -7,13 +7,13 @@ describe('<HomeHero>', () => {
   it('renders the canonical headline in the display face', () => {
     render(<HomeHero />)
     const h1 = screen.getByRole('heading', { level: 1 })
-    expect(h1.textContent).toMatch(/IEEPA tariff refund/i)
+    expect(h1.textContent).toMatch(/get back the tariffs you overpaid/i)
     expect(h1.className).toMatch(/font-display/)
   })
 
   it('renders the subhead in the body face', () => {
     render(<HomeHero />)
-    const sub = screen.getByText(/find your entry numbers/i)
+    const sub = screen.getByText(/reconstruct that\s+package/i)
     expect(sub.tagName).toBe('P')
   })
 

@@ -1,24 +1,28 @@
-import { HomeAntiPositioning } from './_components/HomeAntiPositioning'
+import { HomeDeliverables } from './_components/HomeDeliverables'
 import { HomeHero } from './_components/HomeHero'
 import { HomeMovements } from './_components/HomeMovements'
 import { HomeProof } from './_components/HomeProof'
 import { HomePullQuote } from './_components/HomePullQuote'
 
 /**
- * Homepage — composes the editorial sections per PRD 05 hierarchy.
+ * Homepage composition.
  *
- * SiteFooter renders from the marketing layout, not here.
+ *   Hero          — active promise + two CTAs.
+ *   Proof         — one-paragraph print-article opener.
+ *   Movements     — the three paid stages.
+ *   Deliverables  — what lands in your inbox (concrete artifacts).
+ *   Pull quote    — the canonical 4-clause trust promise (verbatim).
  *
- * Per docs/DESIGN-LANGUAGE.md, this is the moment we either earn or
- * lose taste credit. Restraint is intentional: ink-on-paper, GT Sectra
- * display (fallback chain until licensed), one accent CTA above the
- * fold, hairline rules between sections, real footnotes in the footer.
+ * The earlier "What we are not" negation list moved off the homepage
+ * on the marketing rewrite. Negation belongs on /trust, not the
+ * front door; the homepage earns attention by showing what the
+ * customer receives, not by leading with disclaimers.
  */
 
 export const metadata = {
-  title: 'IEEPA Refund Audit & CAPE Filing Prep',
+  title: 'Get back the IEEPA tariffs you overpaid',
   description:
-    'You may be owed an IEEPA tariff refund. We help you find your entry numbers and prepare a CAPE-ready file.',
+    'U.S. importers who paid IEEPA duties may be owed a refund. We reconstruct the entry list from brokers, carriers, and ACE, validate every line, and hand you a submission-ready refund package.',
 }
 
 export default function HomePage() {
@@ -27,7 +31,7 @@ export default function HomePage() {
       <HomeHero />
       <HomeProof />
       <HomeMovements />
-      <HomeAntiPositioning />
+      <HomeDeliverables />
       <HomePullQuote />
     </main>
   )

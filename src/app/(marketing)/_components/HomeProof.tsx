@@ -12,10 +12,11 @@ export function HomeProof() {
       <Hairline />
       <div className="mx-auto max-w-3xl px-6 py-24 sm:px-10 sm:py-32">
         <p className="font-display text-2xl leading-relaxed text-ink sm:text-3xl">
-          Most importers caught in the IEEPA window cannot file because
-          their entry data is fragmented across brokers, carriers, and
-          ACE accounts they have never used. We turn that mess into a
-          submission-ready CAPE file with human review on every artifact.
+          Most importers can&apos;t file because their entries live in
+          three places at once — a broker portal, a freight invoice,
+          an ACE account nobody logs into. The data is recoverable; it
+          just takes a deliberate outreach workflow. That&apos;s the
+          product.
         </p>
       </div>
       <Hairline />

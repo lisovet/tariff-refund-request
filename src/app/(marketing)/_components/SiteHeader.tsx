@@ -34,10 +34,10 @@ export function SiteHeader() {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-5 sm:px-10">
         <Link
           href="/"
-          aria-label="Tariff Refund — home"
+          aria-label="Tariff Refund Request — home"
           className="font-mono text-sm uppercase tracking-[0.24em] text-ink hover:text-accent"
         >
-          Tariff <span aria-hidden="true" className="text-ink/40">·</span> Refund
+          Tariff <span aria-hidden="true" className="text-ink/40">·</span> Refund <span aria-hidden="true" className="text-ink/40">·</span> Request
         </Link>
 
         <nav aria-label="Primary" className="hidden md:block">

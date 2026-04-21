@@ -47,11 +47,11 @@ const mono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'IEEPA Refund Audit & CAPE Filing Prep',
-    template: '%s · Tariff Refund',
+    default: 'Tariff Refund Request',
+    template: '%s · Tariff Refund Request',
   },
   description:
-    'The fastest, most trustworthy way for U.S. importers to go from "I think I paid these tariffs" to "I have a validated, submission-ready refund package."',
+    'We help U.S. importers reconstruct their IEEPA entry list, validate every line, and prepare a submission-ready refund package.',
   robots: {
     index: true,
     follow: true,

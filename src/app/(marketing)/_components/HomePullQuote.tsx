@@ -22,7 +22,7 @@ export function HomePullQuote() {
           Every artifact you receive has been reviewed by a real person
           before it reaches you.
         </blockquote>
-        <Eyebrow className="mt-8 block">Canonical trust posture</Eyebrow>
+        <Eyebrow className="mt-8 block">Our commitment</Eyebrow>
       </div>
     </section>
   )
