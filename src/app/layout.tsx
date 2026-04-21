@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
+import { Geist, Geist_Mono, Newsreader } from 'next/font/google'
 import './globals.css'
 
 /*
@@ -7,9 +8,38 @@ import './globals.css'
  * ClerkProvider must wrap everything so useUser/auth() helpers work in
  * RSC + client components alike. Per ADR 004.
  *
- * TODO(human-action): wire real font files for GT Sectra / Söhne / Berkeley
- * Mono once licensed; today the fallback chain in tailwind.config.ts handles it.
+ * Font strategy per DESIGN-LANGUAGE.md:
+ *   - Display (headlines) → Newsreader (license-friendly proxy for
+ *     GT Sectra; free; real serif so the editorial hierarchy lands).
+ *   - Body / UI            → Geist Sans (proxy for Söhne; free).
+ *   - Mono / IDs / numerics → Geist Mono (proxy for Berkeley Mono;
+ *     tabular-numbers-friendly; free).
+ * TODO(human-action): swap to licensed GT Sectra + Söhne + Berkeley
+ * Mono when the fonts are purchased (drop the TTFs in public/fonts/
+ * and replace these loaders with next/font/local).
  */
+
+const display = Newsreader({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-display',
+  display: 'swap',
+})
+
+const sans = Geist({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-sans',
+  display: 'swap',
+})
+
+const mono = Geist_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-mono',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: {
@@ -31,7 +61,10 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html
+        lang="en"
+        className={`${display.variable} ${sans.variable} ${mono.variable}`}
+      >
         <body>{children}</body>
       </html>
     </ClerkProvider>

@@ -41,6 +41,26 @@
   --color-positive: rgb(var(--positive));
   --color-warning: rgb(var(--warning));
   --color-blocking: rgb(var(--blocking));
+
+  /*
+   * Font families — the next/font loader in src/app/layout.tsx sets
+   * --font-display / --font-sans / --font-mono on <html>. We mirror
+   * them under the Tailwind v4 theme so `font-display`, `font-sans`,
+   * and `font-mono` utilities resolve to the right face.
+   *
+   * Fallback chain for each variable stays safe against a missed
+   * load or a dev bootstrap without the Google Fonts network.
+   */
+  --font-display:
+    var(--font-display), 'GT Sectra Display', 'Lyon Text', 'Newsreader',
+    'Playfair Display', 'Instrument Serif', 'Times New Roman', ui-serif, serif;
+  --font-sans:
+    var(--font-sans), 'Söhne', 'Geist', 'SF Pro Text', 'Inter', system-ui,
+    ui-sans-serif, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono:
+    var(--font-mono), 'Berkeley Mono', 'Geist Mono', 'SF Mono',
+    'JetBrains Mono', 'Fira Code', 'Menlo', 'Courier New', ui-monospace,
+    monospace;
 }
 
 html,
