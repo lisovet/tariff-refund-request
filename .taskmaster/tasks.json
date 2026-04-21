@@ -362,13 +362,15 @@
         "epic": "E4. Eligibility screener",
         "title": "Results dossier UI",
         "description": "Build results page: hero refund metric (Berkeley Mono, large), confidence label, qualification verdict, prerequisites, recommended next step CTA.",
-        "details": "Disqualified variant: respectful, opt-in to future updates. Photographable design — design review required.",
+        "details": "src/app/_components/screener/ResultsDossier.tsx — single canonical photographable surface used by both /screener (inline post-completion) and /screener/results?token (magic-link resume). Hero refund metric in Berkeley Mono at 4xl–6xl, confidence label in customs-orange uppercase, one-sentence editorial verdict, prerequisites checklist (IOR / ACE / ACH / liquidation as 'Met' / 'Missing' rows), recommended next-step block with copy + single CTA. Disqualified variant carries the respectful explanation + 'we'll let you know if your situation changes' opt-in language. /screener/page.tsx and /screener/results/page.tsx both refactored to use it.",
         "testStrategy": "Snapshot test for layout; A11y; Playwright happy path; design review.",
         "priority": "high",
         "dependencies": [22, 21],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 6,
-        "source": ["PRD 01", "DESIGN-LANGUAGE.md"]
+        "source": ["PRD 01", "DESIGN-LANGUAGE.md"],
+        "completedAt": "2026-04-21T08:11:00Z",
+        "completedNotes": "ResultsDossier: single canonical photographable surface used by both /screener inline (post-completion) and /screener/results?token (magic-link resume). Per PRD 01 + docs/DESIGN-LANGUAGE.md: hero refund metric in Berkeley Mono at 4xl–6xl with $-formatted thousands separators; confidence label in customs-orange uppercase ('CONFIDENCE: HIGH'); one-sentence editorial qualification verdict; prerequisites checklist (Importer of record / ACE access / ACH on file / Liquidation status known) as Met (positive) / Missing (warning) rows in a hairline-bordered <ul>; recommended next-step block with mono price label + plain-English rationale paragraph + single magazine-underline CTA to /how-it-works; optional 'we also sent these results to your inbox' footnote when emailSent. Disqualified variant: respectful headline, mono reason code, 'we'll let you know if your situation changes' opt-in language, link to /how-it-works for evaluators. /screener/page.tsx and /screener/results/page.tsx both refactored — the 90-line inline ScreenerResultCard removed; the ResumeResult removed; both now delegate to ResultsDossier. 8 new component tests RED-then-GREEN; 271/271 pass; lint + typecheck clean; build green (16 routes; /screener client bundle 5.67 kB — slight growth from including the dossier). HUMAN-VERIFICATION: design taste review — confirm the dossier reads photographable; live a11y audit; Playwright happy path against the dev server."
       },
       {
         "id": 25,

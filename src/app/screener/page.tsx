@@ -5,25 +5,20 @@ import {
   ScreenerFlow,
   clearScreenerSession,
 } from '@/app/_components/screener/ScreenerFlow'
-import { TrustFootnote, Eyebrow, Hairline, Button } from '@/app/_components/ui'
+import { ResultsDossier } from '@/app/_components/screener/ResultsDossier'
+import { TrustFootnote } from '@/app/_components/ui'
 import type { ScreenerAnswers, ScreenerResult } from '@contexts/screener'
 
 /**
  * /screener — focused single-column transactional flow per PRD 01 +
- * docs/DESIGN-LANGUAGE.md. Lives outside the marketing route group so
- * it doesn't inherit the full SiteFooter.
+ * docs/DESIGN-LANGUAGE.md.
  *
- * Persistence:
- *   - In-session: ScreenerFlow auto-persists to sessionStorage.
- *   - On completion: client POSTs to /api/screener/complete which
- *     persists the session, writes a lead row, and queues a magic-link
- *     email valid for 7 days.
- *   - Magic-link resume: /screener/results?token=... (server-rendered).
- *
- * The result card renders inline immediately (computed client-side
- * from the same pure helpers the server uses) so the user never waits
- * for the API round-trip; the server's persistence + email send happens
- * in the background.
+ * On completion: ResultsDossier renders the full editorial result
+ * (the same dossier surfaced at /screener/results?token= for the
+ * magic-link resume); client also POSTs to /api/screener/complete
+ * which persists the session, writes a lead row, and queues the
+ * magic-link email — best-effort, since the inline dossier is
+ * already rendered.
  */
 
 export default function ScreenerPage() {
@@ -44,9 +39,7 @@ export default function ScreenerPage() {
             />
           )}
 
-          {result && (
-            <ScreenerResultCard result={result} emailSent={emailSent} />
-          )}
+          {result && <ResultsDossier result={result} emailSent={emailSent} />}
         </div>
       </main>
 
@@ -63,89 +56,8 @@ async function postCompletion(answers: ScreenerAnswers): Promise<void> {
       body: JSON.stringify({ answers }),
     })
   } catch {
-    // Best-effort — the inline result is already rendered. A real
-    // production error reporter would capture this; for now the
-    // server-side route handler logs delivery via the observability
-    // adapters, and a missing email is recoverable by re-running.
+    // Best-effort. The server route logs delivery via the
+    // observability adapters; a missing email is recoverable by
+    // re-running the screener.
   }
-}
-
-function ScreenerResultCard({
-  result,
-  emailSent,
-}: {
-  readonly result: ScreenerResult
-  readonly emailSent: boolean
-}) {
-  if (result.qualification === 'disqualified') {
-    return (
-      <article>
-        <Eyebrow>Result</Eyebrow>
-        <h1 className="mt-3 font-display text-4xl tracking-display text-ink sm:text-5xl">
-          Probably not a fit right now.
-        </h1>
-        <p className="mt-8 text-lg text-ink/85">
-          Based on your answers we don&apos;t see an obvious IEEPA refund
-          here. If your situation changes — say, you become the
-          Importer of Record on a new lane, or your records turn up
-          old IEEPA-window entries — we&apos;d like to hear from you.
-        </p>
-        <p className="mt-4 text-sm text-ink/60">
-          Reason:{' '}
-          <span className="font-mono">{result.disqualificationReason}</span>
-        </p>
-        <Hairline className="my-12" />
-        <p className="text-sm text-ink/70">
-          You can{' '}
-          <a
-            href="/how-it-works"
-            className="text-accent underline underline-offset-[6px] decoration-accent/40 hover:decoration-accent decoration-1"
-          >
-            read how the service works
-          </a>{' '}
-          if you&apos;re evaluating it for someone else.
-        </p>
-      </article>
-    )
-  }
-
-  return (
-    <article>
-      <Eyebrow>Result</Eyebrow>
-      <h1 className="mt-3 font-display text-4xl tracking-display text-ink sm:text-5xl">
-        Likely a fit.
-      </h1>
-      {result.refundEstimate && (
-        <p className="mt-12">
-          <span className="block font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
-            Estimated refund range
-          </span>
-          <span className="mt-3 block font-mono text-4xl text-ink sm:text-6xl">
-            ${result.refundEstimate.low.toLocaleString()} —{' '}
-            ${result.refundEstimate.high.toLocaleString()}
-          </span>
-          <span className="mt-3 block font-mono text-xs uppercase tracking-[0.2em] text-accent">
-            Confidence: {result.refundEstimate.confidence}
-          </span>
-        </p>
-      )}
-      <Hairline className="my-12" />
-      <p className="text-base text-ink/85">
-        Recommended next step:{' '}
-        <span className="font-mono text-accent">
-          {result.recommendedNextStep}
-        </span>
-      </p>
-      <div className="mt-10">
-        <Button as="a" href="/how-it-works" variant="underline" size="lg">
-          See how each stage works
-        </Button>
-      </div>
-      {emailSent && (
-        <p className="mt-8 font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
-          We also sent these results to your inbox.
-        </p>
-      )}
-    </article>
-  )
 }
