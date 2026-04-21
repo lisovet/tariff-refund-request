@@ -1073,12 +1073,14 @@
           52,
           41
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 6,
         "source": [
           "PRD 02",
           "PRD 07"
-        ]
+        ],
+        "completedAt": "2026-04-21T11:55:00Z",
+        "completedNotes": "Manual entry-extraction form + provenance write per PRD 02 + PRD 07. Schema (also satisfies #55): entries (id ent_*, caseId FK\u2192cases RESTRICT NOT NULL, entryNumber, entryDate, importerOfRecord, dutyAmountUsdCents bigint, htsCodes text[], phaseFlag, validatedAt/validatedBy, createdAt/updatedAt + UNIQUE(case_id, entry_number) for canonical dedupe + index on (case,time)) and entry_source_records (id esrc_*, entryId FK\u2192entries RESTRICT NOT NULL, recoverySourceId FK\u2192recovery_sources RESTRICT NOT NULL \u2014 provenance never null per .ralph/PROMPT.md hard rule, rawData jsonb, confidence enum default pending, extractedAt/extractedBy + indexes on entry/source). drizzle/0006_entries_provenance.sql generated; migration name normalized in _journal.json. EntriesRepo (in-memory + Drizzle) with saveExtractedEntry transactional contract (entry + source insert in one db.transaction). Service saveExtractedEntry composes entry write + audit log row (kind=entry.extracted on first save, entry.source_attached on second-source-attached path) \u2014 single source of truth for analyst-facing persistence. POST /api/cases/[id]/entries route: Zod-validated body (entryNumber, dates, htsCodes \u226420, dutyAmountUsdCents non-negative, recoverySourceId required), 400 on bad body, 404 on missing case, 200 with outcome + entry + sourceRecord + auditId on success. ExtractionFormPanel wired to POST when no onSave seam \u2014 requires recoverySourceId prop (caller passes from active doc); shows error state if missing. 12 new tests (6 service + 6 integration route); 637/637 pass; lint + typecheck clean; build green (24 routes \u2014 added /api/cases/[id]/entries)."
       },
       {
         "id": 54,
@@ -1111,11 +1113,13 @@
         "dependencies": [
           44
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 3,
         "source": [
           "PRD 07"
-        ]
+        ],
+        "completedAt": "2026-04-21T11:55:00Z",
+        "completedNotes": "Entry record schema landed inside #53 \u2014 entries + entry_source_records tables per PRD 07. UNIQUE (case_id, entry_number) for canonical dedupe; entry_source_records.recoverySourceId NOT NULL keeps provenance the schema-level invariant. drizzle/0006_entries_provenance.sql generated; integration tests in #53 confirm valid entries insert + duplicate (case_id, entry_number) attaches a second source instead of erroring. Schema barrel re-exports row types + NEW row types. 637/637 pass."
       },
       {
         "id": 56,

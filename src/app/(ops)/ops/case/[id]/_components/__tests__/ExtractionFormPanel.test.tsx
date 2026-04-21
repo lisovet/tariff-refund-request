@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { ExtractionFormPanel } from '../ExtractionFormPanel'
 
@@ -18,8 +18,8 @@ describe('ExtractionFormPanel', () => {
     expect(screen.getByTestId('extraction-case-id').textContent).toBe('cas_xyz_42')
   })
 
-  it('save button calls onSave with the current draft', () => {
-    const onSave = vi.fn()
+  it('save button calls onSave with the current draft', async () => {
+    const onSave = vi.fn(async () => {})
     render(<ExtractionFormPanel caseId="cas_x" onSave={onSave} />)
 
     fireEvent.change(screen.getByTestId('extraction-field-entry-number'), {
@@ -30,7 +30,7 @@ describe('ExtractionFormPanel', () => {
     })
     fireEvent.click(screen.getByTestId('extraction-save'))
 
-    expect(onSave).toHaveBeenCalledTimes(1)
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1))
     expect(onSave).toHaveBeenCalledWith(
       expect.objectContaining({
         entryNumber: 'EI-2024-12345',
@@ -39,10 +39,21 @@ describe('ExtractionFormPanel', () => {
     )
   })
 
-  it('shows the saved-at indicator after a successful save', () => {
+  it('shows the saved-at indicator after a successful onSave', async () => {
+    render(<ExtractionFormPanel caseId="cas_x" onSave={async () => {}} />)
+    fireEvent.click(screen.getByTestId('extraction-save'))
+    await waitFor(() =>
+      expect(screen.getByTestId('extraction-saved-at')).toBeInTheDocument(),
+    )
+  })
+
+  it('shows an error when no recoverySourceId is supplied and onSave is undefined', async () => {
     render(<ExtractionFormPanel caseId="cas_x" />)
     fireEvent.click(screen.getByTestId('extraction-save'))
-    expect(screen.getByTestId('extraction-saved-at')).toBeInTheDocument()
+    await waitFor(() => {
+      const err = screen.getByTestId('extraction-error')
+      expect(err.textContent).toMatch(/no source document selected/i)
+    })
   })
 
   it('initial values seed the form', () => {

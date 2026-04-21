@@ -3,12 +3,16 @@
 import { useCallback, useState, type ReactElement } from 'react'
 
 /**
- * Center pane: entry-extraction form per PRD 04. v1 stub — captures
- * the entry-row fields the analyst would fill from the document on
- * the right; persistence lands with the entries schema (#55+).
+ * Center pane: entry-extraction form per PRD 04 + task #53. Saves
+ * via POST /api/cases/[id]/entries which atomically writes the
+ * entry, an entry_source_record (provenance never null), and an
+ * audit_log row.
  *
- * Saves are intentionally local-only at v1 so the form is exercised
- * end-to-end in the workspace without coupling to schema work.
+ * Tests inject `onSave` to bypass the network. When onSave is not
+ * provided, the form posts to the real route. The selected document
+ * (right-pane viewer) provides the recoverySourceId — for v1 the
+ * caller passes it via the `recoverySourceId` prop; #82 will wire
+ * it dynamically from the active doc.
  */
 
 const EMPTY_DRAFT: ExtractionDraft = {
@@ -29,13 +33,19 @@ interface ExtractionDraft {
 
 export interface ExtractionFormPanelProps {
   readonly caseId: string
+  readonly recoverySourceId?: string
   readonly initial?: Partial<ExtractionDraft>
-  /** Test seam — defaults to console.info so v1 has zero side effects. */
-  readonly onSave?: (draft: ExtractionDraft) => void
+  /**
+   * Test seam — when provided, called instead of the real network
+   * POST. Production callers leave it undefined so the form hits
+   * the route handler.
+   */
+  readonly onSave?: (draft: ExtractionDraft) => void | Promise<void>
 }
 
 export function ExtractionFormPanel({
   caseId,
+  recoverySourceId,
   initial,
   onSave,
 }: ExtractionFormPanelProps): ReactElement {
@@ -44,11 +54,50 @@ export function ExtractionFormPanel({
     ...initial,
   })
   const [savedAt, setSavedAt] = useState<Date | undefined>(undefined)
+  const [error, setError] = useState<string | undefined>(undefined)
 
-  const save = useCallback(() => {
-    if (onSave) onSave(draft)
-    setSavedAt(new Date())
-  }, [draft, onSave])
+  const save = useCallback(async () => {
+    setError(undefined)
+    if (onSave) {
+      try {
+        await onSave(draft)
+        setSavedAt(new Date())
+      } catch (err) {
+        setError(String((err as Error)?.message ?? err))
+      }
+      return
+    }
+    if (!recoverySourceId) {
+      setError('No source document selected — pick a document on the right pane first.')
+      return
+    }
+    try {
+      const res = await fetch(`/api/cases/${encodeURIComponent(caseId)}/entries`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          entryNumber: draft.entryNumber,
+          entryDate: draft.entryDate || undefined,
+          importerOfRecord: draft.importerOfRecord || undefined,
+          dutyAmountUsdCents: draft.dutyAmountUsdCents
+            ? Number(draft.dutyAmountUsdCents)
+            : undefined,
+          htsCodes: draft.htsCodes
+            ? draft.htsCodes.split(',').map((s) => s.trim()).filter(Boolean)
+            : undefined,
+          recoverySourceId,
+        }),
+      })
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string }
+        setError(body.error ?? `HTTP ${res.status}`)
+        return
+      }
+      setSavedAt(new Date())
+    } catch (err) {
+      setError(String((err as Error)?.message ?? err))
+    }
+  }, [caseId, draft, onSave, recoverySourceId])
 
   const update = useCallback(
     (patch: Partial<ExtractionDraft>) => setDraft((prev) => ({ ...prev, ...patch })),
@@ -121,7 +170,7 @@ export function ExtractionFormPanel({
           >
             Save extraction <kbd className="ml-2 text-paper/70">s</kbd>
           </button>
-          {savedAt && (
+          {savedAt && !error && (
             <p
               data-testid="extraction-saved-at"
               className="font-mono text-xs text-ink/65"
@@ -129,12 +178,21 @@ export function ExtractionFormPanel({
               Saved {savedAt.toISOString().slice(11, 19)}Z
             </p>
           )}
+          {error && (
+            <p
+              data-testid="extraction-error"
+              role="alert"
+              className="font-mono text-xs text-ink/85"
+            >
+              {error}
+            </p>
+          )}
         </div>
       </form>
 
       <p className="mt-8 max-w-prose font-mono text-[10px] uppercase tracking-[0.16em] text-ink/45">
-        Persistence lands with the entries schema (task #55). v1 is a local-state stub so the
-        workspace UI is exercisable end-to-end.
+        Save writes the entry, an entry_source_record (provenance), and an audit_log row. Pick a
+        source document in the right pane before saving.
       </p>
     </section>
   )

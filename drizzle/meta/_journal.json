@@ -43,6 +43,13 @@
       "when": 1776769173666,
       "tag": "0005_payments_aggregate",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1776772074046,
+      "tag": "0006_entries_provenance",
+      "breakpoints": true
     }
   ]
 }

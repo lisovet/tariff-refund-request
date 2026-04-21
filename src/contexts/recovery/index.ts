@@ -60,3 +60,17 @@ export {
   OUTREACH_TEMPLATE_VERSION,
   renderOutreachKit,
 } from './templates'
+
+export type {
+  EntriesRepo,
+  EntryRecord,
+  EntrySourceRecord,
+  SaveExtractedEntryInput,
+  SaveExtractedEntryResult,
+} from './entries-repo'
+export type {
+  SaveExtractedEntryDeps,
+  SaveExtractedEntryServiceInput,
+  SaveExtractedEntryServiceResult,
+} from './save-entry'
+export { saveExtractedEntry } from './save-entry'
