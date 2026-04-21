@@ -5,6 +5,7 @@ import type {
   RecommendedNextStep,
   ScreenerResult,
 } from '@contexts/screener'
+import { NotifyMeForm } from './NotifyMeForm'
 
 /**
  * Editorial results dossier per PRD 01 + docs/DESIGN-LANGUAGE.md.
@@ -22,11 +23,21 @@ interface Props {
   readonly result: ScreenerResult
   /** When true, surfaces the "we also sent these to your inbox" footnote. */
   readonly emailSent?: boolean
+  /**
+   * Screener session id. On the disqualified path this lets us attach
+   * a captured email to the originating session so we can reach the
+   * user if eligibility rules change.
+   */
+  readonly sessionId?: string | null
 }
 
-export function ResultsDossier({ result, emailSent = false }: Props) {
+export function ResultsDossier({
+  result,
+  emailSent = false,
+  sessionId = null,
+}: Props) {
   if (result.qualification === 'disqualified') {
-    return <DisqualifiedDossier result={result} />
+    return <DisqualifiedDossier result={result} sessionId={sessionId} />
   }
   return <QualifiedDossier result={result} emailSent={emailSent} />
 }
@@ -91,7 +102,13 @@ function QualifiedDossier({
   )
 }
 
-function DisqualifiedDossier({ result }: { readonly result: ScreenerResult }) {
+function DisqualifiedDossier({
+  result,
+  sessionId,
+}: {
+  readonly result: ScreenerResult
+  readonly sessionId: string | null
+}) {
   return (
     <article>
       <Eyebrow>Your screener results</Eyebrow>
@@ -109,11 +126,22 @@ function DisqualifiedDossier({ result }: { readonly result: ScreenerResult }) {
         <span className="font-mono">{result.disqualificationReason}</span>
       </p>
 
+      <section className="mt-10">
+        <Eyebrow>Stay in the loop</Eyebrow>
+        <p className="mt-3 text-sm text-ink/75">
+          Drop your email and we&apos;ll reach out if eligibility changes
+          or the service expands to your situation. Updates only when
+          something genuinely changes — typically once or twice a year.
+        </p>
+        <div className="mt-6">
+          <NotifyMeForm sessionId={sessionId} />
+        </div>
+      </section>
+
       <Hairline className="my-12" />
 
       <p className="text-sm text-ink/70">
-        We send updates only when something genuinely changes — typically
-        once or twice a year. You can{' '}
+        You can{' '}
         <a
           href="/how-it-works"
           className="text-accent underline underline-offset-[6px] decoration-accent/40 hover:decoration-accent decoration-1"

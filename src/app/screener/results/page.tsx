@@ -53,7 +53,7 @@ export default async function ScreenerResultsPage({ searchParams }: PageProps) {
     <div className="flex min-h-[100dvh] flex-col bg-paper">
       <main className="flex-1">
         <div className="mx-auto max-w-2xl px-6 pt-24 sm:pt-32">
-          <ResultsDossier result={session.result} />
+          <ResultsDossier result={session.result} sessionId={session.id} />
         </div>
       </main>
       <TrustFootnote asFooter />
