@@ -7,6 +7,7 @@ import {
 } from '@contexts/recovery'
 import { getDocumentRepo } from '@contexts/recovery/server'
 import { getScreenerRepo } from '@contexts/screener/server'
+import type { AuditTimelineEntry } from './_components/AuditTimeline'
 import { CaseHeaderPanel } from './_components/CaseHeaderPanel'
 import { CaseSidePanel } from './_components/CaseSidePanel'
 import type { CaseDocumentSummary } from './_components/DocumentViewerPanel'
@@ -58,12 +59,27 @@ export default async function OpsCasePage({
     // task #82+; v1 surfaces the storage key for QA.
   }))
 
+  const rawAudit = await getCaseRepo().listAudit(caseRecord.id)
+  const auditEntries: readonly AuditTimelineEntry[] = rawAudit.map((a) => ({
+    id: a.id,
+    kind: a.kind,
+    actorId: a.actorId,
+    fromState: a.fromState,
+    toState: a.toState,
+    occurredAtIso: a.occurredAt.toISOString(),
+    payload: a.payload,
+  }))
+
   return (
     <main className="min-h-screen bg-paper">
       <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)_minmax(360px,1fr)]">
         <CaseHeaderPanel caseRecord={caseRecord} plan={plan} />
         <WorkSurface caseId={caseRecord.id} state={caseRecord.state} />
-        <CaseSidePanel caseId={caseRecord.id} documents={docSummaries} />
+        <CaseSidePanel
+          caseId={caseRecord.id}
+          documents={docSummaries}
+          auditEntries={auditEntries}
+        />
       </div>
     </main>
   )

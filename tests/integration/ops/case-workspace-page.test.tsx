@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
   findCase: vi.fn(),
+  listAudit: vi.fn(async () => []),
   findSessionById: vi.fn(),
   listDocumentsForCase: vi.fn(),
   notFound: vi.fn(() => {
@@ -18,7 +19,10 @@ vi.mock('next/navigation', () => ({
 }))
 
 vi.mock('@contexts/ops/server', () => ({
-  getCaseRepo: () => ({ findCase: mocks.findCase }),
+  getCaseRepo: () => ({
+    findCase: mocks.findCase,
+    listAudit: mocks.listAudit,
+  }),
 }))
 
 vi.mock('@contexts/screener/server', () => ({

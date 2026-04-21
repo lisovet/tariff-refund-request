@@ -1,29 +1,45 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T14:54:00Z
+**Updated**: 2026-04-21T15:03:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 77 → 78)
+**Loop state**: active (iteration 78 → 79)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 78 |
+| completed | 79 |
 | in-progress | 0 |
-| pending | 8 |
+| pending | 7 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 112 files, 964 tests pass |
+| `npm test` | green — 113 files, 974 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 25 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#79 — Case timeline + audit log viewer**
+
+Replaces the #78-era placeholder in the CaseSidePanel's Audit tab with a real timeline viewer:
+
+- **`AuditTimeline.tsx`** — pure-display component. Input is `AuditTimelineEntry[]` (plain JSON shape, `occurredAtIso: string`). Renders chronological left-ruled list, each row with mono timestamp (`yyyy-mm-dd HH:MM UTC`), uppercase mono kind tag, `from → to` state pair when both present, `by <actorId>` / `by system` attribution, and a secondary line for well-known payload shapes (`admin.note` / `qa.sign_off` → renders the note verbatim; `customer.deleted` → counts-only summary, never PII).
+- **`CaseSidePanel`** gains an `auditEntries?` prop; Audit tab now renders `AuditTimeline` instead of the placeholder sentence.
+- **`/ops/case/[id]/page.tsx`** maps `CaseRepo.listAudit(caseId)` output to `AuditTimelineEntry` (Dates → ISO) and passes them through.
+
+10 new tests covering: ordering (chronological), transition-pair rendering, non-transition rows skip the arrow, actor-id + `system` fallback, kind/timestamp formatting, deletion-audit counts-only render (no PII leak), admin-note secondary-line, empty-state.
+
+The existing integration test for the case workspace page was updated to register `listAudit` on the stubbed repo; the CaseSidePanel tabbed-shell test updated to expect the new empty-state string.
+
+974/974 pass.
+
+## Previously completed this wave
 
 **#78 — Case workspace shell (3-pane layout)**
 
@@ -240,12 +256,12 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 
 ## Next eligible
 
-- Task #79 — deps satisfied. **Eligible — lowest id.** (Case timeline + audit log viewer.)
-- Tasks #80..#82 — ops-console workstream continues.
+- Task #80 — deps satisfied. **Eligible — lowest id.** (Case claim / release / assignment.)
+- Tasks #81..#82 — ops-console workstream continues.
 - Tasks #83 (USER-TEST ops staff), #84 (cross-context lint rule), #85 (funnel metrics), #86 (final USER-TEST) follow.
 
 ## Notes
 
-- 78/86 v1 done — 90.7% of Phase 0.
+- 79/86 v1 done — 91.9% of Phase 0.
 - Post-v1 backlog includes AI-copy funnel task #401.
-- Loop will continue with #79 next iteration.
+- Loop will continue with #80 next iteration.

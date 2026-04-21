@@ -22,13 +22,13 @@ describe('CaseSidePanel — tabbed right-pane (Docs / Audit)', () => {
     expect(screen.getByRole('tab', { name: /audit/i })).toBeTruthy()
   })
 
-  it('switches to the Audit tab on click and shows the placeholder content', () => {
+  it('switches to the Audit tab on click and shows the empty-audit state', () => {
     render(<CaseSidePanel caseId="cas_x" documents={DOCS} />)
     fireEvent.click(screen.getByRole('tab', { name: /audit/i }))
     expect(screen.getByTestId('tab-audit-panel')).toBeTruthy()
-    expect(
-      screen.getByText(/audit log viewer lands with task/i),
-    ).toBeTruthy()
+    // With no auditEntries prop, the timeline renders its
+    // "No audit events yet" empty state.
+    expect(screen.getByText(/no audit events yet/i)).toBeTruthy()
   })
 
   it('Documents tab shows the provided documents', () => {

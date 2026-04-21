@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { AuditTimeline, type AuditTimelineEntry } from './AuditTimeline'
 import { DocumentViewerPanel, type CaseDocumentSummary } from './DocumentViewerPanel'
 
 /**
@@ -17,11 +18,15 @@ import { DocumentViewerPanel, type CaseDocumentSummary } from './DocumentViewerP
 export interface CaseSidePanelProps {
   readonly caseId: string
   readonly documents: readonly CaseDocumentSummary[]
+  readonly auditEntries?: readonly AuditTimelineEntry[]
 }
 
 type TabId = 'docs' | 'audit'
 
-export function CaseSidePanel({ caseId, documents }: CaseSidePanelProps) {
+export function CaseSidePanel({
+  documents,
+  auditEntries,
+}: CaseSidePanelProps) {
   const [active, setActive] = useState<TabId>('docs')
   return (
     <aside className="flex flex-col border-l border-rule bg-paper">
@@ -55,17 +60,8 @@ export function CaseSidePanel({ caseId, documents }: CaseSidePanelProps) {
           id="tab-audit-panel"
           data-testid="tab-audit-panel"
           aria-labelledby="tab-audit"
-          className="p-6"
         >
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
-            Audit log
-          </p>
-          <p className="mt-3 text-sm text-ink/80">
-            The full audit log viewer lands with task #79. Every state
-            transition + reviewer note + deletion event for case{' '}
-            <span className="font-mono text-ink">{caseId}</span> will
-            surface here in chronological order.
-          </p>
+          <AuditTimeline entries={auditEntries ?? []} />
         </div>
       ) : null}
     </aside>
