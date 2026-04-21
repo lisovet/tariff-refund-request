@@ -50,13 +50,15 @@
         "epic": "E1. Foundation",
         "title": "Wire Cloudflare R2 storage adapter",
         "description": "Configure AWS SDK v3 against R2 endpoint; create per-environment buckets; pre-signed URL helper with 15-min expiry.",
-        "details": "src/shared/infra/storage/r2.ts exports putObject, getSignedUploadUrl, getSignedReadUrl. Versioning enabled at bucket level via Terraform/console.",
+        "details": "src/shared/infra/storage/{types,memory,s3,index}.ts exposes putObject, getObject, deleteObject, headObject, getSignedUploadUrl, getSignedReadUrl. STORAGE_DRIVER env switches between memory (default) and s3. Per-case key layout (cases/{caseId}/{documentId}/{filename}) enforced. TODO(human-action) — provision R2 buckets + set R2_* env to use real S3 path.",
         "testStrategy": "MinIO container in CI; integration test uploads, signs, downloads, asserts content matches.",
         "priority": "high",
         "dependencies": [1],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 4,
-        "source": ["ADR 006"]
+        "source": ["ADR 006"],
+        "completedAt": "2026-04-21T05:51:30Z",
+        "completedNotes": "@aws-sdk/client-s3 + @aws-sdk/s3-request-presigner installed. StorageAdapter contract in src/shared/infra/storage/types.ts: case-scoped key validator (cases/{caseId}/{documentId}/{filename}), MAX_UPLOAD_URL_EXPIRY_SECONDS=900 per ADR 006. Memory adapter in memory.ts (preserves version history, used in tests + dev fallback). S3 adapter in s3.ts works against R2/MinIO/S3 (path-style, region 'auto'). Factory in index.ts switches via STORAGE_DRIVER env. 17 new tests (types + memory + factory) RED-then-GREEN. All qa gates green: 34/34 tests, lint + typecheck clean. Real R2 + MinIO are human-action; in-memory test path runs everywhere."
       },
       {
         "id": 4,
