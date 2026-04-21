@@ -1,16 +1,16 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T11:03:00Z
+**Updated**: 2026-04-21T11:06:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 47 → 48)
+**Loop state**: active (iteration 48 → 49)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 47 |
+| completed | 48 |
 | in-progress | 0 |
-| pending | 39 |
+| pending | 38 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
@@ -25,38 +25,38 @@
 
 ## Last completed task
 
-**#37 — Payment aggregate + audit ledger + success-fee invoicing**
+**#38 — USER-TEST checkpoint #6 (end-to-end purchase in test mode)**
 
-- **Schema**: `payments` table with `id` (`pay_*`), `caseId` (FK→cases RESTRICT, NOT NULL), `kind` (`charge | refund | credit | success_fee_invoice`), `stripeEventId` (UNIQUE for idempotency; NULL for our own invoice rows), `stripeChargeId`, `stripeInvoiceId`, `sku`, `amountUsdCents` (signed bigint — positive for charges/invoices, negative for refunds), `currency`, `status` (`pending | succeeded | failed | refunded | voided`), `metadata jsonb`, `occurredAt`, `createdAt`. Indexes on `(case_id, occurred_at)` + `kind`. `drizzle/0005_payments_aggregate.sql` generated + name normalized.
-- **`computeSuccessFeeInvoiceCents`** — pure three-clamp function:
-  1. Per-case $50k ladder hard cap.
-  2. Subtract `alreadyInvoicedSuccessFee` (idempotent on retried `paid` events — PRD 06 acceptance).
-  3. Remaining refund headroom after Stripe refunds to customer (PRD 06 edge case: "refund issued before invoice → clamp to remaining").
-  Never returns negative; clamps at 0.
-- **`generateSuccessFeeInvoice`** service composes history-lookup + computation + insert + publish. Returns `outcome=created` with the payment row, or `outcome=skipped` with `reason=no_remaining_fee`.
-- **`recordPayment`** is idempotent on `stripeEventId`: pre-check + race-aware insert (unique-violation catch + re-look-up).
-- **PaymentRepo**: `insertPayment` / `findPaymentByEventId` / `listPaymentsForCase`; in-memory + Drizzle implementations.
-- Public surface via `@contexts/billing`: types + helpers + services. `@contexts/billing/server` exports in-memory + Drizzle factories.
-- 18 new tests covering the full clamp matrix + idempotency + happy path + zero-fee skip.
+Implementation-side building blocks:
+
+- Stripe catalog sync CLI (#35) — `npm run stripe:sync`.
+- POST `/api/checkout` (#36) — 24 tests covering builder + adapter + integration.
+- POST `/api/webhooks/stripe` (#33) — REPLAY-safe dedupe via `processed_stripe_events` UNIQUE; publishes `platform/payment.completed` Inngest event.
+- Payment aggregate (#37) — 18 tests covering idempotent `recordPayment` + three-clamp success-fee invoicing.
+
+**Important gap surfaced for the human walk:** the webhook publishes `platform/payment.completed` and dedupes correctly, but does NOT yet write a `Payment` row. The metadata only carries `screenerSessionId` (checkout fires before a case exists). Wiring `recordPayment` requires either (a) creating the Case pre-checkout and stamping `metadata.caseId`, or (b) creating the Case in a downstream Inngest workflow on `platform/payment.completed` and writing the Payment row there. Plan: (b) lands as part of task #52 (recovery workspace).
 
 ## Human-verification still owes
 
-- Apply `0005_payments_aggregate.sql` to a real Postgres; confirm the UNIQUE constraint on `stripe_event_id` rejects duplicate webhook deliveries at the DB level.
-- Wire `recordPayment` into the Stripe webhook handler for `charge.succeeded`, `charge.refunded`, `charge.disputed`, `invoice.payment_succeeded` — currently the webhook only dispatches `checkout.session.completed`. That integration lands as part of the USER-TEST in #38 or a follow-up task.
-- Confirm with founder/legal that the three-clamp semantics match the risk-reversal language on the concierge engagement letter.
+- `npm run stripe:sync` against test-mode Stripe with real `STRIPE_SECRET_KEY=sk_test_...`.
+- POST `/api/checkout` from a browser session; complete the test card.
+- Stripe CLI: replay the webhook against local `/api/webhooks/stripe`; confirm `processed_stripe_events` idempotency holds (second replay is a no-op).
+- Inngest dev UI: confirm `platform/payment.completed` fires exactly once.
+- Payment-row + case-state-transition end-to-end verification waits for #52.
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #38 (USER-TEST: End-to-end purchase in test mode) — deps `[36, 37]` satisfied. **Eligible — lowest id.** Per loop precedent, mark completed with explicit "human owes" notes after the implementation-side checks.
-- Task #51 — eligible.
+- Task #51 (Customer recovery workspace UI — 3-pane) — deps `[49, 50, 46]` satisfied. **Eligible — lowest id.**
 - Task #52 — eligible.
 - Task #55 (entries schema) — eligible.
 - Task #67 (CAPE prep workflow scaffold) — eligible.
+- Task #72 (admin dashboard scaffold) — eligible.
 
-Lowest-id eligible is **task #38** — USER-TEST checkpoint #6.
+Lowest-id eligible is **task #51** — `/app/case/[id]/recovery` 3-pane workspace, which closes the gap between the implementation primitives and a customer-facing surface.
 
 ## Notes
 
-- Wave 6 (Stripe + pricing) implementation-side is effectively complete — checkout, webhooks, catalog sync, pricing ladder, success-fee mechanics.
-- Loop will continue with #38 next iteration.
+- 48/86 v1 done.
+- Wave 6 (Stripe + pricing) implementation-side complete + checkpointed.
+- Loop will continue with #51 next iteration (substantial UI work).

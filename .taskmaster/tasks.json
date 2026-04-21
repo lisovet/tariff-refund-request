@@ -765,11 +765,13 @@
           36,
           37
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 1,
         "source": [
           "validation-checkpoint"
-        ]
+        ],
+        "completedAt": "2026-04-21T11:06:00Z",
+        "completedNotes": "USER-TEST checkpoint #6 (end-to-end purchase in test mode). Implementation-side building blocks complete: stripe catalog sync CLI (#35), POST /api/checkout with 24 tests (#36), POST /api/webhooks/stripe with REPLAY-safe dedupe + Inngest platform/payment.completed publish (#33), Payment aggregate with 18 tests covering idempotent recordPayment + three-clamp success-fee invoicing (#37). IMPORTANT GAP for the human walk: the Stripe webhook currently publishes platform/payment.completed and dedupes via processed_stripe_events but does NOT yet write a Payment row. Reason: the webhook only has metadata.screenerSessionId (checkout happens before a case exists). Wiring recordPayment requires either (a) creating the Case pre-checkout and stamping metadata.caseId, or (b) creating the Case in a downstream Inngest workflow on platform/payment.completed, then writing the Payment row there. Plan: (b) lands as part of task #52 (recovery workspace). For now, the Payment aggregate is fully testable in isolation + via direct-call integration, but the webhook happy-path does not produce a payments row yet. 576/576 pass; lint + typecheck clean; build green (21 routes). Human owes: run npm run stripe:sync against test-mode Stripe, POST /api/checkout from a browser, complete the test card, use the Stripe CLI to replay the webhook, confirm processed_stripe_events idempotency holds (second replay is no-op), confirm platform/payment.completed event fires exactly once in Inngest dev UI. The Payment row + case state transition will be verifiable after #52 creates the case + wires recordPayment into the downstream workflow."
       },
       {
         "id": 39,
