@@ -33,3 +33,12 @@ export {
   IEEPA_WINDOWS,
   tagEntry,
 } from './window'
+
+export type {
+  AceColumnKey,
+  AceEntryCandidate,
+  AceParseError,
+  AceParseResult,
+  AceSourceConfidence,
+} from './ace-parser'
+export { ACE_FIELD_KEYS, parseAceCsv } from './ace-parser'

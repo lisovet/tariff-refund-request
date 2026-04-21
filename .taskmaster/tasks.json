@@ -1193,11 +1193,13 @@
           56,
           58
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 5,
         "source": [
           "PRD 07"
-        ]
+        ],
+        "completedAt": "2026-04-21T12:25:00Z",
+        "completedNotes": "ACE CSV parser per PRD 07. parseAceCsv(csv) \u2192 AceParseResult discriminated union: {ok:true, rows: AceEntryCandidate[], errors: AceParseError[]} on header-validated CSV; {ok:false, reason:\"missing_columns\", missingColumns: AceColumnKey[]} on missing required column. Permissive header normalization (trim + lowercase + underscore\u2192space; synonyms accept \"Entry No\"/\"Entry Number\"/\"Entry_No\", \"Total Duty\"/\"Total Duty (USD)\", etc.) but strict per-row validation: entry-number canonicalized via canonicalizeEntryNumber (any failure \u2192 field=entryNumber); date must be YYYY-MM-DD ISO; IOR must be non-empty; duty parsed from $-prefixed/comma-separated dollar string to non-negative cents; HTS codes split on ;/comma/whitespace and validated against 4.2.4 digit-dot pattern. Source confidence stamped \"high\" per PRD 07 source hierarchy (ACE export is the cleanest signal). Per-row failures collected as AceParseError {row, field, reason} with CSV-row line number (header is row 1) so the analyst review queue can show exactly which row failed. papaparse@^5.5 + @types/papaparse added. 16 new tests covering single + multi-row happy paths, header variants (4 forms), missing-column rejection, per-row errors (entry/date/duty/ior), multi-error reporting alongside valid rows, empty input, header-only input, Excel-stripped leading-zero filer codes. 701/701 pass; lint + typecheck clean; build green (24 routes \u2014 pure module)."
       },
       {
         "id": 60,

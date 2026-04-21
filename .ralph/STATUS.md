@@ -1,23 +1,23 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T12:18:00Z
+**Updated**: 2026-04-21T12:25:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 57 → 58)
+**Loop state**: active (iteration 58 → 59)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 58 |
+| completed | 59 |
 | in-progress | 0 |
-| pending | 28 |
+| pending | 27 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 87 files, 685 tests pass |
+| `npm test` | green — 88 files, 701 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 24 routes |
@@ -25,34 +25,39 @@
 
 ## Last completed task
 
-**#58 — Window + phase tagging**
+**#59 — ACE CSV parser**
 
-- `CURRENT_IEEPA_WINDOW` (version `"ieepa-v1-2024"`, start `2024-04-01`, end `2025-12-31`, four phases tiling the window contiguously: `phase_1_2024_h2`, `phase_2_2024_q4`, `phase_3_2025_h1`, `phase_4_2025_h2`). `TODO(human-action)` for legal/customs sign-off on the exact boundaries.
-- `IEEPA_WINDOWS` array carries every registered window (one for now; future versions append).
-- Pure `tagEntry({ entryDate }, window)` → `{ inWindow, windowVersion, phaseFlag }`. **`windowVersion` is ALWAYS the supplied window's version** so batch-level pinning works — a batch tagged today against `ieepa-v1-2024` is reproducible after the window is updated.
-- Phase boundary semantics are start-inclusive (a date sitting on a phase boundary lands in the LATER phase).
-- Out-of-window dates (before start or after end) → `inWindow=false`, `phaseFlag=null`. Malformed or missing dates → same, but `windowVersion` still pinned for audit.
-- 12 new tests covering config invariants (contiguous tiling, unique phase ids), happy paths, boundary dates (day before/after, phase-boundary start-inclusive), missing/invalid input, and version-pinning against a fake old window.
+- `parseAceCsv(csv)` → `AceParseResult` discriminated union: `{ ok:true, rows: AceEntryCandidate[], errors: AceParseError[] }` on header-validated CSV; `{ ok:false, reason:'missing_columns', missingColumns: AceColumnKey[] }` when a required column is missing.
+- **Permissive header normalization** (trim + lowercase + `_` → space; synonyms accept "Entry No" / "Entry Number" / "Entry_No", "Total Duty" / "Total Duty (USD)", etc.) but **strict per-row validation**:
+  - entry-number canonicalized via `canonicalizeEntryNumber` (any failure → `field=entryNumber`)
+  - date must be `YYYY-MM-DD` ISO
+  - IOR must be non-empty
+  - duty parsed from `$`-prefixed/comma-separated dollar string to non-negative cents
+  - HTS codes split on `;` / `,` / whitespace and validated against the 4.2.4 digit-dot pattern
+- Source confidence stamped `'high'` per PRD 07 source hierarchy (ACE export is the cleanest signal).
+- Per-row failures collected as `AceParseError { row, field, reason }` with the CSV-row line number (header is row 1) so the analyst review queue can show exactly which row failed.
+- `papaparse@^5.5` + `@types/papaparse` added.
+- 16 new tests covering single + multi-row happy paths, header variants (4 forms), missing-column rejection, per-row errors, multi-error reporting alongside valid rows, empty input, header-only input, Excel-stripped leading-zero filer codes.
 
 ## Human-verification still owes
 
-- Confirm the v1 IEEPA window dates (start, end, phase boundaries) with customs counsel before launch — current values are placeholders.
-- Decide whether the phase labels should be customer-facing (e.g., "Phase 1 (Apr–Sep 2024)" appears in the Readiness Report) or analyst-only.
-- Wire `tagEntry` into the entries save service so every persisted entry carries `phaseFlag` + a window-version stamp on the audit row.
+- Run against an anonymized real ACE export from a customer to validate header-name coverage; add any missing synonyms.
+- Decide whether HTS codes that don't match the 4.2.4 digit-dot pattern (e.g., partial codes) should be soft-flagged rather than reject the whole row.
+- Wire `parseAceCsv` into the upload pipeline once the storage adapter can stream + the case-aware ingest service exists (#62+).
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #59 — deps satisfied. **Eligible — lowest id.**
+- Task #60 — deps satisfied. **Eligible — lowest id.**
 - Task #61 — eligible.
 - Task #67 (CAPE prep workflow scaffold) — eligible.
 - Task #72 (admin dashboard scaffold) — eligible.
 - Task #74 — eligible.
 
-Lowest-id eligible is **task #59**.
+Lowest-id eligible is **task #60**.
 
 ## Notes
 
-- 58/86 v1 done.
-- Wave 9 (Entry ingestion + normalization) — schema + canonicalizer + dedupe + window-tagging landed.
-- Loop will continue with #59 next iteration.
+- 59/86 v1 done.
+- Wave 9 (Entry ingestion + normalization) — schema + canonicalizer + dedupe + window-tagging + ACE parser landed.
+- Loop will continue with #60 next iteration.
