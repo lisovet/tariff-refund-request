@@ -147,6 +147,7 @@ This list lives at `/trust` and is restated in the engagement letter.
 - **Taste — customer data export / deletion request UI**: `minimalist-ui` (inherits customer-app rules).
 - **Pair with**: `full-output-enforcement` for the engagement-letter renderer and the long-form trust pages.
 - **Other**: `test-driven-development` for the deletion + export workers (must purge all in-scope records and write the audit row without retaining content). `security-review` skill before each PR that touches auth, retention, or sub-processor changes.
+- **Trust-sensitive PR gates** (mandatory): `pr-review-toolkit:review-pr` runs the full reviewer-agent suite on any PR touching auth / retention / disclosure surfaces / engagement letters / data export / deletion / sub-processor list. `code-review:code-review` is the standard PR review on top. `judge` is the final gate — trust-sensitive surfaces are the highest-stakes work in this product. `qa-monkey` proactively stress-tests the deletion worker (idempotency, partial failure, content non-retention).
 - **Override from `docs/DESIGN-LANGUAGE.md`**: disclosures must be real text — never images, never collapsed accordions hiding required text by default. The canonical trust promise appears verbatim across surfaces — never paraphrased.
 
 ### Aesthetic intent

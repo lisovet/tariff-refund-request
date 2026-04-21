@@ -173,6 +173,7 @@ EntryRecord = {
 - **Apply from `minimalist-ui` (customer)**: hairline-bordered upload zone with no cloud illustration, generous internal padding on the three-pane shell, accent-only progress on upload, IntersectionObserver scroll-fade for status changes.
 - **Apply from `industrial-brutalist-ui` Swiss (ops)**: rigid CSS Grid with `gap: 1px` for the three-pane spine, zero `border-radius` on the work surface, monospace dominance for entry numbers / dates / IDs, generous tracking on uppercase queue labels, `<dl>` / `<data>` / `<samp>` semantics in the extraction form.
 - **Override from `docs/DESIGN-LANGUAGE.md`**: customs-orange `--accent` substitutes for both `minimalist-ui` pastel accents and `industrial-brutalist-ui` aviation hazard red. CRT scanlines, halftone, ASCII brackets `[ ... ]`, viewport-bleeding numerals, "REV/UNIT" decoration strings — all banned. No phosphor-green Tactical Telemetry mode.
+- **Cross-cutting** (per `docs/SKILLS-ROUTING.md`): `planner` → `coder` → `qa-monkey` (esp. concurrency on simultaneous staff edits) → `judge` → `ship`. `debugger` for upload-flow incidents.
 
 ### Aesthetic intent
 

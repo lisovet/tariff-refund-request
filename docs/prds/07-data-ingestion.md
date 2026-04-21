@@ -116,6 +116,7 @@ Every `EntryRecord` carries at least one `EntrySourceRecord`. Multiple sources s
 - **Pair with**: `full-output-enforcement` for the upload component and review-pair UI.
 - **Other (critical)**: `test-driven-development` for canonicalization, dedupe, fuzzy match, ACE CSV parser. Golden-file fixtures for each parser. `software-architecture` when shaping the public surface of `src/contexts/entries/`.
 - **Override from `docs/DESIGN-LANGUAGE.md`**: confidence pills use `--positive` / `--warning` / `--blocking` tokens — never the `industrial-brutalist-ui` aviation hazard red or the `minimalist-ui` pastel set.
+- **Cross-cutting** (per `docs/SKILLS-ROUTING.md`): `planner` → `coder` → `qa-monkey` (adversarial fixtures: rotated PDFs, password-protected files, CSVs with leading-zero entry numbers stripped by Excel, mid-batch corruption) → `judge` → `ship`. `vision-analyst` for support workflows analyzing customer-uploaded screenshots.
 
 ### Aesthetic intent
 

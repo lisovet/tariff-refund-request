@@ -132,6 +132,7 @@ This object — not the UI — is the source of truth. The results page renders 
 - Invoke via `/taste-skill screener question screens and editorial results dossier for an importer eligibility check`.
 - **Apply from `minimalist-ui`**: warm-monochrome canvas, generous macro-whitespace per question screen, 1px hairline rules, IntersectionObserver scroll-fade entry on results, kbd-styled chip for `Q3 / 10` indicator, no shadows, no rounded-full pills.
 - **Override from `docs/DESIGN-LANGUAGE.md`**: GT Sectra display (not Playfair); single `--accent` (not pastel multi-accent palette); refund metric in Berkeley Mono, not the body face.
+- **Cross-cutting** (per `docs/SKILLS-ROUTING.md`): `planner` → `coder` → `qa-monkey` → `judge` → `ship` for any new screener PR. `debugger` for any reactive bug investigation.
 
 ### Aesthetic intent
 

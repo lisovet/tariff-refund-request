@@ -112,7 +112,8 @@ CaseAttribution = { caseId, partnerOrgId, capturedAt }
 - **Taste — partner dashboard** (lead list, revenue summary, marketing assets): `industrial-brutalist-ui` Swiss mode (inherits ops console rules from PRD 04 — partner dashboard is a data surface, not a marketing surface).
 - **Taste — white-label**: same as above; only `--accent` and the logo are partner-overridable. Typography, layout, motion stay ours.
 - **Pair with**: `full-output-enforcement` for the dashboard tables and embedded screener iframe shell.
-- **Other**: `test-driven-development` for attribution capture, revenue-share math, and the partner RLS rules. `software-architecture` when introducing the multi-tenant `orgId` boundary across all contexts.
+- **Other**: `test-driven-development` for attribution capture, revenue-share math, and the partner RLS rules. `software-architecture` when introducing the multi-tenant `orgId` boundary across all contexts. `shopify-expert` when integrating with Shopify Plus partners or building embedded screener variants for ecommerce agencies' Shopify sites — covers Liquid templating, Storefront API, App Bridge, and theme-extension patterns.
+- **Multi-tenant QA gates** (mandatory once `orgId` is wired everywhere): `qa-monkey` to stress-test cross-org isolation (data-leak attempts, role-boundary violations, attribution race conditions); `security-review` on every PR that touches the RLS rules or the white-label CSS allowlist; `judge` as the final gate.
 - **Override from `docs/DESIGN-LANGUAGE.md`**: white-label CSS allowlist is restricted to two tokens (`--accent`, `--paper`) plus the logo asset — never typography, motion, or layout primitives. Reject any partner asks that would break the editorial-utilitarian contract.
 
 ### Aesthetic intent

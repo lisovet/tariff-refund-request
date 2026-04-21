@@ -1,6 +1,6 @@
 # PRD Index
 
-Read in order. Each PRD names its bounded context and references the ADRs it depends on (`docs/adr/`). The platform vision lives in `docs/VISION.md`; the visual contract in `docs/DESIGN-LANGUAGE.md`.
+Read in order. Each PRD names its bounded context and references the ADRs it depends on (`docs/adr/`). The platform vision lives in `docs/VISION.md`; the visual contract in `docs/DESIGN-LANGUAGE.md`; the full skills routing (taste + pipeline + marketing + AI + security + ops) in `docs/SKILLS-ROUTING.md`.
 
 | # | PRD | What it covers |
 | --- | --- | --- |

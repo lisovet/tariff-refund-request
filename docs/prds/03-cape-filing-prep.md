@@ -169,6 +169,7 @@ Designed in `src/contexts/cape/report-pdf/` using React PDF. Honors the design l
 - **Apply from `minimalist-ui` (customer + PDF)**: editorial serif masthead, generous macro-whitespace, hairline section dividers, kbd-style chips for prereq checklist items, monospace for IDs / counts / amounts, no shadows on tiles, IntersectionObserver scroll-fade for state transitions.
 - **Apply from `industrial-brutalist-ui` Swiss (ops)**: rigid CSS grid for the three-pane spine, zero `border-radius` on the validator panes, semantic `<data>` / `<output>` / `<samp>` for batch metadata, generous uppercase tracking on QA-checklist labels, bimodal density (dense entry tables next to vast whitespace around the sign-off CTA).
 - **Override from `docs/DESIGN-LANGUAGE.md`**: status colors (`--positive`, `--warning`, `--blocking`) for severity glyphs are app-only; PDF uses ink + accent + a single restrained status hue per row. Never CRT scanlines / halftone / ASCII brackets in the ops view. PDF footnotes are real superscripted footnotes — not banners or pills.
+- **Cross-cutting + extra gates** (per `docs/SKILLS-ROUTING.md`): `planner` → `coder` → `qa-monkey` → `judge` → `ship`. **The validator is the single highest-stakes module in this product** — `judge` is non-negotiable on any change, golden-file diffs must be reviewed by a human, and `qa-monkey` runs a full adversarial-fixture sweep before merge.
 
 ### Aesthetic intent
 

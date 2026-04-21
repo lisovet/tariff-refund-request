@@ -60,14 +60,17 @@ To be filled in once stack is chosen. Until then, defer to global defaults in `~
 
 ## Skills routing (cheat sheet)
 
-When scaffolding any UI work, run `/taste-skill <description>` and verify it picks per the mapping in `docs/DESIGN-LANGUAGE.md`:
+Full routing — taste + pipeline + marketing + AI + security + ops — lives in **`docs/SKILLS-ROUTING.md`**. Quick reference:
 
+**UI scaffolding**: run `/taste-skill <description>`; verify the pick matches `docs/DESIGN-LANGUAGE.md`:
 - Marketing → `minimalist-ui` (+ `high-end-visual-design` Editorial Luxury for homepage hero only)
 - Customer app + PDFs → `minimalist-ui`
-- Ops console → `industrial-brutalist-ui`, **Swiss Industrial Print mode only** (CRT scanlines / halftone / ASCII brackets / hazard red **disabled**)
-- Always pair with `full-output-enforcement`
+- Ops console → `industrial-brutalist-ui` **Swiss Industrial Print mode only** (CRT scanlines / halftone / ASCII brackets / hazard red **disabled**)
+- Always pair with `full-output-enforcement`.
 
-Non-design skills called out per PRD: `claude-api` (mandatory for PRD 08), `test-driven-development` (mandatory for the validator, pricing.ts, parsers, eval suites), `software-architecture` for context boundaries, `security-review` for any auth/retention/data-export PR.
+**Pipeline (cross-cutting on every PR)**: `plan-ceo` → `planner` → `critic` → `coder` (with `test-driven-development`) → `qa-monkey` → `judge` → `ship`. `debugger` for known bugs. `simplify` after a logical chunk. `pr-review-toolkit:review-pr` + `code-review:code-review` for PR review.
+
+**PRD-specific** (called out in each PRD): `claude-api` mandatory for PRD 08; `test-driven-development` critical for PRDs 03 (validator), 06 (pricing.ts), 07 (parsers), 08 (eval suites); `software-architecture` for context boundaries; `security-review` for any auth/retention/data-export PR (PRD 10); `vision-analyst` for screenshot analysis (PRD 07/08); `shopify-expert` for Phase-3 partner integrations (PRD 09); marketing copy + imagery skills (`copywriting-strategist`, `copywriting-formatter`, `advertorial-writer`, `copywriting-optimizer`, `ad-validator`, `image-prompt`, `ad-creator`) per PRD 05.
 
 ## Non-goals (do not build)
 

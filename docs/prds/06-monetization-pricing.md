@@ -127,6 +127,7 @@ Target blended ARPU at 12 months: **$1,800 per qualified lead through full ladde
 - Invoke via `/taste-skill stage-by-stage pricing page with tabular figures, free tier rendered with same weight as paid tiers, no popular badge`.
 - **Apply from `minimalist-ui`**: hairline-divided pricing rows, generous internal padding, monospace numerics, no shadows, no rounded-full pill plan badges.
 - **Override from `docs/DESIGN-LANGUAGE.md`**: customs-orange `--accent` only on the single "Get started" CTA per stage column. Pricing-table source of truth is `pricing.ts` rendered via snapshot — never hand-typed numbers.
+- **Cross-cutting + extra gates** (per `docs/SKILLS-ROUTING.md`): `planner` → `coder` → `qa-monkey` (focus on Stripe webhook idempotency, refund clamp logic, success-fee race conditions) → `judge` → `ship`. `security-review` on any change touching billing flow or engagement-letter capture. Once traffic exists, `copywriting-optimizer` runs A/B tests on the pricing page (subject to PRD 05's design-language gate).
 
 ### Aesthetic intent
 

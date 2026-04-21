@@ -95,7 +95,8 @@ The thresholds are **per task**, not global. Calibrated against real cases.
 ### Skills
 
 - **Implementation (critical)**: `claude-api` — every LLM/extractor implementation must run through this skill. It enforces prompt caching, model selection (Opus 4.7 / Sonnet 4.6 / Haiku 4.5), tool-use patterns, and migration discipline as Anthropic models evolve. Non-negotiable on every PR that imports `@anthropic-ai/sdk`.
-- **Other**: `test-driven-development` for the eval suite — every prompt template ships with a golden-file evaluation before deploy. `software-architecture` when shaping the public surface of `src/contexts/ai/`.
+- **Other**: `test-driven-development` for the eval suite — every prompt template ships with a golden-file evaluation before deploy. `software-architecture` when shaping the public surface of `src/contexts/ai/`. `vision-analyst` when a customer uploads a screenshot for support / extraction QA — extracts structured information from images for downstream agents.
+- **AI QA gates** (mandatory): `qa-monkey` to stress-test extractor outputs against adversarial document fixtures (rotated PDFs, password-protected files, prompt-injection attempts inside docs); `judge` as the final gate before any new prompt template or model version reaches production — confidence calibration drift is a slow-burn failure mode that this gate must catch.
 - **Taste — analyst review surfaces** (side-by-side AI draft + confirmation): `industrial-brutalist-ui` Swiss mode (inherits PRD 04 ops rules).
 - **Taste — customer-facing surfaces touched by AI** (e.g., entry detail with AI confidence): `minimalist-ui` (inherits PRD 02 / 03 rules).
 - **Pair with**: `full-output-enforcement` for the eval-suite scaffolding (long, must not truncate).
