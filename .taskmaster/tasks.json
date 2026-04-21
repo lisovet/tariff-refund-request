@@ -1027,12 +1027,14 @@
           50,
           46
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 8,
         "source": [
           "PRD 02",
           "DESIGN-LANGUAGE.md"
-        ]
+        ],
+        "completedAt": "2026-04-21T11:17:00Z",
+        "completedNotes": "Customer recovery workspace UI (3-pane) at /app/case/[id]/recovery per PRD 02. Server component resolves the recovery path by loading the case (getCaseRepo), the screener session (getScreenerRepo.findSessionById), running determineRecoveryPath, and calling recoveryPlanFor + renderOutreachKit. Three panes: Left \u2014 RecoveryStatusPanel shows case id, status banner with path label + SLA, document checklist (one row per plan.acceptedDocs), prerequisite checks (required vs optional), uploaded list when docs exist. Center \u2014 OutreachKitPanel renders rendered subject + body verbatim + a CopyButton (client component) that writes \"Subject: X\\n\\n<body>\" to navigator.clipboard with \"Copied\" feedback; attachments-needed list; template version footer. Right \u2014 UploadPanel wraps the existing UploadZone with the case-id binding. Zero UI conditionals on path per ADR 015 \u2014 everything reads from the plan. 404 paths: case not found; case has no resolvable recovery path (no screener session OR disqualified). not-found.tsx renders an editorial fallback. Auth: middleware gates /app; fine customer-to-case ownership scoping is a follow-up (#52). 16 new tests (6 status-panel + 5 outreach-panel + 5 integration-page via stubbed repos). 592/592 pass; lint + typecheck clean; build green (22 routes \u2014 /app/case/[id]/recovery at 2.97kB + 114kB first-load, dynamic-rendered)."
       },
       {
         "id": 52,

@@ -1,62 +1,63 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T11:06:00Z
+**Updated**: 2026-04-21T11:17:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 48 → 49)
+**Loop state**: active (iteration 49 → 50)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 48 |
+| completed | 49 |
 | in-progress | 0 |
-| pending | 38 |
+| pending | 37 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 73 files, 576 tests pass |
+| `npm test` | green — 76 files, 592 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
-| `npm run build` | green — 21 routes |
+| `npm run build` | green — 22 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
 
-**#38 — USER-TEST checkpoint #6 (end-to-end purchase in test mode)**
+**#51 — Customer recovery workspace UI (3-pane)**
 
-Implementation-side building blocks:
+`/app/case/[id]/recovery` — server component at `src/app/(app)/app/case/[id]/recovery/page.tsx`:
 
-- Stripe catalog sync CLI (#35) — `npm run stripe:sync`.
-- POST `/api/checkout` (#36) — 24 tests covering builder + adapter + integration.
-- POST `/api/webhooks/stripe` (#33) — REPLAY-safe dedupe via `processed_stripe_events` UNIQUE; publishes `platform/payment.completed` Inngest event.
-- Payment aggregate (#37) — 18 tests covering idempotent `recordPayment` + three-clamp success-fee invoicing.
+- Resolves the recovery path by loading the case (`getCaseRepo`), the screener session (`findSessionById`), running `determineRecoveryPath`, and calling `recoveryPlanFor` + `renderOutreachKit`.
+- **Left** — `RecoveryStatusPanel`: case id, status banner with path label + SLA, document checklist (one row per `plan.acceptedDocs`), prerequisite checks (required vs optional), uploaded list when docs exist.
+- **Center** — `OutreachKitPanel`: rendered subject + body verbatim, `CopyButton` client subcomponent writes `"Subject: …\n\n<body>"` to `navigator.clipboard` with "Copied" feedback, attachments-needed list, template version footer.
+- **Right** — `UploadPanel` wraps the existing `UploadZone` with the case-id binding.
+- **Zero UI conditionals on `path` per ADR 015** — the workspace reads everything from the plan + the rendered outreach kit.
+- 404 paths (via `notFound()`): case doesn't exist; case has no resolvable recovery path (no screener session OR disqualified). `not-found.tsx` renders an editorial fallback page.
+- Auth: middleware gates `/app`; finer customer-to-case ownership scoping is a follow-up with #52 (case lifecycle workflow).
 
-**Important gap surfaced for the human walk:** the webhook publishes `platform/payment.completed` and dedupes correctly, but does NOT yet write a `Payment` row. The metadata only carries `screenerSessionId` (checkout fires before a case exists). Wiring `recordPayment` requires either (a) creating the Case pre-checkout and stamping `metadata.caseId`, or (b) creating the Case in a downstream Inngest workflow on `platform/payment.completed` and writing the Payment row there. Plan: (b) lands as part of task #52 (recovery workspace).
+16 new tests: 6 `RecoveryStatusPanel` + 5 `OutreachKitPanel` (including clipboard write verification) + 5 integration-page via stubbed repos (broker happy path, uploaded list, three 404 paths).
 
 ## Human-verification still owes
 
-- `npm run stripe:sync` against test-mode Stripe with real `STRIPE_SECRET_KEY=sk_test_...`.
-- POST `/api/checkout` from a browser session; complete the test card.
-- Stripe CLI: replay the webhook against local `/api/webhooks/stripe`; confirm `processed_stripe_events` idempotency holds (second replay is a no-op).
-- Inngest dev UI: confirm `platform/payment.completed` fires exactly once.
-- Payment-row + case-state-transition end-to-end verification waits for #52.
+- End-to-end walk once #52 wires case creation into the `platform/payment.completed` workflow: purchase → case created → workspace opens at the correct URL.
+- Real upload flow through the workspace once R2 + worker asset are provisioned.
+- Eyeball the three-pane layout at multiple breakpoints; confirm the right pane collapses under the center on narrow viewports (currently a single-column grid below `lg`).
+- Copy-to-clipboard feedback against Safari + a non-HTTPS local context.
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #51 (Customer recovery workspace UI — 3-pane) — deps `[49, 50, 46]` satisfied. **Eligible — lowest id.**
+- Task #30 — deps satisfied. **Eligible — lowest id.**
 - Task #52 — eligible.
 - Task #55 (entries schema) — eligible.
 - Task #67 (CAPE prep workflow scaffold) — eligible.
 - Task #72 (admin dashboard scaffold) — eligible.
 
-Lowest-id eligible is **task #51** — `/app/case/[id]/recovery` 3-pane workspace, which closes the gap between the implementation primitives and a customer-facing surface.
+Lowest-id eligible is **task #30**.
 
 ## Notes
 
-- 48/86 v1 done.
-- Wave 6 (Stripe + pricing) implementation-side complete + checkpointed.
-- Loop will continue with #51 next iteration (substantial UI work).
+- Wave 8 (Recovery workspace) 4/many done — routing + templates + upload component + workspace page landed.
+- Loop will continue with #30 next iteration.
