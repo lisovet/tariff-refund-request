@@ -1,29 +1,44 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T15:16:00Z
+**Updated**: 2026-04-21T15:23:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 80 → 81)
+**Loop state**: active (iteration 81 → 82)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 81 |
+| completed | 82 |
 | in-progress | 0 |
-| pending | 5 |
+| pending | 4 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 116 files, **1005 tests pass** (4-digit milestone) |
+| `npm test` | green — 117 files, 1014 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 25 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#82 — Keyboard shortcut overlay (?)**
+
+Ops-console keyboard-shortcut reference:
+
+- **`OPS_SHORTCUTS`** — declarative catalog with 9 v1 bindings across three scopes (Global / Queue / Case workspace): `?` (open reference), `g q` (go to queue), `g c` (go to last claimed), `j` / `k` (queue nav), `Enter` (open selected row), `c` (claim), `x` (stall), `/` (focus filter).
+- **`ShortcutOverlay`** client component — window-level `keydown` listener for `?`; closes on `Escape` or the close button. Ignores `?` when focus is in an editable field (input / textarea / select / contenteditable) so typing into the reviewer-note surface doesn't get hijacked. Dialog is real `role="dialog"` with `aria-modal="true"`, a proper `aria-label`, and click-outside-to-dismiss.
+- Grouped-by-scope rendering: each shortcut row shows the description + `<kbd>`-wrapped keys (hairline border, mono typography).
+- **`(ops)/layout.tsx`** — mounts `ShortcutOverlay` at the group level so `?` works on every ops page.
+
+9 new tests — shortcut catalog shape, default-hidden, opens on `?`, aria-modal, Escape closes, close button, ignore-when-editable.
+
+1014/1014 pass.
+
+## Previously completed this wave
 
 **#81 — SLA timer + breach indicators**
 
@@ -291,11 +306,13 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 
 ## Next eligible
 
-- Task #82 — deps satisfied. **Eligible — lowest id.** (Keyboard shortcut overlay.)
-- Tasks #83 (USER-TEST ops staff), #84 (cross-context lint rule), #85 (funnel metrics), #86 (final USER-TEST) follow.
+- Task #83 — deps satisfied. **Eligible — lowest id.** (USER-TEST: Ops staff complete a full case in console.)
+- Task #84 — eligible (cross-context lint rule + CI gate).
+- Task #85 — eligible (Internal funnel metrics instrumentation).
+- Task #86 — (final USER-TEST: Phase 0 launch readiness review).
 
 ## Notes
 
-- 81/86 v1 done — 94.2% of Phase 0.
+- 82/86 v1 done — 95.3% of Phase 0. Ops-console feature wave complete — next is USER-TEST + cross-cutting.
 - Post-v1 backlog: AI-copy funnel task **#401**, and now **#402 — Production deploy** (full checklist: Vercel + Neon migrations + R2 buckets + Clerk prod org + Stripe live + Resend DKIM/SPF + Inngest prod + Sentry + Axiom + E-sign provider wiring + 12-step staging smoke + launch gates). Depends on #86 (final USER-TEST launch readiness review).
 - Loop will continue with #82 next iteration.

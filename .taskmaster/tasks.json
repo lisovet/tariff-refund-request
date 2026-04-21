@@ -1624,7 +1624,7 @@
         "dependencies": [
           78
         ],
-        "status": "pending",
+        "status": "done",
         "estimateHours": 2,
         "source": [
           "PRD 04"
