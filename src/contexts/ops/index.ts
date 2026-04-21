@@ -46,6 +46,14 @@ export {
   resolveSavedView,
 } from './queue'
 
+export type { SlaBand, SlaStatus } from './sla'
+export {
+  SLA_BANDS,
+  SLA_WARNING_PCT,
+  computeSlaStatus,
+  formatRemainingHumanized,
+} from './sla'
+
 export type {
   AssignmentDeps,
   ClaimCaseInput,

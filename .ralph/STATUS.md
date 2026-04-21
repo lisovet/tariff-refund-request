@@ -1,29 +1,45 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T15:09:00Z
+**Updated**: 2026-04-21T15:16:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 79 → 80)
+**Loop state**: active (iteration 80 → 81)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 80 |
+| completed | 81 |
 | in-progress | 0 |
-| pending | 6 |
+| pending | 5 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 114 files, 988 tests pass |
+| `npm test` | green — 116 files, **1005 tests pass** (4-digit milestone) |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 25 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#81 — SLA timer + breach indicators**
+
+Richer SLA model layered on top of the binary `isSlaBreach` flag added for the queue (task #77):
+
+- **`src/contexts/ops/sla.ts`** — `computeSlaStatus(state, ageMs)` returns a four-band discriminated union: `{band: 'none'}` for terminal states, or `{band: 'ok' | 'warning' | 'breach', targetMs, remainingMs, elapsedPctOfTarget}`. The `'warning'` band lights up at `SLA_WARNING_PCT = 0.8` (tune point). `formatRemainingHumanized(ms)` renders `Nd / Nh / Nm` or `Nh overdue` suffix for negative remaining; `—` for no-SLA.
+- **`SlaBadge.tsx`** — case-header badge keyed by band. Design-language palette: `ok → positive`, `warning → warning`, `breach → blocking`, `none → ink/60`. Three-line compact layout: SLA eyebrow / remaining-time number / label (`on track` / `due soon` / `overdue` / `no SLA`). `data-band` attribute for test + integration hooks.
+- **`CaseHeaderPanel`** now renders `<SlaBadge state={caseRecord.state} ageMs={now - updatedAt} />` at the top of the left pane so an analyst sees the clock before anything else.
+
+17 new tests — 13 SLA math (bands + boundary conditions + humanizer) + 4 badge (one per band path).
+
+Public surface on `@contexts/ops` exports the SLA types + helpers.
+
+1005/1005 pass — first time the suite crosses four digits.
+
+## Previously completed this wave
 
 **#80 — Case claim / release / assignment**
 
@@ -275,12 +291,11 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 
 ## Next eligible
 
-- Task #81 — deps satisfied. **Eligible — lowest id.** (SLA timer + breach indicators.)
-- Task #82 — eligible.
-- Tasks #83..#86 — USER-TEST + cross-cutting.
+- Task #82 — deps satisfied. **Eligible — lowest id.** (Keyboard shortcut overlay.)
+- Tasks #83 (USER-TEST ops staff), #84 (cross-context lint rule), #85 (funnel metrics), #86 (final USER-TEST) follow.
 
 ## Notes
 
-- 80/86 v1 done — 93.0% of Phase 0.
+- 81/86 v1 done — 94.2% of Phase 0.
 - Post-v1 backlog includes AI-copy funnel task #401.
-- Loop will continue with #81 next iteration.
+- Loop will continue with #82 next iteration.

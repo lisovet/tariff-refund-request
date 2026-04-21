@@ -1,5 +1,6 @@
 import type { CaseRecord } from '@contexts/ops'
 import type { RecoveryPlan } from '@contexts/recovery'
+import { SlaBadge } from './SlaBadge'
 
 /**
  * Left pane of the ops case workspace per PRD 04. Bloomberg-terminal
@@ -35,12 +36,16 @@ export interface CaseHeaderPanelProps {
 
 export function CaseHeaderPanel({ caseRecord, plan }: CaseHeaderPanelProps) {
   const stateLabel = STATE_LABEL_BY_STATE[caseRecord.state] ?? caseRecord.state.toUpperCase()
+  const ageMs = Date.now() - caseRecord.updatedAt.getTime()
 
   return (
     <aside
       aria-label="Case header"
       className="border-r border-rule p-6"
     >
+      <div className="mb-6">
+        <SlaBadge state={caseRecord.state} ageMs={ageMs} />
+      </div>
       <dl className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-3 font-mono text-xs">
         <dt className="uppercase tracking-[0.18em] text-ink/55">Case</dt>
         <dd className="text-ink" data-testid="case-id">
