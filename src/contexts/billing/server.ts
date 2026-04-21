@@ -20,6 +20,10 @@ import type { BillingRepo } from './repo'
 
 export { createInMemoryBillingRepo } from './in-memory-repo'
 export { createDrizzleBillingRepo } from './drizzle-repo'
+export {
+  createStripeCatalogClient,
+  loadStripeCatalogSnapshot,
+} from './stripe-catalog-client'
 
 let cachedRepo: BillingRepo | undefined
 let cachedClient: Stripe | undefined

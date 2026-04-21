@@ -1,23 +1,23 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T08:56:00Z
+**Updated**: 2026-04-21T09:10:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 30 → 31)
+**Loop state**: active (iteration 31 → 32)
 
-## Counts
+## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 30 |
+| completed | 31 |
 | in-progress | 0 |
-| pending | 56 |
+| pending | 55 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 52 files, 319 tests pass |
+| `npm test` | green — 54 files, 336 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 17 routes |
@@ -25,30 +25,33 @@
 
 ## Last completed task
 
-**#34 — Pricing ladder in code (`pricing.ts`)**
+**#35 — Stripe catalog sync script**
 
-- `PRICE_LADDER` — 6 SKUs × 2 tiers, all amounts in USD cents.
-- `SUCCESS_FEE_RATES` — SMB `{ min: 0.10, max: 0.12 }`, mid-market `{ min: 0.08, max: 0.10 }`.
-- `SUCCESS_FEE_HARD_CAP` — $50k per case (blanket dollar cap is the simplest defensible policy; raising it would be a deliberate ladder change).
-- `determineTier({ entryCount, dutyAmountUsdCents })` — strict `>` thresholds (>100 entries OR >$50k duty → mid_market), so boundary cases land as SMB.
-- `priceFor(sku, tier)` and `computeSuccessFeeCents({ refund, tier, rate? })` helpers. Rate clamped to tier band; result rounded to whole cents; zero on non-positive refund.
-- Re-exported from `src/contexts/billing/index.ts` (UI-safe — pure helpers + types).
-- 27 new tests including ladder-table coverage, tier boundary tests, rate-clamp behavior (low→min, high→max, default→min), $50k hard cap on a $1M refund, fractional-cent rounding, zero/negative refund handling.
+- `planCatalogSync(snapshot) → Plan` is pure: diffs `PRICE_LADDER` against a Stripe snapshot. Tags products with `metadata.app=tariff-refund-request`; uses `lookup_key=trr__<sku>__<tier>` for stable lookup; archives stale prices on amount drift; archives obsolete products when SKUs leave the ladder; ignores products owned by other apps.
+- `SKU_RECURRENCE`: `monitoring=monthly`, all others `one_time`.
+- `executeCatalogPlan(plan, client)` applies via narrow `StripeCatalogClient` surface (real impl in `stripe-catalog-client.ts`). Order: products → prices → archive prices → archive products.
+- `npm run stripe:sync` CLI wrapper. Re-running on the resulting snapshot returns `isNoOp=true` — idempotency property frozen by tests.
+- Missing `STRIPE_SECRET_KEY` → script logs notice + exits 0 (CI smoke without secrets).
+- Added `tsconfig.scripts.json` (stubs `server-only` via the existing vitest noop) so the tsx CLI can import `@contexts/billing/server`.
+- 17 new tests including no-op-on-second-run, amount-drift archive+create, extra-active-price archive, obsolete-product archive, foreign-app product ignored, recurring config passed through.
 
 ## Human-verification still owes
 
-- Review `SUCCESS_FEE_HARD_CAP` with founder/legal — $50k is a reasonable initial policy but worth confirming.
+- Run `npm run stripe:sync` against real Stripe test-mode account once `STRIPE_SECRET_KEY=sk_test_...` is set; verify products/prices appear in dashboard with correct lookup keys.
+- Re-run + confirm second invocation is a true no-op end-to-end (not just at planner level).
 
 ## Next eligible
 
-Per dependency check:
-- Task #35 (Stripe catalog sync script) — deps `[34]` now satisfied. Eligible.
+Per dependency check (v1 only):
+- Task #36 (Checkout sessions for each SKU) — deps `[33, 35]` now satisfied. **Eligible — lowest id.**
 - Task #39 (cases + audit_log schema) — deps `[2]` satisfied. Eligible.
-- Task #16 (`/pricing` page) — deps `[14, 36]`; `#36` not yet done; still task-blocked.
+- Task #49 (recovery routing — broker vs DIY) — deps satisfied. Eligible.
+- Task #67 (CAPE prep workflow scaffold) — deps satisfied. Eligible.
+- Task #72 (admin dashboard scaffold) — deps satisfied. Eligible.
 
-Lowest-id eligible is **task #35** — Stripe catalog sync.
+Lowest-id eligible is **task #36** — Checkout sessions for each SKU.
 
 ## Notes
 
-- Wave 6 (Stripe + pricing) 2/5 done.
-- Loop will continue with task #35 next iteration.
+- Wave 6 (Stripe + pricing) 3/5 done.
+- Loop will continue with task #36 next iteration.

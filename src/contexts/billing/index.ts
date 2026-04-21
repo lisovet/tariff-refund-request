@@ -39,3 +39,23 @@ export {
   priceFor,
   computeSuccessFeeCents,
 } from './pricing'
+
+export type {
+  CatalogSyncPlan,
+  PriceArchivePlan,
+  PriceCreatePlan,
+  ProductArchivePlan,
+  ProductCreatePlan,
+  SkuRecurrence,
+  StripeCatalogClient,
+  StripeCatalogSnapshot,
+  StripePriceSnapshot,
+  StripeProductSnapshot,
+} from './stripe-catalog'
+export {
+  CATALOG_APP_TAG,
+  SKU_RECURRENCE,
+  executeCatalogPlan,
+  lookupKeyFor,
+  planCatalogSync,
+} from './stripe-catalog'

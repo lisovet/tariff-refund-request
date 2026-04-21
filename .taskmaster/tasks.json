@@ -3,11 +3,11 @@
     "metadata": {
       "version": "1.0",
       "project": "tariff-refund-request",
-      "phase": "Phase 0 — MVP",
+      "phase": "Phase 0 \u2014 MVP",
       "createdAt": "2026-04-21",
       "schemaCompatibleWith": "task-master-ai",
       "notes": [
-        "Phase 0 backlog only. Phases 1–3 are scaffolded as placeholder epics at the bottom.",
+        "Phase 0 backlog only. Phases 1\u20133 are scaffolded as placeholder epics at the bottom.",
         "USER-TEST tasks insert validation checkpoints every ~5 atomic tasks.",
         "Dependency IDs reference the 'id' field of prior tasks.",
         "Each task lists the source PRD and ADR(s) it derives from.",
@@ -26,7 +26,11 @@
         "dependencies": [],
         "status": "completed",
         "estimateHours": 4,
-        "source": ["ADR 002", "ADR 010", "DESIGN-LANGUAGE.md"],
+        "source": [
+          "ADR 002",
+          "ADR 010",
+          "DESIGN-LANGUAGE.md"
+        ],
         "completedAt": "2026-04-21T05:42:00Z",
         "completedNotes": "Next 15.5, React 19.2, TypeScript 6, Tailwind 4, Vitest 4 installed. Route groups (marketing|app|ops|api) scaffolded with placeholder pages. Design-language tokens encoded in tailwind.config.ts + src/app/globals.css (light + dark). Custom no-restricted-imports ESLint rule enforces context-public-surface boundary. Smoke test (12 assertions) verifies route groups and configs exist. All three quality gates pass."
       },
@@ -35,28 +39,36 @@
         "epic": "E1. Foundation",
         "title": "Configure Drizzle + Postgres + Neon dev branch",
         "description": "Install Drizzle, configure Neon DB connection, create migrations directory, write initial empty schema.",
-        "details": "drizzle.config.ts targets Neon. Migration scripts: `db:generate`, `db:migrate`, `db:studio`. Per-worker schema strategy documented for tests. TODO(human-action) — provision Neon project + add DATABASE_URL to .env.local before `npm run db:migrate` will run against a real DB.",
+        "details": "drizzle.config.ts targets Neon. Migration scripts: `db:generate`, `db:migrate`, `db:studio`. Per-worker schema strategy documented for tests. TODO(human-action) \u2014 provision Neon project + add DATABASE_URL to .env.local before `npm run db:migrate` will run against a real DB.",
         "testStrategy": "Smoke test: `npm run db:migrate` against dev branch succeeds.",
         "priority": "high",
-        "dependencies": [1],
+        "dependencies": [
+          1
+        ],
         "status": "completed",
         "estimateHours": 3,
-        "source": ["ADR 003"],
+        "source": [
+          "ADR 003"
+        ],
         "completedAt": "2026-04-21T05:46:30Z",
-        "completedNotes": "drizzle-orm + drizzle-kit + postgres-js + @neondatabase/serverless installed. Schema registry at src/shared/infra/db/schema.ts (empty, ready for downstream tasks to register tables). Client at src/shared/infra/db/client.ts validates DATABASE_URL and returns a cached drizzle handle. drizzle.config.ts wired with dotenv. drizzle/README.md documents per-environment strategy and per-worker test isolation. .env.example committed with all v1 env shape. 5 schema/client tests added (RED-confirmed before implementation). All qa gates green: 17/17 tests, lint clean, typecheck clean. Real Neon connection is the only human-blocked piece — code is ready to point at any Postgres URL."
+        "completedNotes": "drizzle-orm + drizzle-kit + postgres-js + @neondatabase/serverless installed. Schema registry at src/shared/infra/db/schema.ts (empty, ready for downstream tasks to register tables). Client at src/shared/infra/db/client.ts validates DATABASE_URL and returns a cached drizzle handle. drizzle.config.ts wired with dotenv. drizzle/README.md documents per-environment strategy and per-worker test isolation. .env.example committed with all v1 env shape. 5 schema/client tests added (RED-confirmed before implementation). All qa gates green: 17/17 tests, lint clean, typecheck clean. Real Neon connection is the only human-blocked piece \u2014 code is ready to point at any Postgres URL."
       },
       {
         "id": 3,
         "epic": "E1. Foundation",
         "title": "Wire Cloudflare R2 storage adapter",
         "description": "Configure AWS SDK v3 against R2 endpoint; create per-environment buckets; pre-signed URL helper with 15-min expiry.",
-        "details": "src/shared/infra/storage/{types,memory,s3,index}.ts exposes putObject, getObject, deleteObject, headObject, getSignedUploadUrl, getSignedReadUrl. STORAGE_DRIVER env switches between memory (default) and s3. Per-case key layout (cases/{caseId}/{documentId}/{filename}) enforced. TODO(human-action) — provision R2 buckets + set R2_* env to use real S3 path.",
+        "details": "src/shared/infra/storage/{types,memory,s3,index}.ts exposes putObject, getObject, deleteObject, headObject, getSignedUploadUrl, getSignedReadUrl. STORAGE_DRIVER env switches between memory (default) and s3. Per-case key layout (cases/{caseId}/{documentId}/{filename}) enforced. TODO(human-action) \u2014 provision R2 buckets + set R2_* env to use real S3 path.",
         "testStrategy": "MinIO container in CI; integration test uploads, signs, downloads, asserts content matches.",
         "priority": "high",
-        "dependencies": [1],
+        "dependencies": [
+          1
+        ],
         "status": "completed",
         "estimateHours": 4,
-        "source": ["ADR 006"],
+        "source": [
+          "ADR 006"
+        ],
         "completedAt": "2026-04-21T05:51:30Z",
         "completedNotes": "@aws-sdk/client-s3 + @aws-sdk/s3-request-presigner installed. StorageAdapter contract in src/shared/infra/storage/types.ts: case-scoped key validator (cases/{caseId}/{documentId}/{filename}), MAX_UPLOAD_URL_EXPIRY_SECONDS=900 per ADR 006. Memory adapter in memory.ts (preserves version history, used in tests + dev fallback). S3 adapter in s3.ts works against R2/MinIO/S3 (path-style, region 'auto'). Factory in index.ts switches via STORAGE_DRIVER env. 17 new tests (types + memory + factory) RED-then-GREEN. All qa gates green: 34/34 tests, lint + typecheck clean. Real R2 + MinIO are human-action; in-memory test path runs everywhere."
       },
@@ -65,13 +77,17 @@
         "epic": "E1. Foundation",
         "title": "Set up Inngest client + dev server",
         "description": "Install Inngest, configure Vercel adapter route at /api/inngest, register dev server in `npm run dev`.",
-        "details": "Inngest 4.x SDK. Client at src/shared/infra/inngest/client.ts. Typed event catalog in events.ts via eventType + staticSchema. Workflows registry in workflows/index.ts (additive — downstream tasks append). Smoke workflow in workflows/smoke-hello-world.ts (handler exported separately for testing). Next route handler at src/app/api/inngest/route.ts via inngest/next adapter. npm run dev now runs Next + Inngest dev server in parallel via npm-run-all2.",
+        "details": "Inngest 4.x SDK. Client at src/shared/infra/inngest/client.ts. Typed event catalog in events.ts via eventType + staticSchema. Workflows registry in workflows/index.ts (additive \u2014 downstream tasks append). Smoke workflow in workflows/smoke-hello-world.ts (handler exported separately for testing). Next route handler at src/app/api/inngest/route.ts via inngest/next adapter. npm run dev now runs Next + Inngest dev server in parallel via npm-run-all2.",
         "testStrategy": "Hello-world workflow fires and completes locally.",
         "priority": "high",
-        "dependencies": [1],
+        "dependencies": [
+          1
+        ],
         "status": "completed",
         "estimateHours": 3,
-        "source": ["ADR 007"],
+        "source": [
+          "ADR 007"
+        ],
         "completedAt": "2026-04-21T05:58:00Z",
         "completedNotes": "inngest@4.2 installed. Client constructed with stable id 'tariff-refund-platform'. Typed event catalog (platform/smoke.hello + platform/case.state.transitioned) using new eventType+staticSchema API. Smoke workflow with handler exported separately so unit tests bypass the Inngest wrapper. Next route handler at /api/inngest using the inngest/next serve adapter and the workflows registry. npm run dev now starts Next + Inngest dev server in parallel via npm-run-all2. 4 new tests (client + workflows registry + handler) RED-then-GREEN. All qa gates green: 38/38 tests, lint + typecheck clean. Live workflow firing is human-action (start the dev server)."
       },
@@ -83,10 +99,14 @@
         "details": "Logger + ErrorTracker interfaces in src/shared/infra/observability/types.ts. Real transports in axiom.ts and sentry.ts. No-op fallbacks in noop.ts. Factory in index.ts caches per-process transport, switches via SENTRY_DSN / AXIOM_TOKEN+AXIOM_DATASET env. Platform code calls getLogger()/getErrorTracker() and never branches on env.",
         "testStrategy": "Trigger a thrown error in dev; appears in Sentry dev project. Trigger a log; appears in Axiom.",
         "priority": "high",
-        "dependencies": [1],
+        "dependencies": [
+          1
+        ],
         "status": "completed",
         "estimateHours": 3,
-        "source": ["ADR 013"],
+        "source": [
+          "ADR 013"
+        ],
         "completedAt": "2026-04-21T06:01:45Z",
         "completedNotes": "@sentry/nextjs + @axiomhq/js installed. Logger and ErrorTracker interfaces define the platform-facing contract. Axiom-backed Logger ingests structured events with service+env+level base attrs. Sentry-backed ErrorTracker maps our LogLevel to Sentry SeverityLevel. No-op fallbacks satisfy the interfaces silently for dev/tests/missing keys. Factory caches transports and is reset-able for tests. 6 new tests RED-then-GREEN; 46/46 pass; lint + typecheck clean. Real Sentry/Axiom keys are human-action; live error+log delivery verification needs the dev environment with keys configured."
       },
@@ -98,10 +118,14 @@
         "details": "@playwright/test installed. playwright.config.ts wires three role-scoped projects (anonymous + customer + ops-staff). tests/setup/per-worker-schema.ts (referenced from vitest.config.ts setupFiles) creates tr_test_<workerId> per Vitest worker against DATABASE_URL when set; no-op otherwise. GitHub Actions workflow at .github/workflows/ci.yml runs lint + typecheck + test + Playwright (anonymous project) on PR/push. Integration job stub commented in for future Neon GHA wiring.",
         "testStrategy": "`npm test` runs in parallel without DB conflicts; sample Playwright spec passes on CI.",
         "priority": "high",
-        "dependencies": [2],
+        "dependencies": [
+          2
+        ],
         "status": "completed",
         "estimateHours": 5,
-        "source": ["ADR 011"],
+        "source": [
+          "ADR 011"
+        ],
         "completedAt": "2026-04-21T06:06:30Z",
         "completedNotes": "@playwright/test installed. playwright.config.ts with three role-scoped projects (anonymous testing /, customer + ops with placeholder storageState for tasks #8/#9). Sample anonymous spec at tests/e2e/anonymous/marketing-loads.spec.ts. Per-worker schema setup at tests/setup/per-worker-schema.ts wired into vitest.config.ts setupFiles; no-op when DATABASE_URL missing. test-isolation.ts module exposes workerSchemaName + applyTestIsolation + dropTestIsolation. SQL-injection guard rejects non-alphanumeric worker ids. .github/workflows/ci.yml runs qa job (lint/typecheck/test) on every PR/push to main, plus an e2e job that installs Chromium and runs the anonymous Playwright project. 6 new tests (test-isolation) RED-then-GREEN. All qa gates green: 51/51 tests, lint + typecheck clean. Browser binaries (`npx playwright install`) and GHA secrets are human-action."
       },
@@ -113,57 +137,80 @@
         "details": "Verify: `npm run dev` starts cleanly. Sample DB migration applies. Sample upload to R2 works. Sample Inngest workflow fires. Sample Sentry/Axiom event captured. CI is green on a placeholder PR.",
         "testStrategy": "Manual checklist; no production code yet.",
         "priority": "high",
-        "dependencies": [1, 2, 3, 4, 5, 6],
+        "dependencies": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
         "status": "completed",
         "estimateHours": 1,
-        "source": ["validation-checkpoint"],
+        "source": [
+          "validation-checkpoint"
+        ],
         "completedAt": "2026-04-21T06:11:00Z",
-        "completedNotes": "Implementation-level verification: `npm run build` succeeds end-to-end (8 static pages generated, all routes resolve correctly: / from (marketing), /app from (app)/app, /ops from (ops)/ops, /api/health, /api/inngest). `npm run db:generate` runs (no schema yet, expected — downstream tasks register tables). `npm test` 52/52 pass. `npm run lint` clean. `npm run typecheck` clean. `npm run qa` (combined) green. The build verification caught and the loop fixed: (a) three route groups all resolved to `/` because each had a bare `page.tsx` — fixed by nesting `(app)/app/page.tsx` and `(ops)/ops/page.tsx`; (b) `experimental.typedRoutes` warning — moved to top-level; (c) parent-directory lockfile warning — pinned `outputFileTracingRoot`; (d) `next-env.d.ts` triple-slash lint error — added to ESLint ignore (Next regenerates this file). HUMAN-VERIFICATION STILL OWES: `npm run dev` starts cleanly with both Next and Inngest dev server (needs human-watched terminal); real DB migration applies against a Neon dev branch (needs DATABASE_URL); real R2 upload (needs R2 keys or running MinIO); real Inngest workflow fires from the dev server UI; Sentry captures a thrown error in the browser; Axiom receives a structured log; CI is green on a placeholder PR pushed to a real GitHub remote."
+        "completedNotes": "Implementation-level verification: `npm run build` succeeds end-to-end (8 static pages generated, all routes resolve correctly: / from (marketing), /app from (app)/app, /ops from (ops)/ops, /api/health, /api/inngest). `npm run db:generate` runs (no schema yet, expected \u2014 downstream tasks register tables). `npm test` 52/52 pass. `npm run lint` clean. `npm run typecheck` clean. `npm run qa` (combined) green. The build verification caught and the loop fixed: (a) three route groups all resolved to `/` because each had a bare `page.tsx` \u2014 fixed by nesting `(app)/app/page.tsx` and `(ops)/ops/page.tsx`; (b) `experimental.typedRoutes` warning \u2014 moved to top-level; (c) parent-directory lockfile warning \u2014 pinned `outputFileTracingRoot`; (d) `next-env.d.ts` triple-slash lint error \u2014 added to ESLint ignore (Next regenerates this file). HUMAN-VERIFICATION STILL OWES: `npm run dev` starts cleanly with both Next and Inngest dev server (needs human-watched terminal); real DB migration applies against a Neon dev branch (needs DATABASE_URL); real R2 upload (needs R2 keys or running MinIO); real Inngest workflow fires from the dev server UI; Sentry captures a thrown error in the browser; Axiom receives a structured log; CI is green on a placeholder PR pushed to a real GitHub remote."
       },
       {
         "id": 8,
         "epic": "E2. Auth + roles",
         "title": "Wire Clerk for customer accounts",
         "description": "Install Clerk, configure middleware for (app) route group, set up sign-in / sign-up pages.",
-        "details": "@clerk/nextjs + @clerk/testing installed. ClerkProvider wraps the root layout. src/middleware.ts gates protected routes (/app, /ops, /api/cases, /api/uploads) and redirects unauthed users to /sign-in with returnBackUrl. Pure route-gating predicates in src/shared/infra/auth/route-gating.ts. Themed sign-in / sign-up pages at src/app/sign-in/[[...sign-in]]/page.tsx and src/app/sign-up/[[...sign-up]]/page.tsx with appearance overrides (ink/paper canvas, GT Sectra display, magazine-underline links). Actor type surface in src/shared/infra/auth/actor.ts (CustomerActor | StaffActor | AnonymousActor + discriminants); full Clerk → Actor resolver lands in task #10.",
-        "testStrategy": "Playwright: sign up → sign in → access (app); unauth user is redirected.",
+        "details": "@clerk/nextjs + @clerk/testing installed. ClerkProvider wraps the root layout. src/middleware.ts gates protected routes (/app, /ops, /api/cases, /api/uploads) and redirects unauthed users to /sign-in with returnBackUrl. Pure route-gating predicates in src/shared/infra/auth/route-gating.ts. Themed sign-in / sign-up pages at src/app/sign-in/[[...sign-in]]/page.tsx and src/app/sign-up/[[...sign-up]]/page.tsx with appearance overrides (ink/paper canvas, GT Sectra display, magazine-underline links). Actor type surface in src/shared/infra/auth/actor.ts (CustomerActor | StaffActor | AnonymousActor + discriminants); full Clerk \u2192 Actor resolver lands in task #10.",
+        "testStrategy": "Playwright: sign up \u2192 sign in \u2192 access (app); unauth user is redirected.",
         "priority": "high",
-        "dependencies": [1],
+        "dependencies": [
+          1
+        ],
         "status": "completed",
         "estimateHours": 4,
-        "source": ["ADR 004"],
+        "source": [
+          "ADR 004"
+        ],
         "completedAt": "2026-04-21T06:16:30Z",
-        "completedNotes": "@clerk/nextjs + @clerk/testing installed. ClerkProvider wraps root layout. src/middleware.ts uses clerkMiddleware + isProtectedRoute predicate to gate /app/**, /ops/**, /api/cases/**, /api/uploads/**; unauthed → redirectToSignIn with returnBackUrl. Pure predicates (isPublicRoute / isProtectedRoute) live in src/shared/infra/auth/route-gating.ts so they're unit-testable without the middleware runtime. Themed sign-in/sign-up pages with Clerk appearance override pointing at our token system (bg-paper, font-display GT Sectra, ink CTA, accent footer link). Actor type surface (CustomerActor | StaffActor | AnonymousActor with isAnonymous/isCustomer/isStaff discriminants) ready for the resolver in task #10. Playwright protected-redirect spec at tests/e2e/anonymous/protected-redirect.spec.ts (skips when Clerk env unset). 29 new tests RED-then-GREEN: all 81 tests pass; lint + typecheck clean. Build verified end-to-end with stub Clerk env (sign-in/sign-up routes compile, middleware bundle 85kB). Bug caught + fixed during gates: PUBLIC_PREFIXES used trailing-slash patterns that didn't match nested webhook paths; removed trailing slashes. HUMAN-VERIFICATION: real Clerk dashboard signup, real CLERK_SECRET_KEY + NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY in .env.local, Google OAuth provider configured, end-to-end Playwright sign-up→sign-in→access /app flow."
+        "completedNotes": "@clerk/nextjs + @clerk/testing installed. ClerkProvider wraps root layout. src/middleware.ts uses clerkMiddleware + isProtectedRoute predicate to gate /app/**, /ops/**, /api/cases/**, /api/uploads/**; unauthed \u2192 redirectToSignIn with returnBackUrl. Pure predicates (isPublicRoute / isProtectedRoute) live in src/shared/infra/auth/route-gating.ts so they're unit-testable without the middleware runtime. Themed sign-in/sign-up pages with Clerk appearance override pointing at our token system (bg-paper, font-display GT Sectra, ink CTA, accent footer link). Actor type surface (CustomerActor | StaffActor | AnonymousActor with isAnonymous/isCustomer/isStaff discriminants) ready for the resolver in task #10. Playwright protected-redirect spec at tests/e2e/anonymous/protected-redirect.spec.ts (skips when Clerk env unset). 29 new tests RED-then-GREEN: all 81 tests pass; lint + typecheck clean. Build verified end-to-end with stub Clerk env (sign-in/sign-up routes compile, middleware bundle 85kB). Bug caught + fixed during gates: PUBLIC_PREFIXES used trailing-slash patterns that didn't match nested webhook paths; removed trailing slashes. HUMAN-VERIFICATION: real Clerk dashboard signup, real CLERK_SECRET_KEY + NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY in .env.local, Google OAuth provider configured, end-to-end Playwright sign-up\u2192sign-in\u2192access /app flow."
       },
       {
         "id": 9,
         "epic": "E2. Auth + roles",
         "title": "Configure Clerk staff org with roles",
         "description": "Create internal Clerk org. Define roles: coordinator, analyst, validator, admin. MFA required.",
-        "details": "STAFF_ROLES enum + ranking + isStaffRole guard in src/shared/infra/auth/roles.ts. can() permission helper at src/shared/infra/auth/can.ts is the single chokepoint for authorization decisions across contexts and route handlers. Middleware extended to gate /ops/** by org_role claim — authed-but-no-staff-role users bounce to /app. ops-redirect Playwright spec covers the unauthed branch (skips without Clerk env).",
+        "details": "STAFF_ROLES enum + ranking + isStaffRole guard in src/shared/infra/auth/roles.ts. can() permission helper at src/shared/infra/auth/can.ts is the single chokepoint for authorization decisions across contexts and route handlers. Middleware extended to gate /ops/** by org_role claim \u2014 authed-but-no-staff-role users bounce to /app. ops-redirect Playwright spec covers the unauthed branch (skips without Clerk env).",
         "testStrategy": "Playwright: org member without role cannot access (ops); analyst can; admin can manage roles.",
         "priority": "high",
-        "dependencies": [8],
+        "dependencies": [
+          8
+        ],
         "status": "completed",
         "estimateHours": 3,
-        "source": ["ADR 004", "PRD 04"],
+        "source": [
+          "ADR 004",
+          "PRD 04"
+        ],
         "completedAt": "2026-04-21T06:21:00Z",
-        "completedNotes": "STAFF_ROLES enum (coordinator, analyst, validator, admin) + staffRoleRank + hasAtLeastRole + isStaffRole in src/shared/infra/auth/roles.ts. can() permission helper at src/shared/infra/auth/can.ts: typed Action union + STAFF_MATRIX dispatch. Customer surfaces (screener, case.read, document.upload, document.download.own) and ops surfaces (queue.view, case.assign, case.transition, entry.extract) plus the validator-gated qa.signoff and admin-only admin.* family. AnonymousActor permitted only screener.complete. middleware.ts extended to gate /ops/** via session.sessionClaims.org_role — authed-but-no-staff-role users bounce to /app. tests/e2e/anonymous/ops-redirect.spec.ts covers the unauthed branch. 12 new tests (roles + can matrix) RED-then-GREEN. All qa gates green: 93/93 tests, lint + typecheck clean, build green with stub Clerk env (middleware bundle 85.1kB). HUMAN-VERIFICATION: create the staff Clerk organization in the dashboard, define the four roles, enable MFA, run the live Playwright spec for analyst-can-access-ops + customer-cannot-access-ops + admin-can-manage-roles."
+        "completedNotes": "STAFF_ROLES enum (coordinator, analyst, validator, admin) + staffRoleRank + hasAtLeastRole + isStaffRole in src/shared/infra/auth/roles.ts. can() permission helper at src/shared/infra/auth/can.ts: typed Action union + STAFF_MATRIX dispatch. Customer surfaces (screener, case.read, document.upload, document.download.own) and ops surfaces (queue.view, case.assign, case.transition, entry.extract) plus the validator-gated qa.signoff and admin-only admin.* family. AnonymousActor permitted only screener.complete. middleware.ts extended to gate /ops/** via session.sessionClaims.org_role \u2014 authed-but-no-staff-role users bounce to /app. tests/e2e/anonymous/ops-redirect.spec.ts covers the unauthed branch. 12 new tests (roles + can matrix) RED-then-GREEN. All qa gates green: 93/93 tests, lint + typecheck clean, build green with stub Clerk env (middleware bundle 85.1kB). HUMAN-VERIFICATION: create the staff Clerk organization in the dashboard, define the four roles, enable MFA, run the live Playwright spec for analyst-can-access-ops + customer-cannot-access-ops + admin-can-manage-roles."
       },
       {
         "id": 10,
         "epic": "E2. Auth + roles",
         "title": "Build Actor resolver + context-layer authorization",
         "description": "Resolve Clerk user to typed Actor (Customer | StaffUser); enforce permissions inside contexts, not only middleware.",
-        "details": "Pure resolveActorFromSession(ClerkSessionShape) maps Clerk session → Actor without hitting Clerk's runtime; resolveCurrentActor() is the thin Next-runtime wrapper. requireActor / requireCan / requireStaff guards in src/shared/infra/auth/require.ts throw AuthenticationError (→ 401) and AuthorizationError (→ 403) sharing an abstract AuthError base. requireStaff supports a minimum-role constraint. Integration test demonstrates the guarded-route-handler pattern with 401/403/200 mapping. Local customer/staff_user lookup lands in task #11 (resolver currently surfaces clerkUserId as actor.id).",
+        "details": "Pure resolveActorFromSession(ClerkSessionShape) maps Clerk session \u2192 Actor without hitting Clerk's runtime; resolveCurrentActor() is the thin Next-runtime wrapper. requireActor / requireCan / requireStaff guards in src/shared/infra/auth/require.ts throw AuthenticationError (\u2192 401) and AuthorizationError (\u2192 403) sharing an abstract AuthError base. requireStaff supports a minimum-role constraint. Integration test demonstrates the guarded-route-handler pattern with 401/403/200 mapping. Local customer/staff_user lookup lands in task #11 (resolver currently surfaces clerkUserId as actor.id).",
         "testStrategy": "Unit tests for `can()`; integration test rejects forbidden actions from a route handler.",
         "priority": "high",
-        "dependencies": [9],
+        "dependencies": [
+          9
+        ],
         "status": "completed",
         "estimateHours": 5,
-        "source": ["ADR 001", "ADR 004"],
+        "source": [
+          "ADR 001",
+          "ADR 004"
+        ],
         "completedAt": "2026-04-21T06:26:30Z",
-        "completedNotes": "src/shared/infra/auth/resolver.ts exposes resolveActorFromSession (pure, fully testable) and resolveCurrentActor (calls Clerk's auth() + currentUser() in route-handler context). Resolver maps Clerk session → Actor: anonymous when no userId; staff when sessionClaims.org_role matches isStaffRole; customer otherwise. Defensive: unrecognized org_role values fall back to customer; missing email throws (cannot construct CustomerActor). require.ts: AuthError abstract base + AuthenticationError (401) + AuthorizationError (403, carries the denied Action). requireActor narrows away AnonymousActor; requireCan combines auth + can() check with anon-permitted actions short-circuiting before the auth check; requireStaff narrows to StaffActor and supports minimum-role constraint via hasAtLeastRole. tests/integration/auth/route-guards.test.ts demonstrates the canonical guarded-route-handler pattern with 401/403/200 outcomes for anonymous/customer/analyst/validator/admin against qa.signoff (validator-gated per .claude/rules/human-qa-required.md). 23 new tests RED-then-GREEN; 116/116 pass; lint + typecheck clean. Bug caught + fixed: AuthError class needed `abstract` keyword for the abstract status property. Local customers.id / staff_users.id lookup ships in task #11; the resolver currently surfaces clerkUserId as actor.id."
+        "completedNotes": "src/shared/infra/auth/resolver.ts exposes resolveActorFromSession (pure, fully testable) and resolveCurrentActor (calls Clerk's auth() + currentUser() in route-handler context). Resolver maps Clerk session \u2192 Actor: anonymous when no userId; staff when sessionClaims.org_role matches isStaffRole; customer otherwise. Defensive: unrecognized org_role values fall back to customer; missing email throws (cannot construct CustomerActor). require.ts: AuthError abstract base + AuthenticationError (401) + AuthorizationError (403, carries the denied Action). requireActor narrows away AnonymousActor; requireCan combines auth + can() check with anon-permitted actions short-circuiting before the auth check; requireStaff narrows to StaffActor and supports minimum-role constraint via hasAtLeastRole. tests/integration/auth/route-guards.test.ts demonstrates the canonical guarded-route-handler pattern with 401/403/200 outcomes for anonymous/customer/analyst/validator/admin against qa.signoff (validator-gated per .claude/rules/human-qa-required.md). 23 new tests RED-then-GREEN; 116/116 pass; lint + typecheck clean. Bug caught + fixed: AuthError class needed `abstract` keyword for the abstract status property. Local customers.id / staff_users.id lookup ships in task #11; the resolver currently surfaces clerkUserId as actor.id."
       },
       {
         "id": 11,
@@ -173,27 +220,38 @@
         "details": "Identity tables in src/shared/infra/db/schema/identity.ts with UNIQUE(clerk_user_id) constraint backing idempotency. Drizzle migration drizzle/0000_identity.sql generated and committed. IdentityRepo contract in src/contexts/identity/repo.ts; in-memory and drizzle implementations. handleClerkEvent dispatcher routes user.created/updated, organizationMembership.created/updated/deleted; unknown events are silent no-ops. Webhook route at src/app/api/webhooks/clerk/route.ts verifies Svix signature when CLERK_WEBHOOK_SECRET is set, no-ops in dev when not. getIdentityRepo() factory switches Drizzle vs in-memory by DATABASE_URL.",
         "testStrategy": "Replay a Clerk webhook event twice; one row created.",
         "priority": "high",
-        "dependencies": [2, 10],
+        "dependencies": [
+          2,
+          10
+        ],
         "status": "completed",
         "estimateHours": 4,
-        "source": ["ADR 003", "ADR 004"],
+        "source": [
+          "ADR 003",
+          "ADR 004"
+        ],
         "completedAt": "2026-04-21T06:35:00Z",
-        "completedNotes": "Drizzle schema (customers + staff_users) with UNIQUE(clerk_user_id) backing webhook idempotency. Initial migration drizzle/0000_identity.sql generated. IdentityRepo contract + in-memory implementation (used by tests and dev fallback) + Drizzle implementation typed against PostgresJsDatabase<Schema>. handleClerkEvent dispatches user.created/updated → upsertCustomer; organizationMembership.created/updated → upsertStaffUser (rejects unrecognized roles defensively); organizationMembership.deleted → deactivateStaffUser (preserves row for audit trail per .ralph/PROMPT.md hard rules). Unknown event types are silent no-ops so unmodeled Clerk events do not 500. Webhook route at src/app/api/webhooks/clerk/route.ts: requires svix-id/timestamp/signature headers; verifies via Svix Webhook when CLERK_WEBHOOK_SECRET set; falls back to JSON parse only in non-production envs; logs success + captures errors via observability adapters from task #5. 14 new tests (repo + sync) including REPLAY tests proving idempotency. All qa gates green: 130/130 tests, lint + typecheck clean, build green with stub Clerk env. svix package installed. HUMAN-VERIFICATION: provision Clerk webhook endpoint pointing at /api/webhooks/clerk in the dashboard, set CLERK_WEBHOOK_SECRET in .env.local, run live user-created flow and confirm a single customers row appears."
+        "completedNotes": "Drizzle schema (customers + staff_users) with UNIQUE(clerk_user_id) backing webhook idempotency. Initial migration drizzle/0000_identity.sql generated. IdentityRepo contract + in-memory implementation (used by tests and dev fallback) + Drizzle implementation typed against PostgresJsDatabase<Schema>. handleClerkEvent dispatches user.created/updated \u2192 upsertCustomer; organizationMembership.created/updated \u2192 upsertStaffUser (rejects unrecognized roles defensively); organizationMembership.deleted \u2192 deactivateStaffUser (preserves row for audit trail per .ralph/PROMPT.md hard rules). Unknown event types are silent no-ops so unmodeled Clerk events do not 500. Webhook route at src/app/api/webhooks/clerk/route.ts: requires svix-id/timestamp/signature headers; verifies via Svix Webhook when CLERK_WEBHOOK_SECRET set; falls back to JSON parse only in non-production envs; logs success + captures errors via observability adapters from task #5. 14 new tests (repo + sync) including REPLAY tests proving idempotency. All qa gates green: 130/130 tests, lint + typecheck clean, build green with stub Clerk env. svix package installed. HUMAN-VERIFICATION: provision Clerk webhook endpoint pointing at /api/webhooks/clerk in the dashboard, set CLERK_WEBHOOK_SECRET in .env.local, run live user-created flow and confirm a single customers row appears."
       },
       {
         "id": 12,
         "epic": "E3. Marketing site",
         "title": "Theme tokens + design system primitives",
         "description": "Tailwind config with design-language tokens; shadcn/ui components themed (button, dialog, input, etc.); custom typography stack loaded.",
-        "details": "7 primitives in src/app/_components/ui/: Button (solid + magazine-underline variants, button|anchor), Card (hairline border + optional display title), StatusBanner (anchored case-id+status+next-action), Eyebrow (uppercase mono label), Hairline (rule with optional chapter-break label), Footnote + FootnoteContent (real superscript pattern per .claude/rules/disclosure-language-required.md), KbdShortcut (kbd chip per minimalist-ui directive). /ui-kit page (noindex) renders every primitive — the 'Storybook alternative' the acceptance asks for. Playwright spec captures the baseline. Tailwind tokens already encoded in tailwind.config.ts (task #1); fonts use the licensed-fallback chain — TODO(human-action): self-host GT Sectra / Söhne / Berkeley Mono once licensed.",
+        "details": "7 primitives in src/app/_components/ui/: Button (solid + magazine-underline variants, button|anchor), Card (hairline border + optional display title), StatusBanner (anchored case-id+status+next-action), Eyebrow (uppercase mono label), Hairline (rule with optional chapter-break label), Footnote + FootnoteContent (real superscript pattern per .claude/rules/disclosure-language-required.md), KbdShortcut (kbd chip per minimalist-ui directive). /ui-kit page (noindex) renders every primitive \u2014 the 'Storybook alternative' the acceptance asks for. Playwright spec captures the baseline. Tailwind tokens already encoded in tailwind.config.ts (task #1); fonts use the licensed-fallback chain \u2014 TODO(human-action): self-host GT Sectra / S\u00f6hne / Berkeley Mono once licensed.",
         "testStrategy": "Storybook (or simple /ui-kit page) renders each primitive; visual diff baseline captured.",
         "priority": "high",
-        "dependencies": [1],
+        "dependencies": [
+          1
+        ],
         "status": "completed",
         "estimateHours": 6,
-        "source": ["DESIGN-LANGUAGE.md", "ADR 010"],
+        "source": [
+          "DESIGN-LANGUAGE.md",
+          "ADR 010"
+        ],
         "completedAt": "2026-04-21T06:46:00Z",
-        "completedNotes": "Loaded /taste-skill → minimalist-ui per docs/SKILLS-ROUTING.md mapping for design-system primitives. Built 7 primitives in src/app/_components/ui/: Button (solid ink-on-paper + magazine-underline accent variants, polymorphic button|anchor with disabled handling), Card (hairline border, no shadow, optional display-face title with aria-labelledby), StatusBanner (anchored top-of-page case-id mono + status + next-action link with severity colors per design language status palette), Eyebrow (uppercase mono tracking label), Hairline (rule with optional chapter-break label), Footnote + FootnoteContent (real superscript pattern + footer block per .claude/rules/disclosure-language-required.md), KbdShortcut (kbd chip per minimalist-ui directive). /ui-kit page at src/app/(marketing)/ui-kit/page.tsx renders every primitive with realistic content (no Lorem Ipsum per minimalist-ui rules) — noindex'd, the visual review surface for the design language. Playwright baseline spec at tests/e2e/anonymous/ui-kit-baseline.spec.ts. Wired @vitejs/plugin-react for vitest's TSX parsing (vitest 4 needed it). Switched component tests from removed environmentMatchGlobs to the per-file `// @vitest-environment jsdom` pragma. Tightened ESLint no-unused-vars to also ignore `_`-prefixed destructured vars + rest siblings. 16 new tests RED-then-GREEN; 146/146 pass; lint + typecheck clean; build green (/ui-kit static at 141B). Per docs/SKILLS-ROUTING.md, minimalist-ui rules applied (warm monochrome, hairline borders, no shadows, kbd as physical keys, no rounded-full pills) with our overrides (single customs-orange accent, GT Sectra display, magazine-underline CTA pattern). HUMAN-VERIFICATION: design-taste review of /ui-kit against docs/DESIGN-LANGUAGE.md before marketing pages land in task #14."
+        "completedNotes": "Loaded /taste-skill \u2192 minimalist-ui per docs/SKILLS-ROUTING.md mapping for design-system primitives. Built 7 primitives in src/app/_components/ui/: Button (solid ink-on-paper + magazine-underline accent variants, polymorphic button|anchor with disabled handling), Card (hairline border, no shadow, optional display-face title with aria-labelledby), StatusBanner (anchored top-of-page case-id mono + status + next-action link with severity colors per design language status palette), Eyebrow (uppercase mono tracking label), Hairline (rule with optional chapter-break label), Footnote + FootnoteContent (real superscript pattern + footer block per .claude/rules/disclosure-language-required.md), KbdShortcut (kbd chip per minimalist-ui directive). /ui-kit page at src/app/(marketing)/ui-kit/page.tsx renders every primitive with realistic content (no Lorem Ipsum per minimalist-ui rules) \u2014 noindex'd, the visual review surface for the design language. Playwright baseline spec at tests/e2e/anonymous/ui-kit-baseline.spec.ts. Wired @vitejs/plugin-react for vitest's TSX parsing (vitest 4 needed it). Switched component tests from removed environmentMatchGlobs to the per-file `// @vitest-environment jsdom` pragma. Tightened ESLint no-unused-vars to also ignore `_`-prefixed destructured vars + rest siblings. 16 new tests RED-then-GREEN; 146/146 pass; lint + typecheck clean; build green (/ui-kit static at 141B). Per docs/SKILLS-ROUTING.md, minimalist-ui rules applied (warm monochrome, hairline borders, no shadows, kbd as physical keys, no rounded-full pills) with our overrides (single customs-orange accent, GT Sectra display, magazine-underline CTA pattern). HUMAN-VERIFICATION: design-taste review of /ui-kit against docs/DESIGN-LANGUAGE.md before marketing pages land in task #14."
       },
       {
         "id": 13,
@@ -203,13 +261,17 @@
         "details": "Implementation-level verification: 146/146 unit tests pass, lint + typecheck clean, build green (10 routes resolve including /, /app, /ops, /sign-in/[[...sign-in]], /sign-up/[[...sign-up]], /api/health, /api/inngest, /api/webhooks/clerk, /ui-kit, /_not-found). Middleware bundle 85.1kB. Design-language banned-patterns grep on src/app/_components/ confirms zero violations (no Inter/Roboto, no shadow-md/lg/xl, no rounded-full on primitives).",
         "testStrategy": "Manual checklist + design review.",
         "priority": "high",
-        "dependencies": [11, 12],
+        "dependencies": [
+          11,
+          12
+        ],
         "status": "completed",
         "estimateHours": 1,
-        "source": ["validation-checkpoint"],
+        "source": [
+          "validation-checkpoint"
+        ],
         "completedAt": "2026-04-21T06:50:00Z",
-        "completedNotes": "Checkpoint 2 implementation gates. Auth-side: middleware compiled (85.1kB), sign-in/sign-up routes registered, /app + /ops protected with role gating, /api/webhooks/clerk live with svix verification + idempotency proof in tests. Design-system side: 7 primitives + /ui-kit page render; zero banned patterns (Inter/Roboto/shadow-md|lg|xl/rounded-full on primitives) per design-language grep. All 146 tests pass; build green. HUMAN-VERIFICATION OWES: (1) live Clerk dashboard sign-up + sign-in completes against real keys; (2) /ops bounce-when-not-staff confirmed with a real customer-only Clerk session; (3) /api/webhooks/clerk receives + applies a real Clerk webhook with valid Svix signature; (4) eyeball /ui-kit at the dev server and verify each primitive matches the docs/DESIGN-LANGUAGE.md intent — especially that the magazine-underline CTA reads correctly under the licensed-fallback fonts (until GT Sectra / Söhne / Berkeley Mono are self-hosted)."
-
+        "completedNotes": "Checkpoint 2 implementation gates. Auth-side: middleware compiled (85.1kB), sign-in/sign-up routes registered, /app + /ops protected with role gating, /api/webhooks/clerk live with svix verification + idempotency proof in tests. Design-system side: 7 primitives + /ui-kit page render; zero banned patterns (Inter/Roboto/shadow-md|lg|xl/rounded-full on primitives) per design-language grep. All 146 tests pass; build green. HUMAN-VERIFICATION OWES: (1) live Clerk dashboard sign-up + sign-in completes against real keys; (2) /ops bounce-when-not-staff confirmed with a real customer-only Clerk session; (3) /api/webhooks/clerk receives + applies a real Clerk webhook with valid Svix signature; (4) eyeball /ui-kit at the dev server and verify each primitive matches the docs/DESIGN-LANGUAGE.md intent \u2014 especially that the magazine-underline CTA reads correctly under the licensed-fallback fonts (until GT Sectra / S\u00f6hne / Berkeley Mono are self-hosted)."
       },
       {
         "id": 14,
@@ -217,29 +279,38 @@
         "title": "Build homepage (editorial hero + sections)",
         "description": "Implement / page per PRD 05 hierarchy: editorial hero, proof statement, three-movement explainer, anti-positioning, pull-quote, footer.",
         "details": "src/app/(marketing)/page.tsx composes 5 sections from src/app/(marketing)/_components/: HomeHero (GT Sectra display, magazine-underline CTA, single accent above the fold), HomeProof (serif print-article opener with hairline frames), HomeMovements (Recovery/Filing prep/Concierge as hairline-bordered cards with mono prices), HomeAntiPositioning (real-text 'What we are not' list with the no-auto-submit promise), HomePullQuote (canonical trust posture as the editorial close). Marketing route-group layout adds the SiteFooter (3 nav columns + canonical 'Not legal advice' real-text disclosure). Static-prerendered (143B). Documentary photograph deferred until human-action sources real imagery.",
-        "testStrategy": "Lighthouse CI gate ≥95; Playwright screenshot baseline; A11y audit (axe-core) clean.",
+        "testStrategy": "Lighthouse CI gate \u226595; Playwright screenshot baseline; A11y audit (axe-core) clean.",
         "priority": "high",
-        "dependencies": [12],
+        "dependencies": [
+          12
+        ],
         "status": "completed",
         "estimateHours": 8,
-        "source": ["PRD 05", "DESIGN-LANGUAGE.md"],
+        "source": [
+          "PRD 05",
+          "DESIGN-LANGUAGE.md"
+        ],
         "completedAt": "2026-04-21T06:58:00Z",
-        "completedNotes": "Homepage built per PRD 05 hierarchy using minimalist-ui taste (loaded earlier). 5 section components in src/app/(marketing)/_components/: HomeHero (editorial GT Sectra display, single accent magazine-underline CTA above the fold), HomeProof (serif print-article opener framed by hairlines), HomeMovements (Recovery/Filing prep/Concierge in hairline-bordered cards with Berkeley Mono price labels), HomeAntiPositioning (the 'What we are not' real-text list including the no-auto-submit, not-a-broker, not-legal-advice non-goals — anchors trust through restraint), HomePullQuote (the canonical trust posture rendered as the page's editorial close). Marketing route-group layout in src/app/(marketing)/layout.tsx wraps every marketing page with SiteFooter (3 nav columns + canonical 'Not legal advice' real-text disclosure linking to /trust per .claude/rules/disclosure-language-required.md). Build green: / static-prerendered at 143B; first-load JS unchanged at 102kB shared. 11 new component tests + 1 Playwright spec asserting hero + sections + footer disclosure RED-then-GREEN; 157/157 pass; lint + typecheck clean. HUMAN-VERIFICATION: live Lighthouse run to confirm ≥95 across categories, axe-core a11y audit, eyeball the homepage at the dev server (especially the GT Sectra fallback rendering until self-hosted), source the full-bleed documentary photograph."
+        "completedNotes": "Homepage built per PRD 05 hierarchy using minimalist-ui taste (loaded earlier). 5 section components in src/app/(marketing)/_components/: HomeHero (editorial GT Sectra display, single accent magazine-underline CTA above the fold), HomeProof (serif print-article opener framed by hairlines), HomeMovements (Recovery/Filing prep/Concierge in hairline-bordered cards with Berkeley Mono price labels), HomeAntiPositioning (the 'What we are not' real-text list including the no-auto-submit, not-a-broker, not-legal-advice non-goals \u2014 anchors trust through restraint), HomePullQuote (the canonical trust posture rendered as the page's editorial close). Marketing route-group layout in src/app/(marketing)/layout.tsx wraps every marketing page with SiteFooter (3 nav columns + canonical 'Not legal advice' real-text disclosure linking to /trust per .claude/rules/disclosure-language-required.md). Build green: / static-prerendered at 143B; first-load JS unchanged at 102kB shared. 11 new component tests + 1 Playwright spec asserting hero + sections + footer disclosure RED-then-GREEN; 157/157 pass; lint + typecheck clean. HUMAN-VERIFICATION: live Lighthouse run to confirm \u226595 across categories, axe-core a11y audit, eyeball the homepage at the dev server (especially the GT Sectra fallback rendering until self-hosted), source the full-bleed documentary photograph."
       },
       {
         "id": 15,
         "epic": "E3. Marketing site",
         "title": "Build /how-it-works",
-        "description": "Three-stage explainer (Recovery → Prep → Concierge) with editorial typography.",
+        "description": "Three-stage explainer (Recovery \u2192 Prep \u2192 Concierge) with editorial typography.",
         "details": "Editorial long-read at src/app/(marketing)/how-it-works/page.tsx. Eyebrow + display H1 pattern, three stage movements separated by labeled hairline section breaks. Each stage: editorial tagline, mono price label, parallel 'What we do' / 'What you do' columns, and an artifact-callout in display face on a left border-rule. Closing CTA back to /screener.",
-        "testStrategy": "Lighthouse ≥95; A11y clean; design review passes.",
+        "testStrategy": "Lighthouse \u226595; A11y clean; design review passes.",
         "priority": "high",
-        "dependencies": [14],
+        "dependencies": [
+          14
+        ],
         "status": "completed",
         "estimateHours": 4,
         "completedAt": "2026-04-21T07:04:00Z",
-        "completedNotes": "Editorial long-read at src/app/(marketing)/how-it-works/page.tsx. Eyebrow ('How it works') + display H1 ('Three movements, paid in stages.') matching the homepage rhythm. Three stage movements (01 Recovery / 02 Filing prep / 03 Concierge) each with: editorial tagline in serif at xl size, mono price label in accent, parallel 'What we do' / 'What you do' columns under uppercase mono sub-headings, and a display-face artifact-callout on a left border-rule. Hairline-with-label section breaks between stages. Closing CTA back to /screener. 4 component tests + 1 Playwright spec RED-then-GREEN; 161/161 pass; lint + typecheck clean; build green (/how-it-works static at 146B). HUMAN-VERIFICATION: Lighthouse ≥95 + a11y audit + design taste review at the dev server.",
-        "source": ["PRD 05"]
+        "completedNotes": "Editorial long-read at src/app/(marketing)/how-it-works/page.tsx. Eyebrow ('How it works') + display H1 ('Three movements, paid in stages.') matching the homepage rhythm. Three stage movements (01 Recovery / 02 Filing prep / 03 Concierge) each with: editorial tagline in serif at xl size, mono price label in accent, parallel 'What we do' / 'What you do' columns under uppercase mono sub-headings, and a display-face artifact-callout on a left border-rule. Hairline-with-label section breaks between stages. Closing CTA back to /screener. 4 component tests + 1 Playwright spec RED-then-GREEN; 161/161 pass; lint + typecheck clean; build green (/how-it-works static at 146B). HUMAN-VERIFICATION: Lighthouse \u226595 + a11y audit + design taste review at the dev server.",
+        "source": [
+          "PRD 05"
+        ]
       },
       {
         "id": 16,
@@ -247,130 +318,180 @@
         "title": "Build /pricing",
         "description": "Stage-by-stage ladder, tabular figures, no 'popular' badge, free tier rendered with same weight as paid.",
         "details": "Pricing data sourced from src/contexts/billing/pricing.ts (single source of truth).",
-        "testStrategy": "Snapshot test against pricing.ts; Lighthouse ≥95.",
+        "testStrategy": "Snapshot test against pricing.ts; Lighthouse \u226595.",
         "priority": "high",
-        "dependencies": [14, 36],
+        "dependencies": [
+          14,
+          36
+        ],
         "status": "pending",
         "estimateHours": 4,
-        "source": ["PRD 05", "PRD 06"]
+        "source": [
+          "PRD 05",
+          "PRD 06"
+        ]
       },
       {
         "id": 17,
         "epic": "E3. Marketing site",
         "title": "Build /trust + /trust/sub-processors",
         "description": "Long-form editorial trust posture page; canonical promise; 'what we are not' list; sub-processors list (vendor name, purpose).",
-        "details": "src/app/(marketing)/trust/page.tsx — long-form editorial document with canonical promise (verbatim per .claude/rules/disclosure-language-required.md), 'what we are not' real-text non-goals, data-collection dl, retention table, customer rights, security posture (with real footnote on the 15-min upload-URL expiry), compliance posture, and a footnotes block at the page footer. src/app/(marketing)/trust/sub-processors/page.tsx — typeset table of every third party with vendor / purpose / region / phase columns. Phase-2 vendors (OCR + Anthropic LLM) flagged so a current reader does not assume they receive customer data today. 14-day update commitment published prominently per PRD 10.",
+        "details": "src/app/(marketing)/trust/page.tsx \u2014 long-form editorial document with canonical promise (verbatim per .claude/rules/disclosure-language-required.md), 'what we are not' real-text non-goals, data-collection dl, retention table, customer rights, security posture (with real footnote on the 15-min upload-URL expiry), compliance posture, and a footnotes block at the page footer. src/app/(marketing)/trust/sub-processors/page.tsx \u2014 typeset table of every third party with vendor / purpose / region / phase columns. Phase-2 vendors (OCR + Anthropic LLM) flagged so a current reader does not assume they receive customer data today. 14-day update commitment published prominently per PRD 10.",
         "testStrategy": "A11y clean; design review passes.",
         "priority": "high",
-        "dependencies": [14],
+        "dependencies": [
+          14
+        ],
         "status": "completed",
         "completedAt": "2026-04-21T07:09:00Z",
         "completedNotes": "Two long-form editorial trust pages. /trust: canonical promise verbatim, 'what we are not' real-text list (5 non-goals including never-auto-submit + not-legal-advice), 'what we collect' dl, retention table (5 categories with windows), customer rights (access/correction/deletion/portability), security posture with real footnote on the 15-min upload-URL expiry rule (per ADR 006), compliance posture (GDPR/CCPA/SOC 2 target/CBP regs), footnotes block. /trust/sub-processors: typeset table of 11 vendors (Vercel, Neon, R2, Clerk, Stripe, Inngest, Resend, Sentry, Axiom + Phase-2 OCR + Anthropic), Phase-2 flagged in warning color so current readers know which vendors don't yet receive customer data, 14-day update commitment in mono. Both pages anchored by hairline-labeled section breaks. 9 new component tests + 1 Playwright spec RED-then-GREEN; 170/170 pass; lint + typecheck clean; build green (/trust + /trust/sub-processors static at 151B each). HUMAN-VERIFICATION: live a11y audit, design taste review, legal-counsel sign-off on the canonical promise and disclosures.",
         "estimateHours": 5,
-        "source": ["PRD 10", "DESIGN-LANGUAGE.md"]
+        "source": [
+          "PRD 10",
+          "DESIGN-LANGUAGE.md"
+        ]
       },
       {
         "id": 18,
         "epic": "E3. Marketing site",
         "title": "Footer + global trust footnote pattern",
         "description": "Footer component with trust link, status link, and 'not legal advice' real footnote pattern.",
-        "details": "Canonical CANONICAL_TRUST_PROMISE + NOT_LEGAL_ADVICE_DISCLOSURE constants in src/app/_components/ui/Disclosure.tsx — single source of truth, frozen by tests so accidental edits fail loudly. TrustFootnote component with optional asFooter prop renders the disclosure either inline (used by SiteFooter) or as a standalone <footer> landmark (used by /app + /ops route-group layouts). Every customer-facing surface now ends with the canonical disclosure linking to /trust.",
+        "details": "Canonical CANONICAL_TRUST_PROMISE + NOT_LEGAL_ADVICE_DISCLOSURE constants in src/app/_components/ui/Disclosure.tsx \u2014 single source of truth, frozen by tests so accidental edits fail loudly. TrustFootnote component with optional asFooter prop renders the disclosure either inline (used by SiteFooter) or as a standalone <footer> landmark (used by /app + /ops route-group layouts). Every customer-facing surface now ends with the canonical disclosure linking to /trust.",
         "testStrategy": "Component test renders footnote; integration: footer present on every public route.",
         "priority": "high",
-        "dependencies": [12],
+        "dependencies": [
+          12
+        ],
         "status": "completed",
         "estimateHours": 2,
-        "source": ["PRD 10"],
+        "source": [
+          "PRD 10"
+        ],
         "completedAt": "2026-04-21T07:16:00Z",
-        "completedNotes": "Disclosure module at src/app/_components/ui/Disclosure.tsx exposes CANONICAL_TRUST_PROMISE + NOT_LEGAL_ADVICE_DISCLOSURE constants frozen by string-equality tests (per .claude/rules/disclosure-language-required.md — verbatim across surfaces, never paraphrased). TrustFootnote component with optional asFooter prop. SiteFooter (marketing) refactored to use <TrustFootnote /> inline. New (app)/layout.tsx and (ops)/layout.tsx wrap their route groups with <TrustFootnote asFooter /> so every customer + staff surface ends with the canonical disclosure. tests/integration/marketing/footer-presence.test.tsx asserts the disclosure + /trust link appears on every marketing page (5 pages × multiple checks). 7 new tests RED-then-GREEN; 180/180 pass; lint + typecheck clean; build green (13 routes, all customer + ops surfaces now share the disclosure footer)."
+        "completedNotes": "Disclosure module at src/app/_components/ui/Disclosure.tsx exposes CANONICAL_TRUST_PROMISE + NOT_LEGAL_ADVICE_DISCLOSURE constants frozen by string-equality tests (per .claude/rules/disclosure-language-required.md \u2014 verbatim across surfaces, never paraphrased). TrustFootnote component with optional asFooter prop. SiteFooter (marketing) refactored to use <TrustFootnote /> inline. New (app)/layout.tsx and (ops)/layout.tsx wrap their route groups with <TrustFootnote asFooter /> so every customer + staff surface ends with the canonical disclosure. tests/integration/marketing/footer-presence.test.tsx asserts the disclosure + /trust link appears on every marketing page (5 pages \u00d7 multiple checks). 7 new tests RED-then-GREEN; 180/180 pass; lint + typecheck clean; build green (13 routes, all customer + ops surfaces now share the disclosure footer)."
       },
       {
         "id": 19,
         "epic": "USER-TEST",
         "title": "USER-TEST: Marketing site live at staging",
         "description": "Walk through marketing site from a fresh user perspective; confirm taste is right.",
-        "details": "Deploy to staging. Founder + at least one outside reviewer walks through homepage → how-it-works → pricing → trust. Document feedback as new tasks.",
+        "details": "Deploy to staging. Founder + at least one outside reviewer walks through homepage \u2192 how-it-works \u2192 pricing \u2192 trust. Document feedback as new tasks.",
         "testStrategy": "Manual review + Lighthouse CI dashboard check.",
         "priority": "high",
-        "dependencies": [14, 15, 16, 17, 18],
+        "dependencies": [
+          14,
+          15,
+          16,
+          17,
+          18
+        ],
         "status": "pending",
         "estimateHours": 1,
-        "source": ["validation-checkpoint", "Checkpoint 1"]
+        "source": [
+          "validation-checkpoint",
+          "Checkpoint 1"
+        ]
       },
       {
         "id": 20,
         "epic": "E4. Eligibility screener",
         "title": "Screener domain logic + branching engine",
-        "description": "src/contexts/screener/branching.ts — pure function: (answers) → next question or completion. Versioned (v1).",
-        "details": "src/contexts/screener/{types,questions,branching,estimator,qualification,index}.ts. types.ts encodes ScreenerAnswers + ScreenerResult per PRD 01. questions.ts holds the 10-question metadata. branching.ts: nextQuestion() advances Q1..Q10 in order with terminal-DQ shortcuts on q1=no and q3=no; isComplete() flags terminal states. estimator.ts (versioned ESTIMATOR_VERSION='v1'): maps duty bands to refund (low,high) ranges with confidence shifting on q2=unknown / q8 / q9. qualification.ts: computeResult() outputs the typed ScreenerResult — qualification (qualified/likely/disqualified), refundEstimate (versioned), confidence, recoveryPath (broker/carrier/ace-self-export/mixed/null with TODO for task #49 to extract into recovery context per ADR 015), prerequisites (ace/ach/ior/liquidationKnown), recommendedNextStep (recovery_kit/service/cape_prep/concierge/none).",
-        "testStrategy": "Unit tests cover every branch; ≥95% coverage on branching.ts.",
+        "description": "src/contexts/screener/branching.ts \u2014 pure function: (answers) \u2192 next question or completion. Versioned (v1).",
+        "details": "src/contexts/screener/{types,questions,branching,estimator,qualification,index}.ts. types.ts encodes ScreenerAnswers + ScreenerResult per PRD 01. questions.ts holds the 10-question metadata. branching.ts: nextQuestion() advances Q1..Q10 in order with terminal-DQ shortcuts on q1=no and q3=no; isComplete() flags terminal states. estimator.ts (versioned ESTIMATOR_VERSION='v1'): maps duty bands to refund (low,high) ranges with confidence shifting on q2=unknown / q8 / q9. qualification.ts: computeResult() outputs the typed ScreenerResult \u2014 qualification (qualified/likely/disqualified), refundEstimate (versioned), confidence, recoveryPath (broker/carrier/ace-self-export/mixed/null with TODO for task #49 to extract into recovery context per ADR 015), prerequisites (ace/ach/ior/liquidationKnown), recommendedNextStep (recovery_kit/service/cape_prep/concierge/none).",
+        "testStrategy": "Unit tests cover every branch; \u226595% coverage on branching.ts.",
         "priority": "high",
-        "dependencies": [1],
+        "dependencies": [
+          1
+        ],
         "status": "completed",
         "estimateHours": 6,
-        "source": ["PRD 01"],
+        "source": [
+          "PRD 01"
+        ],
         "completedAt": "2026-04-21T07:24:00Z",
-        "completedNotes": "Five new modules in src/contexts/screener/ with 38 new tests covering every branching path + every duty band + every confidence tier + every qualification outcome + every recovery-path mapping + every recommendedNextStep rule. Coverage on the screener context: 96.00% lines / 95.94% branches / 100% functions / 96.72% statements — exceeds the ≥95% acceptance gate. types.ts encodes ScreenerAnswers + ScreenerResult per PRD 01. questions.ts holds the 10-question metadata (frozen). branching.ts: nextQuestion advances Q1..Q10 in order with terminal-DQ shortcuts (q1=no → DQ-1, q3=no → DQ-2). estimator.ts: ESTIMATOR_VERSION='v1', BAND_RANGES mapped to per-band (low,high), confidence rules. qualification.ts: computeResult outputs the full ScreenerResult including recoveryPath determination — TODO marker so task #49 can extract this into src/contexts/recovery/routing.ts per ADR 015. RESULT_VERSION = 'screener-v1+estimator-v1' for audit trail. All qa gates green: 218/218 tests, lint + typecheck clean, build green (13 routes unchanged — context code, no new routes yet)."
+        "completedNotes": "Five new modules in src/contexts/screener/ with 38 new tests covering every branching path + every duty band + every confidence tier + every qualification outcome + every recovery-path mapping + every recommendedNextStep rule. Coverage on the screener context: 96.00% lines / 95.94% branches / 100% functions / 96.72% statements \u2014 exceeds the \u226595% acceptance gate. types.ts encodes ScreenerAnswers + ScreenerResult per PRD 01. questions.ts holds the 10-question metadata (frozen). branching.ts: nextQuestion advances Q1..Q10 in order with terminal-DQ shortcuts (q1=no \u2192 DQ-1, q3=no \u2192 DQ-2). estimator.ts: ESTIMATOR_VERSION='v1', BAND_RANGES mapped to per-band (low,high), confidence rules. qualification.ts: computeResult outputs the full ScreenerResult including recoveryPath determination \u2014 TODO marker so task #49 can extract this into src/contexts/recovery/routing.ts per ADR 015. RESULT_VERSION = 'screener-v1+estimator-v1' for audit trail. All qa gates green: 218/218 tests, lint + typecheck clean, build green (13 routes unchanged \u2014 context code, no new routes yet)."
       },
       {
         "id": 21,
         "epic": "E4. Eligibility screener",
-        "title": "Screener UI — one-question-per-screen flow",
+        "title": "Screener UI \u2014 one-question-per-screen flow",
         "description": "Build /screener route flow: question screen, transitions, persistence (sessionStorage + DB on completion).",
         "details": "src/app/screener/page.tsx (top-level, focused single-column flow with TrustFootnote). 3 components in src/app/_components/screener/: QuestionPrompt (display H1 + top-right `Q3/10` mono indicator, no progress bar per PRD 01), AnswerInput (per-kind: yes_no submit-on-click, yes_no_unknown with the I-don't-know magazine-underline shortcut, country with input + I-don't-know shortcut, choice-list for clearance/shipment/duty bands, multi-category checkbox grid with disabled-until-picked Continue, email_capture with company + email validation), ScreenerFlow (orchestrator using nextQuestion + isComplete + computeResult, sessionStorage persistence on every change, back-button removes last answered). Inline result card on completion (qualified vs disqualified variants); dedicated photographable Results page lands in task #24. DB persistence + magic-link resume in tasks #25/#23.",
         "testStrategy": "Playwright: complete a happy-path screener; complete with backtracking; resume after refresh.",
         "priority": "high",
-        "dependencies": [20, 12],
+        "dependencies": [
+          20,
+          12
+        ],
         "status": "completed",
         "estimateHours": 8,
-        "source": ["PRD 01", "DESIGN-LANGUAGE.md"],
+        "source": [
+          "PRD 01",
+          "DESIGN-LANGUAGE.md"
+        ],
         "completedAt": "2026-04-21T07:32:00Z",
-        "completedNotes": "src/app/screener/page.tsx ('use client'-rooted, focused single-column flow outside the marketing route group so it doesn't inherit SiteFooter — only the compact TrustFootnote per .claude/rules/disclosure-language-required.md). 3 components in src/app/_components/screener/: QuestionPrompt (display H1 in GT Sectra + top-right `Q3/10` mono indicator, NO progress bar per PRD 01), AnswerInput (per-kind: yes_no submit-on-click, yes_no_unknown with I-don't-know magazine-underline shortcut, country text input + unknown shortcut, choice-list for clearance/shipment/duty/multi-category bands, email_capture with company + RFC-shaped email validation), ScreenerFlow (orchestrator: useState seeded from sessionStorage, useEffect persists on every change + fires onComplete the moment isComplete becomes true, back removes the most recently answered q, also clears sessionStorage on completion). Inline ScreenerResultCard renders disqualified vs qualified variants with refund range in Berkeley Mono display size and recommended next step. Wired @testing-library/jest-dom for component tests via a new tests/setup/jest-dom.ts setupFile. 18 new tests + 1 Playwright spec (happy + DQ + back-button) RED-then-GREEN; 238/238 pass; lint + typecheck clean; build green (/screener is the first interactive client-component route at 4.79kB / 107kB first-load). HUMAN-VERIFICATION: live walkthrough at the dev server."
+        "completedNotes": "src/app/screener/page.tsx ('use client'-rooted, focused single-column flow outside the marketing route group so it doesn't inherit SiteFooter \u2014 only the compact TrustFootnote per .claude/rules/disclosure-language-required.md). 3 components in src/app/_components/screener/: QuestionPrompt (display H1 in GT Sectra + top-right `Q3/10` mono indicator, NO progress bar per PRD 01), AnswerInput (per-kind: yes_no submit-on-click, yes_no_unknown with I-don't-know magazine-underline shortcut, country text input + unknown shortcut, choice-list for clearance/shipment/duty/multi-category bands, email_capture with company + RFC-shaped email validation), ScreenerFlow (orchestrator: useState seeded from sessionStorage, useEffect persists on every change + fires onComplete the moment isComplete becomes true, back removes the most recently answered q, also clears sessionStorage on completion). Inline ScreenerResultCard renders disqualified vs qualified variants with refund range in Berkeley Mono display size and recommended next step. Wired @testing-library/jest-dom for component tests via a new tests/setup/jest-dom.ts setupFile. 18 new tests + 1 Playwright spec (happy + DQ + back-button) RED-then-GREEN; 238/238 pass; lint + typecheck clean; build green (/screener is the first interactive client-component route at 4.79kB / 107kB first-load). HUMAN-VERIFICATION: live walkthrough at the dev server."
       },
       {
         "id": 22,
         "epic": "E4. Eligibility screener",
         "title": "Refund estimator (v1)",
-        "description": "Pure function from screener answers → refund estimate range + confidence label.",
+        "description": "Pure function from screener answers \u2192 refund estimate range + confidence label.",
         "details": "Shipped inside task #20's screener-domain bundle as src/contexts/screener/estimator.ts. ESTIMATOR_VERSION='v1' frozen constant; BAND_RANGES table; confidence rules (low when q2='unknown', high when liquidation known + ACE access, otherwise moderate). Every result records the version for audit. Tests in src/contexts/screener/__tests__/estimator.test.ts cover all five duty bands + every confidence tier.",
         "testStrategy": "Unit tests against fixture answer sets; result object schema validated.",
         "priority": "high",
-        "dependencies": [20],
+        "dependencies": [
+          20
+        ],
         "status": "completed",
         "estimateHours": 4,
-        "source": ["PRD 01"],
+        "source": [
+          "PRD 01"
+        ],
         "completedAt": "2026-04-21T07:34:00Z",
-        "completedNotes": "Shipped as part of task #20. estimator.ts at src/contexts/screener/estimator.ts exports ESTIMATOR_VERSION='v1' (frozen) and estimateRefund(answers) which maps the duty-band answer to a (low, high) range with confidence rules per PRD 01. Tests in src/contexts/screener/__tests__/estimator.test.ts cover all five duty bands (under_5k through over_5m), the version-stamp invariant (every result carries the version), the low ≤ high invariant, the strictly-larger-band rule (large.high > small.high), the country-unknown confidence downgrade, and the ace+liquidation confidence upgrade. Coverage on the screener context is 96% lines / 95.9% branches / 100% functions — well past the implicit ≥95% acceptance criterion. No new code needed for this task — admin entry only."
+        "completedNotes": "Shipped as part of task #20. estimator.ts at src/contexts/screener/estimator.ts exports ESTIMATOR_VERSION='v1' (frozen) and estimateRefund(answers) which maps the duty-band answer to a (low, high) range with confidence rules per PRD 01. Tests in src/contexts/screener/__tests__/estimator.test.ts cover all five duty bands (under_5k through over_5m), the version-stamp invariant (every result carries the version), the low \u2264 high invariant, the strictly-larger-band rule (large.high > small.high), the country-unknown confidence downgrade, and the ace+liquidation confidence upgrade. Coverage on the screener context is 96% lines / 95.9% branches / 100% functions \u2014 well past the implicit \u226595% acceptance criterion. No new code needed for this task \u2014 admin entry only."
       },
       {
         "id": 23,
         "epic": "E4. Eligibility screener",
         "title": "Email capture + magic-link resume",
         "description": "Final step captures email; sends magic link via Resend that resumes the session.",
-        "details": "magic-link.ts: HMAC-SHA256 token signing/verification with TTL + constant-time signature check. finalize.ts: pure server function that persists session + writes idempotent lead + queues magic-link email; disqualified paths skip the lead+email. POST /api/screener/complete handler (Zod-validated body, optional Turnstile gate via TURNSTILE_SECRET, MAGIC_LINK_SECRET length-checked, observability hooks). /screener/results?token=… server-rendered resume page (loads session by id, renders qualified vs disqualified result; expired/tampered tokens land on a friendly error). ScreenerFlow callback signature changed to pass answers along with result so the parent can POST. Inline result still renders instantly client-side; server persistence + email send happen in the background.",
+        "details": "magic-link.ts: HMAC-SHA256 token signing/verification with TTL + constant-time signature check. finalize.ts: pure server function that persists session + writes idempotent lead + queues magic-link email; disqualified paths skip the lead+email. POST /api/screener/complete handler (Zod-validated body, optional Turnstile gate via TURNSTILE_SECRET, MAGIC_LINK_SECRET length-checked, observability hooks). /screener/results?token=\u2026 server-rendered resume page (loads session by id, renders qualified vs disqualified result; expired/tampered tokens land on a friendly error). ScreenerFlow callback signature changed to pass answers along with result so the parent can POST. Inline result still renders instantly client-side; server persistence + email send happen in the background.",
         "testStrategy": "Integration: complete screener, receive magic link in dev mailbox, click, see results.",
         "priority": "high",
-        "dependencies": [21, 25, 27],
+        "dependencies": [
+          21,
+          25,
+          27
+        ],
         "status": "completed",
         "estimateHours": 4,
-        "source": ["PRD 01"],
+        "source": [
+          "PRD 01"
+        ],
         "completedAt": "2026-04-21T08:05:00Z",
-        "completedNotes": "magic-link.ts: HMAC-SHA256 token (base64url payload + sig). signToken enforces ≥32-char secret + 7-day TTL ceiling per PRD 01. verifyToken does constant-time signature compare via timingSafeEqual + structured failure reasons (malformed/bad_signature/expired). 5 round-trip tests (good, wrong secret, tampered payload, expired, malformed). finalize.ts: pure server function takes (answers, sessionId?) + deps {repo, email, secret, fromAddress, resultsBaseUrl}. Persists session (creates or upserts via sessionId), computes result, completes session, writes idempotent lead (skipped on DQ paths since no email captured), signs token, renders ScreenerResultsEmail, queues delivery via the email transport with idempotencyKey for replay safety. 4 finalize tests including the REPLAY assertion. POST /api/screener/complete (Zod-validated body, optional Turnstile via TURNSTILE_SECRET if configured, MAGIC_LINK_SECRET length check, structured 400/403/500 responses, observability hooks logging success + capturing exceptions). /screener/results?token=… server-rendered (params verified, session loaded by id, renders qualified vs disqualified variant; expired/tampered tokens land on a friendly resume-error page that points back to /screener). ScreenerFlow callback signature changed from (result) to (result, answers) so the parent can POST. Inline result continues to render instantly client-side; the server round-trip is best-effort and runs in the background. ESLint rule updated to allow @contexts/<name>/server as a sanctioned public surface (ADR 001 amendment). Bug caught + fixed during gates: `import 'server-only'` in implementation modules broke vitest — moved the directive only to server.ts, kept implementation modules importable. zod installed for body validation. 9 new tests RED-then-GREEN; 263/263 pass; lint + typecheck clean; build green (16 routes; /screener client bundle still 4.94kB — server modules don't leak)."
+        "completedNotes": "magic-link.ts: HMAC-SHA256 token (base64url payload + sig). signToken enforces \u226532-char secret + 7-day TTL ceiling per PRD 01. verifyToken does constant-time signature compare via timingSafeEqual + structured failure reasons (malformed/bad_signature/expired). 5 round-trip tests (good, wrong secret, tampered payload, expired, malformed). finalize.ts: pure server function takes (answers, sessionId?) + deps {repo, email, secret, fromAddress, resultsBaseUrl}. Persists session (creates or upserts via sessionId), computes result, completes session, writes idempotent lead (skipped on DQ paths since no email captured), signs token, renders ScreenerResultsEmail, queues delivery via the email transport with idempotencyKey for replay safety. 4 finalize tests including the REPLAY assertion. POST /api/screener/complete (Zod-validated body, optional Turnstile via TURNSTILE_SECRET if configured, MAGIC_LINK_SECRET length check, structured 400/403/500 responses, observability hooks logging success + capturing exceptions). /screener/results?token=\u2026 server-rendered (params verified, session loaded by id, renders qualified vs disqualified variant; expired/tampered tokens land on a friendly resume-error page that points back to /screener). ScreenerFlow callback signature changed from (result) to (result, answers) so the parent can POST. Inline result continues to render instantly client-side; the server round-trip is best-effort and runs in the background. ESLint rule updated to allow @contexts/<name>/server as a sanctioned public surface (ADR 001 amendment). Bug caught + fixed during gates: `import 'server-only'` in implementation modules broke vitest \u2014 moved the directive only to server.ts, kept implementation modules importable. zod installed for body validation. 9 new tests RED-then-GREEN; 263/263 pass; lint + typecheck clean; build green (16 routes; /screener client bundle still 4.94kB \u2014 server modules don't leak)."
       },
       {
         "id": 24,
         "epic": "E4. Eligibility screener",
         "title": "Results dossier UI",
         "description": "Build results page: hero refund metric (Berkeley Mono, large), confidence label, qualification verdict, prerequisites, recommended next step CTA.",
-        "details": "src/app/_components/screener/ResultsDossier.tsx — single canonical photographable surface used by both /screener (inline post-completion) and /screener/results?token (magic-link resume). Hero refund metric in Berkeley Mono at 4xl–6xl, confidence label in customs-orange uppercase, one-sentence editorial verdict, prerequisites checklist (IOR / ACE / ACH / liquidation as 'Met' / 'Missing' rows), recommended next-step block with copy + single CTA. Disqualified variant carries the respectful explanation + 'we'll let you know if your situation changes' opt-in language. /screener/page.tsx and /screener/results/page.tsx both refactored to use it.",
+        "details": "src/app/_components/screener/ResultsDossier.tsx \u2014 single canonical photographable surface used by both /screener (inline post-completion) and /screener/results?token (magic-link resume). Hero refund metric in Berkeley Mono at 4xl\u20136xl, confidence label in customs-orange uppercase, one-sentence editorial verdict, prerequisites checklist (IOR / ACE / ACH / liquidation as 'Met' / 'Missing' rows), recommended next-step block with copy + single CTA. Disqualified variant carries the respectful explanation + 'we'll let you know if your situation changes' opt-in language. /screener/page.tsx and /screener/results/page.tsx both refactored to use it.",
         "testStrategy": "Snapshot test for layout; A11y; Playwright happy path; design review.",
         "priority": "high",
-        "dependencies": [22, 21],
+        "dependencies": [
+          22,
+          21
+        ],
         "status": "completed",
         "estimateHours": 6,
-        "source": ["PRD 01", "DESIGN-LANGUAGE.md"],
+        "source": [
+          "PRD 01",
+          "DESIGN-LANGUAGE.md"
+        ],
         "completedAt": "2026-04-21T08:11:00Z",
-        "completedNotes": "ResultsDossier: single canonical photographable surface used by both /screener inline (post-completion) and /screener/results?token (magic-link resume). Per PRD 01 + docs/DESIGN-LANGUAGE.md: hero refund metric in Berkeley Mono at 4xl–6xl with $-formatted thousands separators; confidence label in customs-orange uppercase ('CONFIDENCE: HIGH'); one-sentence editorial qualification verdict; prerequisites checklist (Importer of record / ACE access / ACH on file / Liquidation status known) as Met (positive) / Missing (warning) rows in a hairline-bordered <ul>; recommended next-step block with mono price label + plain-English rationale paragraph + single magazine-underline CTA to /how-it-works; optional 'we also sent these results to your inbox' footnote when emailSent. Disqualified variant: respectful headline, mono reason code, 'we'll let you know if your situation changes' opt-in language, link to /how-it-works for evaluators. /screener/page.tsx and /screener/results/page.tsx both refactored — the 90-line inline ScreenerResultCard removed; the ResumeResult removed; both now delegate to ResultsDossier. 8 new component tests RED-then-GREEN; 271/271 pass; lint + typecheck clean; build green (16 routes; /screener client bundle 5.67 kB — slight growth from including the dossier). HUMAN-VERIFICATION: design taste review — confirm the dossier reads photographable; live a11y audit; Playwright happy path against the dev server."
+        "completedNotes": "ResultsDossier: single canonical photographable surface used by both /screener inline (post-completion) and /screener/results?token (magic-link resume). Per PRD 01 + docs/DESIGN-LANGUAGE.md: hero refund metric in Berkeley Mono at 4xl\u20136xl with $-formatted thousands separators; confidence label in customs-orange uppercase ('CONFIDENCE: HIGH'); one-sentence editorial qualification verdict; prerequisites checklist (Importer of record / ACE access / ACH on file / Liquidation status known) as Met (positive) / Missing (warning) rows in a hairline-bordered <ul>; recommended next-step block with mono price label + plain-English rationale paragraph + single magazine-underline CTA to /how-it-works; optional 'we also sent these results to your inbox' footnote when emailSent. Disqualified variant: respectful headline, mono reason code, 'we'll let you know if your situation changes' opt-in language, link to /how-it-works for evaluators. /screener/page.tsx and /screener/results/page.tsx both refactored \u2014 the 90-line inline ScreenerResultCard removed; the ResumeResult removed; both now delegate to ResultsDossier. 8 new component tests RED-then-GREEN; 271/271 pass; lint + typecheck clean; build green (16 routes; /screener client bundle 5.67 kB \u2014 slight growth from including the dossier). HUMAN-VERIFICATION: design taste review \u2014 confirm the dossier reads photographable; live a11y audit; Playwright happy path against the dev server."
       },
       {
         "id": 25,
@@ -380,12 +501,18 @@
         "details": "src/shared/infra/db/schema/screener.ts: screener_sessions (id sess_*, jsonb answers + result, resultVersion text for audit) + leads (id lead_*, FK to screener_sessions with on-delete-set-null, UNIQUE(email, screener_session_id) for idempotency). Schema registry updated. drizzle/0001_screener.sql generated. ScreenerRepo contract + in-memory + Drizzle repos in src/contexts/screener/. Public surface split: index.ts UI-safe (types + pure helpers); server.ts (with `import 'server-only'`) exports the repo factory and pulls in node:crypto + postgres-js. 30-day / 12-month retention is documented; the purge worker lands in Phase-1 ops scaling.",
         "testStrategy": "Migration applies; integration test creates session + lead.",
         "priority": "high",
-        "dependencies": [2, 22],
+        "dependencies": [
+          2,
+          22
+        ],
         "status": "completed",
         "estimateHours": 3,
-        "source": ["PRD 01", "PRD 10"],
+        "source": [
+          "PRD 01",
+          "PRD 10"
+        ],
         "completedAt": "2026-04-21T07:53:00Z",
-        "completedNotes": "Drizzle schema: src/shared/infra/db/schema/screener.ts adds screener_sessions (id sess_*, jsonb answers + result, resultVersion text for audit, started/completed/created/updated timestamps) + leads (id lead_*, FK to screener_sessions ON DELETE SET NULL, UNIQUE(email, screener_session_id) backing idempotency). drizzle/0001_screener.sql generated cleanly (4 tables tracked total). ScreenerRepo contract in repo.ts; in-memory + Drizzle implementations. Public surface SPLIT: index.ts is UI-safe (types + pure helpers — no node:crypto, no postgres-js — so client bundles stay clean); server.ts (with `import 'server-only'`) exports getScreenerRepo, the in-memory + Drizzle factories. server-only package installed. 12 new tests RED-then-GREEN; 254/254 pass; lint + typecheck clean; build green (/screener still 4.79kB — no server code leaked into client bundle). Bug caught + fixed during gates: in-memory findLeadByEmail used strict > on equal-millisecond timestamps; switched to >= so the later insertion wins (matches Drizzle ORDER BY updated_at DESC). 30-day / 12-month retention is documented; the purge worker lands in Phase-1 ops scaling. Also corrected task #23's dependencies to include #25 — the magic-link flow needs these tables."
+        "completedNotes": "Drizzle schema: src/shared/infra/db/schema/screener.ts adds screener_sessions (id sess_*, jsonb answers + result, resultVersion text for audit, started/completed/created/updated timestamps) + leads (id lead_*, FK to screener_sessions ON DELETE SET NULL, UNIQUE(email, screener_session_id) backing idempotency). drizzle/0001_screener.sql generated cleanly (4 tables tracked total). ScreenerRepo contract in repo.ts; in-memory + Drizzle implementations. Public surface SPLIT: index.ts is UI-safe (types + pure helpers \u2014 no node:crypto, no postgres-js \u2014 so client bundles stay clean); server.ts (with `import 'server-only'`) exports getScreenerRepo, the in-memory + Drizzle factories. server-only package installed. 12 new tests RED-then-GREEN; 254/254 pass; lint + typecheck clean; build green (/screener still 4.79kB \u2014 no server code leaked into client bundle). Bug caught + fixed during gates: in-memory findLeadByEmail used strict > on equal-millisecond timestamps; switched to >= so the later insertion wins (matches Drizzle ORDER BY updated_at DESC). 30-day / 12-month retention is documented; the purge worker lands in Phase-1 ops scaling. Also corrected task #23's dependencies to include #25 \u2014 the magic-link flow needs these tables."
       },
       {
         "id": 26,
@@ -395,13 +522,19 @@
         "details": "Implementation-level verification: all 16 routes resolve including /screener, /screener/results, /api/screener/complete; 271/271 tests pass; build green. Magic-link flow complete (signing, persistence, idempotent lead, email queueing). ResultsDossier renders qualified + disqualified variants with PRD 01 spec. Human verification still owes: 2+ real importers walk the full flow, observed feedback captured as new tasks.",
         "testStrategy": "User testing; confusion points captured as new tasks.",
         "priority": "high",
-        "dependencies": [24, 25, 23],
+        "dependencies": [
+          24,
+          25,
+          23
+        ],
         "status": "completed",
         "estimateHours": 2,
-        "source": ["validation-checkpoint", "Checkpoint 2"],
+        "source": [
+          "validation-checkpoint",
+          "Checkpoint 2"
+        ],
         "completedAt": "2026-04-21T08:15:00Z",
-        "completedNotes": "Implementation-level checkpoint complete. /screener (interactive client component, 5.67kB), /screener/results (server-rendered with magic-link verify), /api/screener/complete (Zod-validated, idempotent lead, replay-safe email) all build + render. 38 screener-domain tests + 18 ScreenerFlow / AnswerInput / QuestionPrompt tests + 8 ResultsDossier tests + 9 magic-link/finalize tests + 12 repo tests = 85 screener-related tests total, all pass. Wave 4's flow is technically end-to-end. HUMAN-VERIFICATION OWES (PRD 01 acceptance criteria): (1) at least 2 real importers walk the screener at the dev server; (2) observed confusion points are captured as new tasks before Phase 0 ships; (3) confirm the ResultsDossier reads photographable — a founder should want to screenshot it; (4) a11y audit (axe-core); (5) live magic-link delivery via real Resend keys."
-
+        "completedNotes": "Implementation-level checkpoint complete. /screener (interactive client component, 5.67kB), /screener/results (server-rendered with magic-link verify), /api/screener/complete (Zod-validated, idempotent lead, replay-safe email) all build + render. 38 screener-domain tests + 18 ScreenerFlow / AnswerInput / QuestionPrompt tests + 8 ResultsDossier tests + 9 magic-link/finalize tests + 12 repo tests = 85 screener-related tests total, all pass. Wave 4's flow is technically end-to-end. HUMAN-VERIFICATION OWES (PRD 01 acceptance criteria): (1) at least 2 real importers walk the screener at the dev server; (2) observed confusion points are captured as new tasks before Phase 0 ships; (3) confirm the ResultsDossier reads photographable \u2014 a founder should want to screenshot it; (4) a11y audit (axe-core); (5) live magic-link delivery via real Resend keys."
       },
       {
         "id": 27,
@@ -411,25 +544,34 @@
         "details": "EmailTransport contract in src/shared/infra/email/types.ts; Resend transport + console transport (dev/test fallback per .ralph/PROMPT.md local-stub policy); cached factory chooses by RESEND_API_KEY env. renderEmail() returns HTML + plaintext via @react-email/render. EmailLayout shell wraps every template with the canonical 'Not legal advice' disclosure verbatim per .claude/rules/disclosure-language-required.md. ScreenerResultsEmail is the first template (used by tasks #23/#28 for the magic-link results delivery).",
         "testStrategy": "Send a test email to a dev address; render snapshot test for the template.",
         "priority": "high",
-        "dependencies": [4],
+        "dependencies": [
+          4
+        ],
         "status": "completed",
         "estimateHours": 4,
-        "source": ["ADR 012"],
+        "source": [
+          "ADR 012"
+        ],
         "completedAt": "2026-04-21T07:42:00Z",
-        "completedNotes": "resend + @react-email/components + @react-email/render installed. EmailTransport contract in types.ts (SendEmailInput / SendEmailResult / EmailTransport interfaces). Resend transport at resend-transport.ts (idempotency-key passthrough, error normalization). Console transport at console-transport.ts (logs + synthetic id, used in dev/tests when RESEND_API_KEY missing per .ralph/PROMPT.md local-stub policy). Factory in index.ts caches the selection per-process; throws if RESEND_API_KEY is set but EMAIL_FROM missing (refuses to send from unintended address). renderEmail() at render.ts returns HTML + plaintext via @react-email/render. EmailLayout shell at templates/_layout.tsx wraps every template with the canonical NOT_LEGAL_ADVICE_DISCLOSURE verbatim per .claude/rules/disclosure-language-required.md (imported from the same Disclosure module that the SiteFooter uses — single source of truth). First template ScreenerResultsEmail.tsx (used by tasks #23 + #28 for the screener-results magic-link delivery). 8 new tests RED-then-GREEN; 246/246 pass; lint + typecheck clean; build green. HUMAN-VERIFICATION: provision Resend account, configure DKIM/SPF on the sending domain, set RESEND_API_KEY + EMAIL_FROM env, send a real test message and confirm DKIM passes."
+        "completedNotes": "resend + @react-email/components + @react-email/render installed. EmailTransport contract in types.ts (SendEmailInput / SendEmailResult / EmailTransport interfaces). Resend transport at resend-transport.ts (idempotency-key passthrough, error normalization). Console transport at console-transport.ts (logs + synthetic id, used in dev/tests when RESEND_API_KEY missing per .ralph/PROMPT.md local-stub policy). Factory in index.ts caches the selection per-process; throws if RESEND_API_KEY is set but EMAIL_FROM missing (refuses to send from unintended address). renderEmail() at render.ts returns HTML + plaintext via @react-email/render. EmailLayout shell at templates/_layout.tsx wraps every template with the canonical NOT_LEGAL_ADVICE_DISCLOSURE verbatim per .claude/rules/disclosure-language-required.md (imported from the same Disclosure module that the SiteFooter uses \u2014 single source of truth). First template ScreenerResultsEmail.tsx (used by tasks #23 + #28 for the screener-results magic-link delivery). 8 new tests RED-then-GREEN; 246/246 pass; lint + typecheck clean; build green. HUMAN-VERIFICATION: provision Resend account, configure DKIM/SPF on the sending domain, set RESEND_API_KEY + EMAIL_FROM env, send a real test message and confirm DKIM passes."
       },
       {
         "id": 28,
         "epic": "E12. Lifecycle email + Inngest",
-        "title": "Lifecycle workflow #1 — screener-completed",
+        "title": "Lifecycle workflow #1 \u2014 screener-completed",
         "description": "Inngest workflow fires on screener completion; sends results dossier email.",
         "details": "Email links back to results page. Workflow is idempotent. finalize.ts publishes platform/screener.completed via a publishCompleted callback the route handler wires to inngest.send. The screener-completed workflow handler renders + sends the email with idempotencyKey 'screener-results:<sessionId>' so Inngest retries are safe. Workflows registry updated.",
-        "testStrategy": "Workflow test: trigger event → assert email step ran with correct payload.",
+        "testStrategy": "Workflow test: trigger event \u2192 assert email step ran with correct payload.",
         "priority": "high",
-        "dependencies": [27, 24],
+        "dependencies": [
+          27,
+          24
+        ],
         "status": "completed",
         "estimateHours": 3,
-        "source": ["PRD 05"],
+        "source": [
+          "PRD 05"
+        ],
         "completedAt": "2026-04-21T08:27:00Z",
         "completedNotes": "platform/screener.completed event added to the typed catalog (eventType + staticSchema). screener-completed workflow handler in src/contexts/screener/workflows/screener-completed.ts: 2 step.run calls (render-email + send-email), idempotencyKey 'screener-results:<sessionId>' so Inngest retries are safe. Wrapped via inngest.createFunction with triggers:[screenerCompleted]; handler exported separately so unit tests bypass the Inngest wrapper. Workflows registry now includes screenerCompletedWorkflow alongside the smoke workflow. finalize.ts REFACTORED: previously rendered+sent the email inline; now publishes via a publishCompleted callback and the route handler wires inngest.send into it. The change makes delivery durable, replayable, AND the trigger for downstream cadences (24h/72h nudges in tasks #29/#30). 2 new workflow handler tests + finalize tests refactored to assert the publish payload shape; 273/273 pass; lint + typecheck clean; build green (16 routes). server-only package aliased to a no-op module in vitest config so server-only entry points (@contexts/<name>/server) remain importable in tests; production builds see the real package."
       },
@@ -441,12 +583,16 @@
         "details": "nudgeCadenceWorkflow triggered by platform/screener.completed. Two waitForEvent windows (24h + 48h additional) listening for platform/payment.completed filtered to the same sessionId. Nudge templates ScreenerNudge24hEmail (soft 'recovery comes first' framing) + ScreenerNudge72hEmail (founder-style 'hard part is records' framing). Both honour the canonical disclosure footer. Distinct idempotency keys per cadence step ('screener-nudge-24h:<sessionId>', 'screener-nudge-72h:<sessionId>'). platform/payment.completed event added to the catalog (Stripe webhook in task #33 will publish it).",
         "testStrategy": "Workflow test: simulate time advance; assert correct emails fire and stop on purchase.",
         "priority": "medium",
-        "dependencies": [28],
+        "dependencies": [
+          28
+        ],
         "status": "completed",
         "estimateHours": 4,
-        "source": ["PRD 05"],
+        "source": [
+          "PRD 05"
+        ],
         "completedAt": "2026-04-21T08:35:00Z",
-        "completedNotes": "nudgeCadenceWorkflow triggered by platform/screener.completed (runs in parallel with the screener-completed workflow — results email goes out instantly, nudges wait). Two step.waitForEvent windows (24h then 48h more) listening for platform/payment.completed filtered to the same sessionId via Inngest's `if` expression. On purchase: cadence stops with cancelledBy ('purchase-during-24h-window' or '...-72h-window'). On timeout: send nudge with sessionId-scoped idempotencyKey for retry safety. Two new email templates (ScreenerNudge24hEmail soft-recovery framing + ScreenerNudge72hEmail founder-style records framing); both wrap in EmailLayout so the canonical disclosure rides on every send. platform/payment.completed event added to the typed catalog (Stripe webhook in task #33 will publish it). 4 new workflow tests (no-purchase fires both, purchase-in-window-1 cancels both, purchase-in-window-2 sends nudge 1 only, idempotencyKey assertions); 277/277 pass; lint + typecheck clean; build green. HUMAN-VERIFICATION: walk the cadence in Inngest dev UI — observe the two waitForEvent steps, simulate a payment.completed event mid-window, confirm the cadence cancels."
+        "completedNotes": "nudgeCadenceWorkflow triggered by platform/screener.completed (runs in parallel with the screener-completed workflow \u2014 results email goes out instantly, nudges wait). Two step.waitForEvent windows (24h then 48h more) listening for platform/payment.completed filtered to the same sessionId via Inngest's `if` expression. On purchase: cadence stops with cancelledBy ('purchase-during-24h-window' or '...-72h-window'). On timeout: send nudge with sessionId-scoped idempotencyKey for retry safety. Two new email templates (ScreenerNudge24hEmail soft-recovery framing + ScreenerNudge72hEmail founder-style records framing); both wrap in EmailLayout so the canonical disclosure rides on every send. platform/payment.completed event added to the typed catalog (Stripe webhook in task #33 will publish it). 4 new workflow tests (no-purchase fires both, purchase-in-window-1 cancels both, purchase-in-window-2 sends nudge 1 only, idempotencyKey assertions); 277/277 pass; lint + typecheck clean; build green. HUMAN-VERIFICATION: walk the cadence in Inngest dev UI \u2014 observe the two waitForEvent steps, simulate a payment.completed event mid-window, confirm the cadence cancels."
       },
       {
         "id": 30,
@@ -456,26 +602,34 @@
         "details": "Each fire records audit row.",
         "testStrategy": "Workflow test with simulated time advance.",
         "priority": "medium",
-        "dependencies": [28, 51],
+        "dependencies": [
+          28,
+          51
+        ],
         "status": "pending",
         "estimateHours": 4,
-        "source": ["PRD 04"]
+        "source": [
+          "PRD 04"
+        ]
       },
       {
         "id": 31,
         "epic": "E12. Lifecycle email + Inngest",
-        "title": "Lifecycle templates 4–9",
+        "title": "Lifecycle templates 4\u20139",
         "description": "Build remaining lifecycle templates: recovery purchased, missing docs, entry list ready, prep ready, concierge upsell, day-14 re-engagement.",
         "details": "Six new React Email templates wrapping the canonical EmailLayout (so the 'Not legal advice' disclosure rides on every send). Shared editorial primitives (H1, P, PrimaryCta, SecondaryLink, greetingFor) extracted to templates/_components.tsx so the templates stay short and consistent. Each template carries the right CTA URL + a per-template preview line.",
         "testStrategy": "Snapshot tests per template.",
         "priority": "medium",
-        "dependencies": [27],
+        "dependencies": [
+          27
+        ],
         "status": "completed",
         "estimateHours": 6,
-        "source": ["PRD 05"],
+        "source": [
+          "PRD 05"
+        ],
         "completedAt": "2026-04-21T08:42:00Z",
-        "completedNotes": "Six new templates per PRD 05 lifecycle table (#4–#9): RecoveryPurchasedEmail (#4 — welcome + first task), RecoveryMissingDocsEmail (#5 — 96h check-in with 15-min call offer), EntryListReadyEmail (#6 — restrained celebration + entry count + Prep next step), PrepReadyEmail (#7 — Readiness Report delivered + Concierge upsell), ConciergeUpsellEmail (#8 — at-the-moment-of-need framing with success-fee mechanic), ReengagementEmail (#9 — day-14 soft re-entry, no pressure). Shared editorial primitives extracted to templates/_components.tsx (H1, P with size/muted variants, PrimaryCta ink-on-paper button, SecondaryLink accent-underlined, greetingFor helper). Every template wraps EmailLayout so the canonical NOT_LEGAL_ADVICE_DISCLOSURE rides on every send (single source of truth per .claude/rules/disclosure-language-required.md). Each carries a per-template preview line for inbox preview. 6 new render-snapshot tests RED-then-GREEN; 283/283 pass; lint + typecheck clean; build green. The lifecycle workflows that publish these emails (recovery-purchased trigger, prep-ready trigger, etc.) land in their respective Phase-1 ops-scaling tasks; templates are ready when those workflows arrive."
-
+        "completedNotes": "Six new templates per PRD 05 lifecycle table (#4\u2013#9): RecoveryPurchasedEmail (#4 \u2014 welcome + first task), RecoveryMissingDocsEmail (#5 \u2014 96h check-in with 15-min call offer), EntryListReadyEmail (#6 \u2014 restrained celebration + entry count + Prep next step), PrepReadyEmail (#7 \u2014 Readiness Report delivered + Concierge upsell), ConciergeUpsellEmail (#8 \u2014 at-the-moment-of-need framing with success-fee mechanic), ReengagementEmail (#9 \u2014 day-14 soft re-entry, no pressure). Shared editorial primitives extracted to templates/_components.tsx (H1, P with size/muted variants, PrimaryCta ink-on-paper button, SecondaryLink accent-underlined, greetingFor helper). Every template wraps EmailLayout so the canonical NOT_LEGAL_ADVICE_DISCLOSURE rides on every send (single source of truth per .claude/rules/disclosure-language-required.md). Each carries a per-template preview line for inbox preview. 6 new render-snapshot tests RED-then-GREEN; 283/283 pass; lint + typecheck clean; build green. The lifecycle workflows that publish these emails (recovery-purchased trigger, prep-ready trigger, etc.) land in their respective Phase-1 ops-scaling tasks; templates are ready when those workflows arrive."
       },
       {
         "id": 32,
@@ -485,10 +639,17 @@
         "details": "Founder + ops review. Capture rewrites as new tasks.",
         "testStrategy": "Manual review.",
         "priority": "medium",
-        "dependencies": [28, 29, 30, 31],
+        "dependencies": [
+          28,
+          29,
+          30,
+          31
+        ],
         "status": "pending",
         "estimateHours": 1,
-        "source": ["validation-checkpoint"]
+        "source": [
+          "validation-checkpoint"
+        ]
       },
       {
         "id": 33,
@@ -496,29 +657,38 @@
         "title": "Stripe SDK integration + webhook handler",
         "description": "Install Stripe, set up webhook route /api/stripe/webhooks, idempotent event handling.",
         "details": "stripe SDK installed. processed_stripe_events table (event_id PK + event_type + processedAt) backs ON CONFLICT DO NOTHING dedupe per ADR 005. BillingRepo contract + in-memory + Drizzle implementations. handleStripeEvent dispatcher: marks-then-dispatches (duplicate returns no-op without side effects); checkout.session.completed publishes platform/payment.completed (cancels nudge cadence in #29 + advances case state in #41); other event types are silent no-ops recorded in dedupe table for audit. POST /api/webhooks/stripe verifies signature via constructEventAsync + STRIPE_WEBHOOK_SECRET. Public-surface split: index.ts UI-safe; server.ts (server-only) has the Stripe client + repo factory.",
-        "testStrategy": "Replay same event twice — only one DB effect.",
+        "testStrategy": "Replay same event twice \u2014 only one DB effect.",
         "priority": "high",
-        "dependencies": [2],
+        "dependencies": [
+          2
+        ],
         "status": "completed",
         "estimateHours": 4,
-        "source": ["ADR 005"],
+        "source": [
+          "ADR 005"
+        ],
         "completedAt": "2026-04-21T08:50:00Z",
-        "completedNotes": "stripe SDK installed. src/shared/infra/db/schema/billing.ts adds processed_stripe_events (event_id PK + event_type + processedAt) backing ON CONFLICT DO NOTHING dedupe per ADR 005. drizzle/0002_billing.sql generated cleanly (5 tables tracked total). BillingRepo contract in src/contexts/billing/repo.ts; in-memory + Drizzle implementations. handleStripeEvent in event-handler.ts: marks-then-dispatches (duplicate returns {status: 'duplicate'} without firing the publish callback); checkout.session.completed extracts metadata.screenerSessionId / sku / payment_intent / amount_total / customer_email and publishes platform/payment.completed (which cancels the nudge cadence from #29 and will advance the case state machine in #41); other event types are silent no-ops recorded in the dedupe table for audit. POST /api/webhooks/stripe verifies the Stripe-Signature header via stripe.webhooks.constructEventAsync + STRIPE_WEBHOOK_SECRET; logs success/duplicate/error via observability adapters. Public-surface split: src/contexts/billing/index.ts is UI-safe (types + handler); src/contexts/billing/server.ts (with import 'server-only') exposes getBillingRepo + getStripeClient (Stripe client uses 2026-03-25.dahlia api version). 9 new tests RED-then-GREEN including the explicit REPLAY assertion (same event id twice → publish called once); 292/292 pass; lint + typecheck clean; build green (17 routes — /api/webhooks/stripe added). HUMAN-VERIFICATION: provision Stripe test mode + STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET; use stripe-cli `stripe listen` to forward events locally; verify a real checkout.session.completed publishes the cadence-cancel event."
+        "completedNotes": "stripe SDK installed. src/shared/infra/db/schema/billing.ts adds processed_stripe_events (event_id PK + event_type + processedAt) backing ON CONFLICT DO NOTHING dedupe per ADR 005. drizzle/0002_billing.sql generated cleanly (5 tables tracked total). BillingRepo contract in src/contexts/billing/repo.ts; in-memory + Drizzle implementations. handleStripeEvent in event-handler.ts: marks-then-dispatches (duplicate returns {status: 'duplicate'} without firing the publish callback); checkout.session.completed extracts metadata.screenerSessionId / sku / payment_intent / amount_total / customer_email and publishes platform/payment.completed (which cancels the nudge cadence from #29 and will advance the case state machine in #41); other event types are silent no-ops recorded in the dedupe table for audit. POST /api/webhooks/stripe verifies the Stripe-Signature header via stripe.webhooks.constructEventAsync + STRIPE_WEBHOOK_SECRET; logs success/duplicate/error via observability adapters. Public-surface split: src/contexts/billing/index.ts is UI-safe (types + handler); src/contexts/billing/server.ts (with import 'server-only') exposes getBillingRepo + getStripeClient (Stripe client uses 2026-03-25.dahlia api version). 9 new tests RED-then-GREEN including the explicit REPLAY assertion (same event id twice \u2192 publish called once); 292/292 pass; lint + typecheck clean; build green (17 routes \u2014 /api/webhooks/stripe added). HUMAN-VERIFICATION: provision Stripe test mode + STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET; use stripe-cli `stripe listen` to forward events locally; verify a real checkout.session.completed publishes the cadence-cancel event."
       },
       {
         "id": 34,
         "epic": "E5. Stripe + pricing ladder",
         "title": "Pricing ladder in code (pricing.ts)",
-        "description": "src/contexts/billing/pricing.ts — types, ladder, tier-determining function, success-fee config.",
-        "details": "PRICE_LADDER (6 SKUs × 2 tiers, USD cents); SUCCESS_FEE_RATES (SMB 10–12%, mid-market 8–10%); SUCCESS_FEE_HARD_CAP $50k per case. determineTier({ entryCount, dutyAmountUsdCents }) — strict > thresholds (100 entries, $50k duty). priceFor(sku, tier). computeSuccessFeeCents({ refund, tier, rate? }) — clamps rate into the tier band, applies hard cap, rounds to whole cents, 0 on non-positive refund.",
+        "description": "src/contexts/billing/pricing.ts \u2014 types, ladder, tier-determining function, success-fee config.",
+        "details": "PRICE_LADDER (6 SKUs \u00d7 2 tiers, USD cents); SUCCESS_FEE_RATES (SMB 10\u201312%, mid-market 8\u201310%); SUCCESS_FEE_HARD_CAP $50k per case. determineTier({ entryCount, dutyAmountUsdCents }) \u2014 strict > thresholds (100 entries, $50k duty). priceFor(sku, tier). computeSuccessFeeCents({ refund, tier, rate? }) \u2014 clamps rate into the tier band, applies hard cap, rounds to whole cents, 0 on non-positive refund.",
         "testStrategy": "Unit tests cover SMB / mid-market boundaries; success-fee math; clamp logic.",
         "priority": "high",
-        "dependencies": [1],
+        "dependencies": [
+          1
+        ],
         "status": "completed",
         "estimateHours": 4,
-        "source": ["PRD 06", "ADR 005"],
+        "source": [
+          "PRD 06",
+          "ADR 005"
+        ],
         "completedAt": "2026-04-21T08:56:00Z",
-        "completedNotes": "src/contexts/billing/pricing.ts: PRICE_LADDER (6 SKUs × 2 tiers, all amounts in USD cents — Stripe's lingua franca); SUCCESS_FEE_RATES per PRD 06 (SMB { min: 0.10, max: 0.12 }, mid-market { min: 0.08, max: 0.10 }); SUCCESS_FEE_HARD_CAP $50k per case (a blanket dollar cap is the simplest defensible policy — if a future case warrants more it's a deliberate ladder change, not quiet drift). determineTier strict > thresholds (entryCount > 100 OR dutyAmount > $50k → mid_market) so the boundary cases land as SMB. priceFor(sku, tier) and computeSuccessFeeCents({ refund, tier, rate? }) helpers; rate is clamped to tier band [min, max], result rounded to whole cents, zero on non-positive refund. Re-exported from src/contexts/billing/index.ts (UI-safe — pure helpers + types). 27 new tests including ladder-table coverage, tier boundary tests, rate clamp behavior (low→min, high→max, default→min), $50k hard cap on a $1M refund, fractional-cent rounding, zero/negative refund handling. 319/319 pass; lint + typecheck clean; build green. Coverage on the pricing module is 100%; the billing context's overall coverage (69%) sits below the 80% threshold because the Drizzle repo can't unit-test without a real DB — qa script doesn't enforce coverage threshold (only test:coverage does), so build is green. HUMAN-VERIFICATION: review SUCCESS_FEE_HARD_CAP with founder/legal — $50k is a reasonable initial policy but worth confirming."
+        "completedNotes": "src/contexts/billing/pricing.ts: PRICE_LADDER (6 SKUs \u00d7 2 tiers, all amounts in USD cents \u2014 Stripe's lingua franca); SUCCESS_FEE_RATES per PRD 06 (SMB { min: 0.10, max: 0.12 }, mid-market { min: 0.08, max: 0.10 }); SUCCESS_FEE_HARD_CAP $50k per case (a blanket dollar cap is the simplest defensible policy \u2014 if a future case warrants more it's a deliberate ladder change, not quiet drift). determineTier strict > thresholds (entryCount > 100 OR dutyAmount > $50k \u2192 mid_market) so the boundary cases land as SMB. priceFor(sku, tier) and computeSuccessFeeCents({ refund, tier, rate? }) helpers; rate is clamped to tier band [min, max], result rounded to whole cents, zero on non-positive refund. Re-exported from src/contexts/billing/index.ts (UI-safe \u2014 pure helpers + types). 27 new tests including ladder-table coverage, tier boundary tests, rate clamp behavior (low\u2192min, high\u2192max, default\u2192min), $50k hard cap on a $1M refund, fractional-cent rounding, zero/negative refund handling. 319/319 pass; lint + typecheck clean; build green. Coverage on the pricing module is 100%; the billing context's overall coverage (69%) sits below the 80% threshold because the Drizzle repo can't unit-test without a real DB \u2014 qa script doesn't enforce coverage threshold (only test:coverage does), so build is green. HUMAN-VERIFICATION: review SUCCESS_FEE_HARD_CAP with founder/legal \u2014 $50k is a reasonable initial policy but worth confirming."
       },
       {
         "id": 35,
@@ -526,12 +696,18 @@
         "title": "Stripe catalog sync script",
         "description": "Deploy-time script that reconciles pricing.ts with Stripe products/prices; archives obsolete prices.",
         "details": "Run via `npm run stripe:sync`; idempotent. Logs every diff.",
-        "testStrategy": "Run twice — second run is no-op.",
+        "testStrategy": "Run twice \u2014 second run is no-op.",
         "priority": "high",
-        "dependencies": [34],
-        "status": "pending",
+        "dependencies": [
+          34
+        ],
+        "status": "completed",
         "estimateHours": 4,
-        "source": ["PRD 06"]
+        "source": [
+          "PRD 06"
+        ],
+        "completedAt": "2026-04-21T09:10:00Z",
+        "completedNotes": "Stripe catalog sync script (npm run stripe:sync). planCatalogSync(snapshot)\u2192Plan is pure: diff against PRICE_LADDER, tags products with metadata.app=tariff-refund-request, uses lookup_key=trr__<sku>__<tier> for stable lookup, archives stale prices on amount drift, archives obsolete products when SKUs leave the ladder. SKU_RECURRENCE: monitoring=monthly, others=one_time. executeCatalogPlan applies plan via narrow StripeCatalogClient surface (real impl in stripe-catalog-client.ts). Re-running on the resulting snapshot returns isNoOp=true \u2014 idempotency property frozen by tests. CLI handles missing STRIPE_SECRET_KEY gracefully (skip + notice). Added tsconfig.scripts.json (stubs server-only via vitest noop) so the tsx script can import @contexts/billing/server. Re-exported catalog client from billing/server.ts. 17 new tests; 336/336 pass; lint + typecheck clean; build green (17 routes, /screener 5.67kB unchanged)."
       },
       {
         "id": 36,
@@ -541,10 +717,15 @@
         "details": "Includes success/cancel URLs; metadata carries case id and SKU; idempotency keys.",
         "testStrategy": "Integration: hit Checkout, complete in test mode via Stripe CLI, webhook updates case.",
         "priority": "high",
-        "dependencies": [33, 35],
+        "dependencies": [
+          33,
+          35
+        ],
         "status": "pending",
         "estimateHours": 5,
-        "source": ["PRD 06"]
+        "source": [
+          "PRD 06"
+        ]
       },
       {
         "id": 37,
@@ -554,23 +735,33 @@
         "details": "Idempotent on Stripe event id. Refund clamp logic for success fee.",
         "testStrategy": "Integration tests for happy path, refund, success-fee clamp.",
         "priority": "high",
-        "dependencies": [33, 50],
+        "dependencies": [
+          33,
+          50
+        ],
         "status": "pending",
         "estimateHours": 5,
-        "source": ["PRD 06"]
+        "source": [
+          "PRD 06"
+        ]
       },
       {
         "id": 38,
         "epic": "USER-TEST",
         "title": "USER-TEST: End-to-end purchase in test mode",
-        "description": "Complete a real Checkout for each SKU; confirm webhook → case state transitions cleanly.",
+        "description": "Complete a real Checkout for each SKU; confirm webhook \u2192 case state transitions cleanly.",
         "details": "Use Stripe test cards. Verify Payment row created, case state advances, no duplicates on webhook replay.",
         "testStrategy": "Manual end-to-end + Stripe CLI replay.",
         "priority": "high",
-        "dependencies": [36, 37],
+        "dependencies": [
+          36,
+          37
+        ],
         "status": "pending",
         "estimateHours": 1,
-        "source": ["validation-checkpoint"]
+        "source": [
+          "validation-checkpoint"
+        ]
       },
       {
         "id": 39,
@@ -580,36 +771,52 @@
         "details": "audit_log fields: id, caseId, actorId, kind, fromState, toState, payload jsonb, occurredAt. RLS denies DELETE for all roles.",
         "testStrategy": "Migration applies; attempted DELETE on audit_log fails.",
         "priority": "high",
-        "dependencies": [2],
+        "dependencies": [
+          2
+        ],
         "status": "pending",
         "estimateHours": 3,
-        "source": ["PRD 04", "PRD 10"]
+        "source": [
+          "PRD 04",
+          "PRD 10"
+        ]
       },
       {
         "id": 40,
         "epic": "E6. Case state machine + audit log",
-        "title": "XState case machine — states + transitions",
+        "title": "XState case machine \u2014 states + transitions",
         "description": "src/contexts/ops/case-machine.ts encoding all 16 states + guarded transitions per PRD 04.",
         "details": "Pure machine, no I/O. Side effects declared as named actions.",
         "testStrategy": "Model-based tests via @xstate/test cover every transition.",
         "priority": "high",
-        "dependencies": [39],
+        "dependencies": [
+          39
+        ],
         "status": "pending",
         "estimateHours": 6,
-        "source": ["PRD 04", "ADR 008"]
+        "source": [
+          "PRD 04",
+          "ADR 008"
+        ]
       },
       {
         "id": 41,
         "epic": "E6. Case state machine + audit log",
-        "title": "Case service — transition() with audit logging",
-        "description": "Public surface in src/contexts/ops/index.ts: transition(caseId, event, actor) → result. Wraps machine + persists state + writes audit row.",
+        "title": "Case service \u2014 transition() with audit logging",
+        "description": "Public surface in src/contexts/ops/index.ts: transition(caseId, event, actor) \u2192 result. Wraps machine + persists state + writes audit row.",
         "details": "Single transactional write. Fires Inngest event on success.",
         "testStrategy": "Integration: invalid transitions rejected; valid transitions persist + audit row exists.",
         "priority": "high",
-        "dependencies": [40, 4],
+        "dependencies": [
+          40,
+          4
+        ],
         "status": "pending",
         "estimateHours": 5,
-        "source": ["PRD 04", "ADR 008"]
+        "source": [
+          "PRD 04",
+          "ADR 008"
+        ]
       },
       {
         "id": 42,
@@ -619,10 +826,15 @@
         "details": "Best-effort mirror; never blocks the transactional write. Failures retried via Inngest.",
         "testStrategy": "Integration: row appears in Axiom within 5s.",
         "priority": "medium",
-        "dependencies": [41, 5],
+        "dependencies": [
+          41,
+          5
+        ],
         "status": "pending",
         "estimateHours": 3,
-        "source": ["ADR 013"]
+        "source": [
+          "ADR 013"
+        ]
       },
       {
         "id": 43,
@@ -632,10 +844,15 @@
         "details": "Code review + grep for direct writes to cases.state. Ops staff review the audit log UX.",
         "testStrategy": "Static analysis + manual review.",
         "priority": "high",
-        "dependencies": [41, 42],
+        "dependencies": [
+          41,
+          42
+        ],
         "status": "pending",
         "estimateHours": 1,
-        "source": ["validation-checkpoint"]
+        "source": [
+          "validation-checkpoint"
+        ]
       },
       {
         "id": 44,
@@ -645,23 +862,35 @@
         "details": "Versioning enabled; immutable. Provenance fields per PRD 07.",
         "testStrategy": "Migration; integration test creates document with valid key shape.",
         "priority": "high",
-        "dependencies": [3, 39],
+        "dependencies": [
+          3,
+          39
+        ],
         "status": "pending",
         "estimateHours": 3,
-        "source": ["PRD 02", "PRD 07"]
+        "source": [
+          "PRD 02",
+          "PRD 07"
+        ]
       },
       {
         "id": 45,
         "epic": "E7. Document storage + uploads",
         "title": "Pre-signed upload endpoint + client",
-        "description": "POST /api/uploads → returns pre-signed PUT URL with 15-min expiry; client uploads direct to R2.",
+        "description": "POST /api/uploads \u2192 returns pre-signed PUT URL with 15-min expiry; client uploads direct to R2.",
         "details": "Type-restricted (PDF, XLSX, CSV, EML). Per-customer quota for paid tier.",
         "testStrategy": "Integration: request URL, upload file, document row created on completion.",
         "priority": "high",
-        "dependencies": [44, 10],
+        "dependencies": [
+          44,
+          10
+        ],
         "status": "pending",
         "estimateHours": 5,
-        "source": ["PRD 02", "PRD 07"]
+        "source": [
+          "PRD 02",
+          "PRD 07"
+        ]
       },
       {
         "id": 46,
@@ -671,10 +900,15 @@
         "details": "Accent-colored progress bar; restraint per design language.",
         "testStrategy": "Playwright: drop multiple files, confirm all upload.",
         "priority": "high",
-        "dependencies": [45, 12],
+        "dependencies": [
+          45,
+          12
+        ],
         "status": "pending",
         "estimateHours": 5,
-        "source": ["PRD 02"]
+        "source": [
+          "PRD 02"
+        ]
       },
       {
         "id": 47,
@@ -682,12 +916,16 @@
         "title": "Document viewer (PDF preview, zoom, pagination)",
         "description": "PDF viewer component for ops side-by-side workflow.",
         "details": "Use react-pdf or pdfjs-dist. Page nav, zoom, search.",
-        "testStrategy": "Component test renders sample PDF; e2e: ops user opens case → viewer renders.",
+        "testStrategy": "Component test renders sample PDF; e2e: ops user opens case \u2192 viewer renders.",
         "priority": "high",
-        "dependencies": [45],
+        "dependencies": [
+          45
+        ],
         "status": "pending",
         "estimateHours": 6,
-        "source": ["PRD 04"]
+        "source": [
+          "PRD 04"
+        ]
       },
       {
         "id": 48,
@@ -697,23 +935,33 @@
         "details": "Manual.",
         "testStrategy": "Manual.",
         "priority": "high",
-        "dependencies": [46, 47],
+        "dependencies": [
+          46,
+          47
+        ],
         "status": "pending",
         "estimateHours": 1,
-        "source": ["validation-checkpoint"]
+        "source": [
+          "validation-checkpoint"
+        ]
       },
       {
         "id": 49,
         "epic": "E8. Entry recovery workspace",
         "title": "Recovery routing module (broker/carrier/ACE)",
-        "description": "src/contexts/recovery/routing.ts — determineRecoveryPath + recoveryPlanFor.",
+        "description": "src/contexts/recovery/routing.ts \u2014 determineRecoveryPath + recoveryPlanFor.",
         "details": "Per ADR 015. Plan content snapshot-tested.",
         "testStrategy": "Table-driven tests for path determination; snapshot tests for plan content.",
         "priority": "high",
-        "dependencies": [20],
+        "dependencies": [
+          20
+        ],
         "status": "pending",
         "estimateHours": 4,
-        "source": ["PRD 02", "ADR 015"]
+        "source": [
+          "PRD 02",
+          "ADR 015"
+        ]
       },
       {
         "id": 50,
@@ -723,49 +971,72 @@
         "details": "Stored in src/contexts/recovery/templates/. Versioned.",
         "testStrategy": "Snapshot tests; rendered preview matches expected.",
         "priority": "high",
-        "dependencies": [49],
+        "dependencies": [
+          49
+        ],
         "status": "pending",
         "estimateHours": 5,
-        "source": ["PRD 02"]
+        "source": [
+          "PRD 02"
+        ]
       },
       {
         "id": 51,
         "epic": "E8. Entry recovery workspace",
         "title": "Customer recovery workspace UI (3-pane)",
-        "description": "Build /app/case/[id]/recovery — left: status+checklist; center: outreach kit; right: upload.",
+        "description": "Build /app/case/[id]/recovery \u2014 left: status+checklist; center: outreach kit; right: upload.",
         "details": "Status banner anchored; design language enforced.",
-        "testStrategy": "Playwright: customer purchases recovery → workspace renders with correct path content.",
+        "testStrategy": "Playwright: customer purchases recovery \u2192 workspace renders with correct path content.",
         "priority": "high",
-        "dependencies": [49, 50, 46],
+        "dependencies": [
+          49,
+          50,
+          46
+        ],
         "status": "pending",
         "estimateHours": 8,
-        "source": ["PRD 02", "DESIGN-LANGUAGE.md"]
+        "source": [
+          "PRD 02",
+          "DESIGN-LANGUAGE.md"
+        ]
       },
       {
         "id": 52,
         "epic": "E8. Entry recovery workspace",
         "title": "Ops recovery view + side-by-side viewer/form",
-        "description": "Build /ops/case/[id] — three-pane with PDF viewer + extraction form.",
+        "description": "Build /ops/case/[id] \u2014 three-pane with PDF viewer + extraction form.",
         "details": "Keyboard shortcuts (j/k/v/e/s). Berkeley Mono on numbers.",
         "testStrategy": "Playwright with ops role: open case, navigate via keyboard, save extraction.",
         "priority": "high",
-        "dependencies": [47, 41, 12],
+        "dependencies": [
+          47,
+          41,
+          12
+        ],
         "status": "pending",
         "estimateHours": 10,
-        "source": ["PRD 04"]
+        "source": [
+          "PRD 04"
+        ]
       },
       {
         "id": 53,
         "epic": "E8. Entry recovery workspace",
         "title": "Manual entry-extraction form + provenance write",
         "description": "Form for analyst to enter entry fields; saves with sourceRecordId; audit log records actor.",
-        "details": "Drag-region copy from PDF (P1 polish — basic copy/paste in MVP).",
-        "testStrategy": "Integration: save entry → row exists with sourceRecordId + audit row.",
+        "details": "Drag-region copy from PDF (P1 polish \u2014 basic copy/paste in MVP).",
+        "testStrategy": "Integration: save entry \u2192 row exists with sourceRecordId + audit row.",
         "priority": "high",
-        "dependencies": [52, 41],
+        "dependencies": [
+          52,
+          41
+        ],
         "status": "pending",
         "estimateHours": 6,
-        "source": ["PRD 02", "PRD 07"]
+        "source": [
+          "PRD 02",
+          "PRD 07"
+        ]
       },
       {
         "id": 54,
@@ -775,10 +1046,17 @@
         "details": "Customer purchases; uploads docs; analyst extracts; case transitions to entry_list_ready; customer notified.",
         "testStrategy": "End-to-end Playwright + manual review.",
         "priority": "high",
-        "dependencies": [51, 52, 53],
+        "dependencies": [
+          51,
+          52,
+          53
+        ],
         "status": "pending",
         "estimateHours": 2,
-        "source": ["validation-checkpoint", "Checkpoint 3"]
+        "source": [
+          "validation-checkpoint",
+          "Checkpoint 3"
+        ]
       },
       {
         "id": 55,
@@ -788,23 +1066,31 @@
         "details": "Per PRD 07 entity definitions.",
         "testStrategy": "Migration + integration test inserts valid entry.",
         "priority": "high",
-        "dependencies": [44],
+        "dependencies": [
+          44
+        ],
         "status": "pending",
         "estimateHours": 3,
-        "source": ["PRD 07"]
+        "source": [
+          "PRD 07"
+        ]
       },
       {
         "id": 56,
         "epic": "E9. Entry ingestion + normalization",
         "title": "Entry-number canonicalization function",
-        "description": "src/contexts/entries/canonicalize.ts — strips whitespace, normalizes separators, validates CBP format.",
+        "description": "src/contexts/entries/canonicalize.ts \u2014 strips whitespace, normalizes separators, validates CBP format.",
         "details": "Pure function, fully unit-tested with edge cases.",
         "testStrategy": "Unit tests cover known good/bad/edge formats.",
         "priority": "high",
-        "dependencies": [55],
+        "dependencies": [
+          55
+        ],
         "status": "pending",
         "estimateHours": 3,
-        "source": ["PRD 07"]
+        "source": [
+          "PRD 07"
+        ]
       },
       {
         "id": 57,
@@ -814,10 +1100,14 @@
         "details": "Surface 'review pair' UI in ops workspace.",
         "testStrategy": "Unit + integration tests against fixture sets.",
         "priority": "high",
-        "dependencies": [56],
+        "dependencies": [
+          56
+        ],
         "status": "pending",
         "estimateHours": 5,
-        "source": ["PRD 07"]
+        "source": [
+          "PRD 07"
+        ]
       },
       {
         "id": 58,
@@ -827,10 +1117,14 @@
         "details": "Window dates centralized in a single config.",
         "testStrategy": "Unit tests cover boundary dates.",
         "priority": "high",
-        "dependencies": [56],
+        "dependencies": [
+          56
+        ],
         "status": "pending",
         "estimateHours": 3,
-        "source": ["PRD 07"]
+        "source": [
+          "PRD 07"
+        ]
       },
       {
         "id": 59,
@@ -840,10 +1134,16 @@
         "details": "Use papaparse + Zod schema. Rejects malformed rows with structured error.",
         "testStrategy": "Golden-file tests against anonymized ACE fixture CSVs.",
         "priority": "high",
-        "dependencies": [55, 56, 58],
+        "dependencies": [
+          55,
+          56,
+          58
+        ],
         "status": "pending",
         "estimateHours": 5,
-        "source": ["PRD 07"]
+        "source": [
+          "PRD 07"
+        ]
       },
       {
         "id": 60,
@@ -853,36 +1153,52 @@
         "details": "Manual review of resulting entries table.",
         "testStrategy": "Manual.",
         "priority": "high",
-        "dependencies": [57, 58, 59],
+        "dependencies": [
+          57,
+          58,
+          59
+        ],
         "status": "pending",
         "estimateHours": 1,
-        "source": ["validation-checkpoint"]
+        "source": [
+          "validation-checkpoint"
+        ]
       },
       {
         "id": 61,
         "epic": "E10. CAPE schema + validator + CSV",
         "title": "CAPE Zod schema",
-        "description": "src/contexts/cape/schema.ts — entry row schema, batch schema, ReadinessReport schema.",
+        "description": "src/contexts/cape/schema.ts \u2014 entry row schema, batch schema, ReadinessReport schema.",
         "details": "Per ADR 014 + PRD 03.",
         "testStrategy": "Schema tests cover happy + 5+ edge cases each.",
         "priority": "high",
-        "dependencies": [55],
+        "dependencies": [
+          55
+        ],
         "status": "pending",
         "estimateHours": 4,
-        "source": ["PRD 03", "ADR 014"]
+        "source": [
+          "PRD 03",
+          "ADR 014"
+        ]
       },
       {
         "id": 62,
         "epic": "E10. CAPE schema + validator + CSV",
         "title": "Validator with severity-leveled issues",
-        "description": "Validator function: entries → ReadinessReport with blocking / warning / info issues.",
-        "details": "All validation rules per PRD 03 §Validation rules.",
+        "description": "Validator function: entries \u2192 ReadinessReport with blocking / warning / info issues.",
+        "details": "All validation rules per PRD 03 \u00a7Validation rules.",
         "testStrategy": "Golden-file tests against fixture batches in tests/fixtures/cape/ (clean, dupes, mixed-phase, malformed-date, missing-prereq).",
         "priority": "high",
-        "dependencies": [61],
+        "dependencies": [
+          61
+        ],
         "status": "pending",
         "estimateHours": 8,
-        "source": ["PRD 03", "ADR 014"]
+        "source": [
+          "PRD 03",
+          "ADR 014"
+        ]
       },
       {
         "id": 63,
@@ -892,10 +1208,14 @@
         "details": "Rejects when blocking issues present.",
         "testStrategy": "Golden-file CSV output diffed against expected.",
         "priority": "high",
-        "dependencies": [62],
+        "dependencies": [
+          62
+        ],
         "status": "pending",
         "estimateHours": 5,
-        "source": ["PRD 03"]
+        "source": [
+          "PRD 03"
+        ]
       },
       {
         "id": 64,
@@ -905,10 +1225,14 @@
         "details": "Premium tier auto-suggests; Standard tier shows recommendation as info.",
         "testStrategy": "Unit tests for grouping; integration: create batch from entries.",
         "priority": "high",
-        "dependencies": [62],
+        "dependencies": [
+          62
+        ],
         "status": "pending",
         "estimateHours": 5,
-        "source": ["PRD 03"]
+        "source": [
+          "PRD 03"
+        ]
       },
       {
         "id": 65,
@@ -916,12 +1240,17 @@
         "title": "QA checklist + analyst sign-off gate",
         "description": "Required checklist enforced server-side; analyst sign-off transitions case to submission_ready.",
         "details": "Sign-off records validator id, timestamp, note. Audit row written.",
-        "testStrategy": "Integration: missing item → sign-off rejected; complete → case advances.",
+        "testStrategy": "Integration: missing item \u2192 sign-off rejected; complete \u2192 case advances.",
         "priority": "high",
-        "dependencies": [62, 41],
+        "dependencies": [
+          62,
+          41
+        ],
         "status": "pending",
         "estimateHours": 5,
-        "source": ["PRD 04"]
+        "source": [
+          "PRD 04"
+        ]
       },
       {
         "id": 66,
@@ -931,10 +1260,16 @@
         "details": "Manual + golden-file diff.",
         "testStrategy": "Test suite + manual review.",
         "priority": "high",
-        "dependencies": [62, 63, 65],
+        "dependencies": [
+          62,
+          63,
+          65
+        ],
         "status": "pending",
         "estimateHours": 1,
-        "source": ["validation-checkpoint"]
+        "source": [
+          "validation-checkpoint"
+        ]
       },
       {
         "id": 67,
@@ -944,10 +1279,15 @@
         "details": "Custom font registration for GT Sectra + Berkeley Mono in PDF context.",
         "testStrategy": "Snapshot test of rendered PDF buffer.",
         "priority": "high",
-        "dependencies": [12],
+        "dependencies": [
+          12
+        ],
         "status": "pending",
         "estimateHours": 5,
-        "source": ["PRD 03", "DESIGN-LANGUAGE.md"]
+        "source": [
+          "PRD 03",
+          "DESIGN-LANGUAGE.md"
+        ]
       },
       {
         "id": 68,
@@ -957,10 +1297,15 @@
         "details": "Berkeley Mono numerics; hairline rules.",
         "testStrategy": "Snapshot + golden-file PDF comparison.",
         "priority": "high",
-        "dependencies": [67, 62],
+        "dependencies": [
+          67,
+          62
+        ],
         "status": "pending",
         "estimateHours": 6,
-        "source": ["PRD 03"]
+        "source": [
+          "PRD 03"
+        ]
       },
       {
         "id": 69,
@@ -970,10 +1315,15 @@
         "details": "Disclosures appear as real footnotes.",
         "testStrategy": "Visual diff and text-extraction assertion.",
         "priority": "high",
-        "dependencies": [68],
+        "dependencies": [
+          68
+        ],
         "status": "pending",
         "estimateHours": 4,
-        "source": ["PRD 03", "PRD 10"]
+        "source": [
+          "PRD 03",
+          "PRD 10"
+        ]
       },
       {
         "id": 70,
@@ -981,12 +1331,19 @@
         "title": "Artifact generation pipeline + R2 storage",
         "description": "On QA sign-off: generate CSV + PDF, upload to R2, return signed URLs to customer.",
         "details": "Workflow via Inngest; idempotent.",
-        "testStrategy": "Integration: sign-off → artifacts present in R2 → email sent with signed URL.",
+        "testStrategy": "Integration: sign-off \u2192 artifacts present in R2 \u2192 email sent with signed URL.",
         "priority": "high",
-        "dependencies": [65, 63, 69, 4],
+        "dependencies": [
+          65,
+          63,
+          69,
+          4
+        ],
         "status": "pending",
         "estimateHours": 5,
-        "source": ["PRD 03"]
+        "source": [
+          "PRD 03"
+        ]
       },
       {
         "id": 71,
@@ -996,10 +1353,14 @@
         "details": "Founder + design reviewer assess.",
         "testStrategy": "Subjective + design review.",
         "priority": "high",
-        "dependencies": [70],
+        "dependencies": [
+          70
+        ],
         "status": "pending",
         "estimateHours": 1,
-        "source": ["validation-checkpoint"]
+        "source": [
+          "validation-checkpoint"
+        ]
       },
       {
         "id": 72,
@@ -1009,23 +1370,33 @@
         "details": "Each signed copy records the version.",
         "testStrategy": "Render template; assert required clauses present.",
         "priority": "high",
-        "dependencies": [1],
+        "dependencies": [
+          1
+        ],
         "status": "pending",
         "estimateHours": 4,
-        "source": ["PRD 06", "PRD 10"]
+        "source": [
+          "PRD 06",
+          "PRD 10"
+        ]
       },
       {
         "id": 73,
         "epic": "E13. Trust posture + engagement letter",
         "title": "E-sign flow integration",
         "description": "Integrate e-signature provider (DocuSign API or similar) into Concierge purchase; payment captured only after signature.",
-        "details": "Webhook on signature completion → Stripe captures payment → case transitions concierge_active.",
+        "details": "Webhook on signature completion \u2192 Stripe captures payment \u2192 case transitions concierge_active.",
         "testStrategy": "End-to-end Playwright with provider sandbox.",
         "priority": "high",
-        "dependencies": [72, 36],
+        "dependencies": [
+          72,
+          36
+        ],
         "status": "pending",
         "estimateHours": 8,
-        "source": ["PRD 10"]
+        "source": [
+          "PRD 10"
+        ]
       },
       {
         "id": 74,
@@ -1035,10 +1406,14 @@
         "details": "Updates trigger lifecycle email to active customers (Phase 1).",
         "testStrategy": "Snapshot + A11y; design review.",
         "priority": "medium",
-        "dependencies": [17],
+        "dependencies": [
+          17
+        ],
         "status": "pending",
         "estimateHours": 3,
-        "source": ["PRD 10"]
+        "source": [
+          "PRD 10"
+        ]
       },
       {
         "id": 75,
@@ -1046,12 +1421,17 @@
         "title": "Customer data export + deletion endpoints",
         "description": "Customer can request and receive full JSON export; deletion processed within 30 days.",
         "details": "Audit log records deletion event without retaining content.",
-        "testStrategy": "Integration: request export → JSON delivered; request deletion → records purged after worker run.",
+        "testStrategy": "Integration: request export \u2192 JSON delivered; request deletion \u2192 records purged after worker run.",
         "priority": "medium",
-        "dependencies": [11, 39],
+        "dependencies": [
+          11,
+          39
+        ],
         "status": "pending",
         "estimateHours": 6,
-        "source": ["PRD 10"]
+        "source": [
+          "PRD 10"
+        ]
       },
       {
         "id": 76,
@@ -1061,36 +1441,54 @@
         "details": "Founder + outside reviewer (lawyer if available).",
         "testStrategy": "Manual review.",
         "priority": "high",
-        "dependencies": [73, 74, 75, 71],
+        "dependencies": [
+          73,
+          74,
+          75,
+          71
+        ],
         "status": "pending",
         "estimateHours": 2,
-        "source": ["validation-checkpoint"]
+        "source": [
+          "validation-checkpoint"
+        ]
       },
       {
         "id": 77,
         "epic": "E14. Ops console (queues, SLA, QA)",
         "title": "Queue list page + filters + saved views",
-        "description": "/ops route — queue list with state, SLA timer, owner; filters; saved views.",
+        "description": "/ops route \u2014 queue list with state, SLA timer, owner; filters; saved views.",
         "details": "Berkeley Mono, dense layout, design-language compliance.",
         "testStrategy": "Playwright with ops role; snapshot test.",
         "priority": "high",
-        "dependencies": [10, 41, 12],
+        "dependencies": [
+          10,
+          41,
+          12
+        ],
         "status": "pending",
         "estimateHours": 8,
-        "source": ["PRD 04"]
+        "source": [
+          "PRD 04"
+        ]
       },
       {
         "id": 78,
         "epic": "E14. Ops console (queues, SLA, QA)",
         "title": "Case workspace shell (3-pane layout)",
         "description": "Three-pane shell for case workspace; left action panel, center work surface, right document/audit/comments.",
-        "details": "Adaptive based on case state — different center surface per state.",
+        "details": "Adaptive based on case state \u2014 different center surface per state.",
         "testStrategy": "Playwright: navigate states, confirm correct surface renders.",
         "priority": "high",
-        "dependencies": [77, 47],
+        "dependencies": [
+          77,
+          47
+        ],
         "status": "pending",
         "estimateHours": 8,
-        "source": ["PRD 04"]
+        "source": [
+          "PRD 04"
+        ]
       },
       {
         "id": 79,
@@ -1100,10 +1498,15 @@
         "details": "Pure read of audit_log table.",
         "testStrategy": "Component test with fixture audit log.",
         "priority": "medium",
-        "dependencies": [78, 39],
+        "dependencies": [
+          78,
+          39
+        ],
         "status": "pending",
         "estimateHours": 4,
-        "source": ["PRD 04"]
+        "source": [
+          "PRD 04"
+        ]
       },
       {
         "id": 80,
@@ -1113,10 +1516,15 @@
         "details": "CaseAssignment table; conflict resolution on simultaneous claim.",
         "testStrategy": "Integration: two staff race a claim; only one wins; audit row.",
         "priority": "medium",
-        "dependencies": [78, 11],
+        "dependencies": [
+          78,
+          11
+        ],
         "status": "pending",
         "estimateHours": 4,
-        "source": ["PRD 04"]
+        "source": [
+          "PRD 04"
+        ]
       },
       {
         "id": 81,
@@ -1126,10 +1534,14 @@
         "details": "Indicator color drawn from design-language status palette.",
         "testStrategy": "Unit tests for SLA math; visual snapshot of breach state.",
         "priority": "medium",
-        "dependencies": [77],
+        "dependencies": [
+          77
+        ],
         "status": "pending",
         "estimateHours": 4,
-        "source": ["PRD 04"]
+        "source": [
+          "PRD 04"
+        ]
       },
       {
         "id": 82,
@@ -1139,23 +1551,38 @@
         "details": "Accessible via screen reader.",
         "testStrategy": "Playwright: press `?`; modal renders; shortcuts work.",
         "priority": "low",
-        "dependencies": [78],
+        "dependencies": [
+          78
+        ],
         "status": "pending",
         "estimateHours": 2,
-        "source": ["PRD 04"]
+        "source": [
+          "PRD 04"
+        ]
       },
       {
         "id": 83,
         "epic": "USER-TEST",
         "title": "USER-TEST: Ops staff complete a full case in console",
-        "description": "Run two real cases through console end-to-end (recovery → prep → submission ready).",
+        "description": "Run two real cases through console end-to-end (recovery \u2192 prep \u2192 submission ready).",
         "details": "Time-track each stage to set baseline. Capture friction points as new tasks.",
         "testStrategy": "Manual + observation.",
         "priority": "high",
-        "dependencies": [77, 78, 79, 80, 81, 65, 70],
+        "dependencies": [
+          77,
+          78,
+          79,
+          80,
+          81,
+          65,
+          70
+        ],
         "status": "pending",
         "estimateHours": 3,
-        "source": ["validation-checkpoint", "Checkpoint 4"]
+        "source": [
+          "validation-checkpoint",
+          "Checkpoint 4"
+        ]
       },
       {
         "id": 84,
@@ -1165,75 +1592,121 @@
         "details": "Imports must go through `contexts/<name>/index.ts` public surface.",
         "testStrategy": "Failing-import fixture in test repo causes CI failure.",
         "priority": "medium",
-        "dependencies": [1, 6],
+        "dependencies": [
+          1,
+          6
+        ],
         "status": "pending",
         "estimateHours": 3,
-        "source": ["ADR 001"]
+        "source": [
+          "ADR 001"
+        ]
       },
       {
         "id": 85,
         "epic": "E1. Foundation",
         "title": "Internal funnel metrics instrumentation",
-        "description": "Wire screener → recovery → prep → concierge → paid funnel events to Axiom dashboard.",
-        "details": "Per PRD 00 §9 metrics list. No third-party analytics on customer surfaces (privacy posture).",
+        "description": "Wire screener \u2192 recovery \u2192 prep \u2192 concierge \u2192 paid funnel events to Axiom dashboard.",
+        "details": "Per PRD 00 \u00a79 metrics list. No third-party analytics on customer surfaces (privacy posture).",
         "testStrategy": "Trigger each event; query Axiom; values match.",
         "priority": "medium",
-        "dependencies": [5, 33, 41],
+        "dependencies": [
+          5,
+          33,
+          41
+        ],
         "status": "pending",
         "estimateHours": 5,
-        "source": ["PRD 00", "ADR 013"]
+        "source": [
+          "PRD 00",
+          "ADR 013"
+        ]
       },
       {
         "id": 86,
         "epic": "USER-TEST",
         "title": "USER-TEST: Phase 0 launch readiness review",
         "description": "Final gate: walk every flow as both customer and ops; confirm Checkpoint 4 criteria from PRD 11 met.",
-        "details": "Full end-to-end: traffic → screener → recovery → prep → readiness → concierge → filed (manual mark). Confirm trust pages, lifecycle emails, audit log, and design language reviews all green.",
+        "details": "Full end-to-end: traffic \u2192 screener \u2192 recovery \u2192 prep \u2192 readiness \u2192 concierge \u2192 filed (manual mark). Confirm trust pages, lifecycle emails, audit log, and design language reviews all green.",
         "testStrategy": "Manual + checklist; sign-off from founder.",
         "priority": "high",
-        "dependencies": [83, 76, 71, 66, 60, 54, 48, 43, 38, 32, 26, 19, 13, 7, 84, 85],
+        "dependencies": [
+          83,
+          76,
+          71,
+          66,
+          60,
+          54,
+          48,
+          43,
+          38,
+          32,
+          26,
+          19,
+          13,
+          7,
+          84,
+          85
+        ],
         "status": "pending",
         "estimateHours": 4,
-        "source": ["validation-checkpoint", "PRD 11 Checkpoint 4"]
+        "source": [
+          "validation-checkpoint",
+          "PRD 11 Checkpoint 4"
+        ]
       },
       {
         "id": 200,
-        "epic": "E15. Phase 1 — Ops scaling (deferred)",
+        "epic": "E15. Phase 1 \u2014 Ops scaling (deferred)",
         "title": "Phase 1 epic placeholder",
         "description": "Scope: side-by-side drag-region copy, outreach template library, reminder + stalled automation, internal notes + @-mentions, partner referral attribution + dashboard, mailbox forward integration, internal analytics dashboards.",
         "details": "Decompose into atomic tasks at start of Phase 1 (month 2).",
         "testStrategy": "TBD.",
         "priority": "low",
-        "dependencies": [86],
+        "dependencies": [
+          86
+        ],
         "status": "pending",
         "estimateHours": 0,
-        "source": ["PRD 11"]
+        "source": [
+          "PRD 11"
+        ]
       },
       {
         "id": 300,
-        "epic": "E16. Phase 2 — AI assist (deferred)",
+        "epic": "E16. Phase 2 \u2014 AI assist (deferred)",
         "title": "Phase 2 epic placeholder",
         "description": "Scope: OCR + LLM-assisted extraction, AI-drafted Readiness Report notes, triage assist, RAG knowledge surface, adaptive cadences, eval suite gates, per-case AI cost budgeting.",
         "details": "Use claude-api skill when implementing. Decompose at start of Phase 2 (month 4).",
         "testStrategy": "TBD.",
         "priority": "low",
-        "dependencies": [200],
+        "dependencies": [
+          200
+        ],
         "status": "pending",
         "estimateHours": 0,
-        "source": ["PRD 08", "PRD 11"]
+        "source": [
+          "PRD 08",
+          "PRD 11"
+        ]
       },
       {
         "id": 400,
-        "epic": "E17. Phase 3 — Partner & enterprise (deferred)",
+        "epic": "E17. Phase 3 \u2014 Partner & enterprise (deferred)",
         "title": "Phase 3 epic placeholder",
         "description": "Scope: multi-tenant orgs everywhere with RLS, co-branded screener embeds, white-label for first design partner, multi-entity case linking, portfolio dashboards, enterprise approval workflows, SOC 2 Type I.",
         "details": "Decompose at start of Phase 3 (month 7).",
         "testStrategy": "TBD.",
         "priority": "low",
-        "dependencies": [300],
+        "dependencies": [
+          300
+        ],
         "status": "pending",
         "estimateHours": 0,
-        "source": ["PRD 09", "PRD 11"]
+        "source": [
+          "PRD 09",
+          "PRD 11"
+        ]
       }
     ]
   }
