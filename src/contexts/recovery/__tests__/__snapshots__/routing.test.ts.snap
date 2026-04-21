@@ -1,0 +1,202 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`recoveryPlanFor — snapshot (full plan content frozen) > plan content is frozen for ace-self-export — change requires explicit snapshot update 1`] = `
+{
+  "acceptedDocs": [
+    "ace_export",
+    "other",
+  ],
+  "opsQueue": "recovery-ace",
+  "outreachTemplate": {
+    "body": "Hi {{importerName}},
+
+You have an ACE account, which is the cleanest path. Sign in at https://ace.cbp.dhs.gov, run the Entry Summary report for the date range {{windowStart}} to {{windowEnd}}, export as CSV, and upload it through the secure portal below.
+
+Step-by-step screenshots are linked from the workspace. If you would prefer, an analyst can join a 30-minute screen-share and walk through the export with you — just reply to this email.",
+    "placeholders": [
+      "importerName",
+      "windowStart",
+      "windowEnd",
+    ],
+    "subject": "ACE entry export walkthrough",
+  },
+  "path": "ace-self-export",
+  "prerequisiteChecks": [
+    {
+      "id": "ace_account",
+      "label": "Active ACE Portal account",
+      "required": true,
+    },
+    {
+      "id": "ior_status",
+      "label": "You are the importer of record",
+      "required": true,
+    },
+    {
+      "id": "ach_on_file",
+      "label": "ACH refund authorization on file",
+      "required": false,
+    },
+  ],
+  "sla": {
+    "completionHours": 24,
+    "firstTouchHours": 8,
+  },
+}
+`;
+
+exports[`recoveryPlanFor — snapshot (full plan content frozen) > plan content is frozen for broker — change requires explicit snapshot update 1`] = `
+{
+  "acceptedDocs": [
+    "broker_7501",
+    "broker_spreadsheet",
+    "other",
+  ],
+  "opsQueue": "recovery-broker",
+  "outreachTemplate": {
+    "body": "Hi {{brokerName}},
+
+We are working with {{importerName}} on an IEEPA tariff refund. Could you send the entry summaries (CBP Form 7501) for every entry filed under their importer of record number between {{windowStart}} and {{windowEnd}}? Please include any associated broker spreadsheets or reconciliation reports you produced for that period.
+
+If a CSV export is easier than individual 7501 PDFs, that works too — we accept .pdf, .xlsx, .csv, and forwarded .eml.
+
+Thank you,
+{{importerName}}",
+    "placeholders": [
+      "brokerName",
+      "importerName",
+      "windowStart",
+      "windowEnd",
+    ],
+    "subject": "Request for IEEPA tariff entry summaries",
+  },
+  "path": "broker",
+  "prerequisiteChecks": [
+    {
+      "id": "ior_status",
+      "label": "You are the importer of record",
+      "required": true,
+    },
+    {
+      "id": "broker_relationship",
+      "label": "Broker contact email available",
+      "required": true,
+    },
+    {
+      "id": "ach_on_file",
+      "label": "ACH refund authorization on file",
+      "required": false,
+    },
+  ],
+  "sla": {
+    "completionHours": 24,
+    "firstTouchHours": 4,
+  },
+}
+`;
+
+exports[`recoveryPlanFor — snapshot (full plan content frozen) > plan content is frozen for carrier — change requires explicit snapshot update 1`] = `
+{
+  "acceptedDocs": [
+    "carrier_invoice",
+    "broker_7501",
+    "other",
+  ],
+  "opsQueue": "recovery-carrier",
+  "outreachTemplate": {
+    "body": "Hi {{importerName}},
+
+For the carrier path you log into the carrier portal (DHL MyDHL+, FedEx eCustoms, UPS Quantum View) and pull every duty invoice for entries between {{windowStart}} and {{windowEnd}}. Export each invoice as a PDF or CSV and upload them through the secure portal below.
+
+If multiple carriers handled your shipments, repeat the process for each one. The accepted formats are .pdf, .xlsx, and .csv.
+
+Need help with a specific carrier — reply to this email and an analyst will walk you through it.",
+    "placeholders": [
+      "importerName",
+      "windowStart",
+      "windowEnd",
+    ],
+    "subject": "IEEPA duty invoices — historical entries",
+  },
+  "path": "carrier",
+  "prerequisiteChecks": [
+    {
+      "id": "ior_status",
+      "label": "You are the importer of record",
+      "required": true,
+    },
+    {
+      "id": "carrier_account",
+      "label": "Carrier portal credentials available",
+      "required": true,
+    },
+    {
+      "id": "ach_on_file",
+      "label": "ACH refund authorization on file",
+      "required": false,
+    },
+  ],
+  "sla": {
+    "completionHours": 48,
+    "firstTouchHours": 4,
+  },
+}
+`;
+
+exports[`recoveryPlanFor — snapshot (full plan content frozen) > plan content is frozen for mixed — change requires explicit snapshot update 1`] = `
+{
+  "acceptedDocs": [
+    "ace_export",
+    "broker_7501",
+    "broker_spreadsheet",
+    "carrier_invoice",
+    "other",
+  ],
+  "opsQueue": "recovery-broker",
+  "outreachTemplate": {
+    "body": "Hi {{importerName}},
+
+Because your shipments cleared through more than one path (broker + carrier or ACE + broker), we will collect entries from each path you used. The workspace lets you upload documents from any source — broker 7501s, carrier invoices, and ACE exports are all accepted in the same case.
+
+An analyst will reconcile the entries across sources and flag any duplicates before the entry list is finalized.",
+    "placeholders": [
+      "importerName",
+      "windowStart",
+      "windowEnd",
+    ],
+    "subject": "IEEPA tariff entry collection — mixed clearance",
+  },
+  "path": "mixed",
+  "prerequisiteChecks": [
+    {
+      "id": "ior_status",
+      "label": "You are the importer of record",
+      "required": true,
+    },
+    {
+      "id": "broker_relationship",
+      "label": "Broker contact email available",
+      "required": false,
+    },
+    {
+      "id": "carrier_account",
+      "label": "Carrier portal credentials available",
+      "required": false,
+    },
+    {
+      "id": "ace_account",
+      "label": "Active ACE Portal account",
+      "required": false,
+    },
+    {
+      "id": "ach_on_file",
+      "label": "ACH refund authorization on file",
+      "required": false,
+    },
+  ],
+  "sla": {
+    "completionHours": 48,
+    "firstTouchHours": 4,
+  },
+}
+`;

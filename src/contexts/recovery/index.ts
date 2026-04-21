@@ -35,3 +35,17 @@ export type {
   PrepareUploadResult,
 } from './upload'
 export { completeUpload, prepareUpload } from './upload'
+
+export type {
+  OutreachEmailTemplate,
+  PrerequisiteCheck,
+  RecoveryPath,
+  RecoveryPlan,
+  RecoverySLA,
+} from './routing'
+export {
+  RECOVERY_QUEUES,
+  SCHEMA_TO_RECOVERY_PATH,
+  determineRecoveryPath,
+  recoveryPlanFor,
+} from './routing'

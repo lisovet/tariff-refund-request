@@ -1,25 +1,23 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T10:41:00Z
+**Updated**: 2026-04-21T10:48:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 44 → 45)
+**Loop state**: active (iteration 45 → 46)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 44 |
+| completed | 45 |
 | in-progress | 0 |
-| pending | 42 |
+| pending | 41 |
 | human-blocked | 0 |
-
-Past the halfway mark on Phase 0.
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 70 files, 507 tests pass |
+| `npm test` | green — 71 files, 533 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 21 routes |
@@ -27,34 +25,32 @@ Past the halfway mark on Phase 0.
 
 ## Last completed task
 
-**#48 — USER-TEST checkpoint #5 (upload + viewer flow)**
+**#49 — Recovery routing module per ADR 015**
 
-Implementation-side scaffolding complete:
-
-- POST /api/uploads + POST /api/uploads/complete (#45) — 8 integration tests covering happy path, content-type rejection, oversized rejection, HEAD-failure, storage_key_mismatch, duplicate_sha256.
-- UploadZone component (#46) — 6 client + 9 component tests covering pre-validation, multi-file, drag-drop, retry, and duplicate_sha256 surfaces.
-- DocumentViewer component (#47) — 8 tests covering load/render/error states, page nav (buttons + arrow keys + boundary disable), zoom (in/out + min/max clamp), aria-live indicators.
-
-Provenance is captured at the schema level: `documents.case_id` NOT NULL, `documents.uploaded_by` + `uploaded_by_actor_id` recorded on every insert; `recovery_sources.documentId` NOT NULL (per the `.ralph/PROMPT.md` hard rule that EntryRecord provenance is never optional). UNIQUE `(case_id, sha256)` prevents accidental duplicates and surfaces them as `outcome: duplicate_sha256` (never a hard error).
+- `src/contexts/recovery/routing.ts` — pure module exposing `determineRecoveryPath(answers)` and `recoveryPlanFor(path)`.
+- `RecoveryPlan` carries `outreachTemplate` (subject + body with `{{placeholders}}`), `acceptedDocs`, `opsQueue`, `sla` (firstTouch + completion hours), and `prerequisiteChecks`. Four plans (broker, carrier, ace-self-export, mixed), all frozen via `toMatchSnapshot` so any plan change is visible in PR review.
+- UI + ops console MUST read from the plan, never branch on `path` per ADR 015's `no-recovery-path-conditionals` rule. Custom lint enforcement deferred to when the workspace lands (#51+).
+- `qualification.ts` refactored: removed inline `mapRecoveryPath`, now calls `determineRecoveryPath` from `@contexts/recovery` via the UI-safe public surface (no ADR-001 violation; the import is kept type-clean by re-exporting the function from `index.ts`).
+- `SCHEMA_TO_RECOVERY_PATH` bridges the snake_case schema enum (`ace_self_export`) to the ADR-015 kebab-case (`ace-self-export`).
+- 26 new tests (table-driven path determination + per-path queue/docs/SLA/template assertions + snapshot freeze + non-empty invariant). Existing 16 screener qualification tests still green after the refactor.
 
 ## Human-verification still owes
 
-- Copy `pdfjs-dist/build/pdf.worker.min.mjs` into `public/pdf-worker.mjs` (postinstall script or build step).
-- Provision real R2 bucket + CORS; upload several real documents (broker 7501s, broker spreadsheets, ACE export CSVs); render via DocumentViewer.
-- Confirm provenance trail is visible in the audit log + `recovery_sources` rows once the recovery workspace (#51) and ops console workspace (#82) wire the components into pages.
+- Sign off on the four plan snapshots — these are the customer-facing outreach templates and the ops queue assignments. Wording / SLA changes are deliberate ladder shifts, not silent drift.
+- Wire the custom `no-recovery-path-conditionals` ESLint rule once the recovery workspace lands in #51 — the rule should fail any UI conditional like `if (path === 'broker') ...` outside `routing.ts`.
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #49 (Recovery routing module — broker/carrier/ACE) — deps `[20]` satisfied. **Eligible — lowest id.**
+- Task #50 — deps satisfied. **Eligible — lowest id.**
 - Task #52 — eligible.
 - Task #55 (entries schema) — eligible.
 - Task #67 (CAPE prep workflow scaffold) — eligible.
 - Task #72 (admin dashboard scaffold) — eligible.
 
-Lowest-id eligible is **task #49** — `determineRecoveryPath` + `recoveryPlanFor` per ADR 015.
+Lowest-id eligible is **task #50**.
 
 ## Notes
 
-- Wave 8 (Recovery context — uploads + viewer) checkpointed.
-- Loop will continue with task #49 next iteration. Pure routing logic + snapshot-tested outreach templates.
+- Wave 8 (Recovery context) — routing module landed; outreach templates frozen.
+- Loop will continue with #50 next iteration.

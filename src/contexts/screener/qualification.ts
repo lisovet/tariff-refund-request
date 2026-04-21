@@ -1,3 +1,4 @@
+import { determineRecoveryPath } from '@contexts/recovery'
 import { ESTIMATOR_VERSION, estimateRefund } from './estimator'
 import type {
   ClearancePath,
@@ -13,13 +14,8 @@ import type {
 /**
  * computeResult — pure function from ScreenerAnswers to the typed
  * ScreenerResult per PRD 01. Combines qualification, refund estimate,
- * recovery-path determination, prerequisite signals, and the
- * recommended next paid step.
- *
- * TODO(task-49): the recovery-path mapping currently lives inline; task
- * #49 will extract `determineRecoveryPath` into
- * src/contexts/recovery/routing.ts per ADR 015 and the screener will
- * call it instead of re-implementing.
+ * recovery-path determination (delegated to @contexts/recovery per
+ * ADR 015), prerequisite signals, and the recommended next paid step.
  */
 
 export const RESULT_VERSION = `screener-v1+estimator-${ESTIMATOR_VERSION}`
@@ -34,7 +30,7 @@ export function computeResult(answers: ScreenerAnswers): ScreenerResult {
   }
 
   const refundEstimate = estimateRefund(answers)
-  const recoveryPath = mapRecoveryPath(answers.q4)
+  const recoveryPath = determineRecoveryPath(answers) as RecoveryPath | null
   const prerequisites = computePrerequisites(answers)
   const qualification = computeQualification(answers, prerequisites)
   const confidence = refundEstimate?.confidence ?? 'low'
@@ -69,21 +65,6 @@ function baseDqResult(
     recommendedNextStep: 'none',
     disqualificationReason: reason,
     version: RESULT_VERSION,
-  }
-}
-
-function mapRecoveryPath(q4: ClearancePath | undefined): RecoveryPath | null {
-  switch (q4) {
-    case 'broker':
-      return 'broker'
-    case 'carrier':
-      return 'carrier'
-    case 'ace_self_filed':
-      return 'ace-self-export'
-    case 'mixed':
-      return 'mixed'
-    default:
-      return null
   }
 }
 

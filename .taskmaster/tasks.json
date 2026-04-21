@@ -982,12 +982,14 @@
         "dependencies": [
           20
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 4,
         "source": [
           "PRD 02",
           "ADR 015"
-        ]
+        ],
+        "completedAt": "2026-04-21T10:48:00Z",
+        "completedNotes": "Recovery routing module per ADR 015 + PRD 02. src/contexts/recovery/routing.ts exposes the two public functions: determineRecoveryPath(answers: ScreenerAnswers) \u2192 RecoveryPath | null (pure: maps q4 ClearancePath \u2192 RecoveryPath, returns null on disqualification q1=no or q3=no), and recoveryPlanFor(path: RecoveryPath) \u2192 RecoveryPlan. RecoveryPlan carries: outreachTemplate ({subject, body with {{placeholders}}, placeholders[]}), acceptedDocs (DocumentKind[]), opsQueue (recovery-broker | recovery-carrier | recovery-ace), sla ({firstTouchHours, completionHours}), prerequisiteChecks ({id, label, required}). Four plans frozen via toMatchSnapshot \u2014 broker, carrier, ACE self-export, mixed. UI + ops console MUST read from the plan, never branch on path (per ADR 015 \"no-recovery-path-conditionals\" rule \u2014 to be enforced via custom lint when the workspace lands in #51+). Screener qualification.ts refactored: mapRecoveryPath inline function removed, computeResult now calls determineRecoveryPath from @contexts/recovery (cross-context import via UI-safe public surface, no ADR-001 violation). SCHEMA_TO_RECOVERY_PATH bridges the snake_case schema enum to ADR 015 kebab-case. 26 new tests (table-driven path determination, per-path queue/docs/SLA/template assertions, snapshot freeze of full plan content, non-empty invariant). 533/533 pass (16 existing screener qualification tests still green); lint + typecheck clean; build green (21 routes \u2014 pure module, no client-bundle impact)."
       },
       {
         "id": 50,
