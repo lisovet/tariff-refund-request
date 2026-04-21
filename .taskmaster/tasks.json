@@ -651,11 +651,13 @@
           30,
           31
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 1,
         "source": [
           "validation-checkpoint"
-        ]
+        ],
+        "completedAt": "2026-04-21T11:34:00Z",
+        "completedNotes": "USER-TEST checkpoint #7 (lifecycle emails reviewed). Implementation-side governance baseline codified as a permanent test (tests/integration/governance/lifecycle-templates.test.tsx). Seven assertions enforced on every CI run: (1) every v1 lifecycle template file exists; (2) every template imports EmailLayout (so the canonical \"Not legal advice\" disclosure wraps every send); (3) no template contains AI copywriting clich\u00e9s (Elevate, Seamless, Unleash, Next-Gen, Game-changer, Delve) or ad-style imperatives (Click here, Limited time, Act now); (4) rendered HTML carries the disclosure for every template; (5) no image-only bodies \u2014 real-text content >200 chars per template; (6) plain-text rendering is non-empty; (7) plain-text rendering also carries the disclosure (so non-HTML clients still see it). Also fixed a flaky DocumentViewer test that asserted scale before the initial useEffect render landed \u2014 now waits for both the page indicator AND renderCalls.length>0. 606/606 pass; lint + typecheck clean; build green (22 routes). Human owes: founder + ops top-to-bottom read of all 9 templates; check tone is restrained; capture rewrites as new tasks. The governance test catches structural drift; the human catches editorial drift."
       },
       {
         "id": 33,

@@ -117,9 +117,14 @@ describe('DocumentViewer — zoom', () => {
     const { loader, renderCalls } = makeLoader(3)
     render(<DocumentViewer src="x" loader={loader} />)
 
-    await waitFor(() =>
-      expect(screen.getByTestId('page-indicator').textContent).toBe('1 / 3'),
-    )
+    // Wait for BOTH the page indicator AND the first render call —
+    // rendering happens in a useEffect that fires after the state
+    // update that flips the indicator, so we can't assume both have
+    // landed together.
+    await waitFor(() => {
+      expect(screen.getByTestId('page-indicator').textContent).toBe('1 / 3')
+      expect(renderCalls.length).toBeGreaterThan(0)
+    })
     const initialCallCount = renderCalls.length
     expect(renderCalls.at(-1)?.scale).toBe(1)
 
