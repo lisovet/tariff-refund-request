@@ -123,6 +123,18 @@ export function createInMemoryCaseRepo(): CaseRepo {
       const limit = input?.limit ?? all.length
       return all.slice(offset, offset + limit)
     },
+    async casSetOwner(input) {
+      const existing = cases.get(input.caseId)
+      if (!existing) return undefined
+      if (existing.ownerStaffId !== input.expectedOwnerStaffId) return undefined
+      const updated: CaseRecord = {
+        ...existing,
+        ownerStaffId: input.nextOwnerStaffId,
+        updatedAt: input.occurredAt,
+      }
+      cases.set(input.caseId, updated)
+      return updated
+    },
   }
 }
 

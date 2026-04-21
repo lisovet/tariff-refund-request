@@ -45,3 +45,14 @@ export {
   filterQueue,
   resolveSavedView,
 } from './queue'
+
+export type {
+  AssignmentDeps,
+  ClaimCaseInput,
+  ClaimCaseResult,
+  ReassignCaseInput,
+  ReassignCaseResult,
+  ReleaseCaseInput,
+  ReleaseCaseResult,
+} from './assignment'
+export { claimCase, reassignCase, releaseCase } from './assignment'

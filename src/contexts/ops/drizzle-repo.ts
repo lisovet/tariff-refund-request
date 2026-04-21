@@ -1,5 +1,5 @@
 import 'server-only'
-import { and, asc, desc, eq } from 'drizzle-orm'
+import { and, asc, desc, eq, isNull } from 'drizzle-orm'
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import { auditLog, cases, type Schema } from '@shared/infra/db/schema'
 import type { CaseEvent, CaseState } from './case-machine'
@@ -153,6 +153,32 @@ export function createDrizzleCaseRepo(
       }
       const rows = await q
       return rows.map(mapCase)
+    },
+
+    async casSetOwner(input: {
+      readonly caseId: string
+      readonly expectedOwnerStaffId: string | null
+      readonly nextOwnerStaffId: string | null
+      readonly occurredAt: Date
+    }): Promise<CaseRecord | undefined> {
+      // Optimistic concurrency: the WHERE clause pins the current
+      // owner. When two actors race, the second UPDATE matches zero
+      // rows; returning() is empty; the service treats the empty
+      // result as a CAS miss.
+      const expected = input.expectedOwnerStaffId
+      const whereOwner =
+        expected === null
+          ? and(eq(cases.id, input.caseId), isNull(cases.ownerStaffId))
+          : and(eq(cases.id, input.caseId), eq(cases.ownerStaffId, expected))
+      const rows = (await db
+        .update(cases)
+        .set({
+          ownerStaffId: input.nextOwnerStaffId,
+          updatedAt: input.occurredAt,
+        })
+        .where(whereOwner)
+        .returning()) as CaseRow[]
+      return rows[0] ? mapCase(rows[0]) : undefined
     },
   }
 }

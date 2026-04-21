@@ -1,29 +1,48 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T15:03:00Z
+**Updated**: 2026-04-21T15:09:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 78 → 79)
+**Loop state**: active (iteration 79 → 80)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 79 |
+| completed | 80 |
 | in-progress | 0 |
-| pending | 7 |
+| pending | 6 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 113 files, 974 tests pass |
+| `npm test` | green — 114 files, 988 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 25 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#80 — Case claim / release / assignment**
+
+Ownership lifecycle for ops cases per PRD 04:
+
+- **`CaseRepo.casSetOwner({caseId, expectedOwnerStaffId, nextOwnerStaffId, occurredAt})`** — optimistic-concurrency compare-and-swap on `ownerStaffId`. In-memory impl checks + swaps; Drizzle impl pins the expected owner in the WHERE clause so a racing UPDATE matches zero rows and the service treats the empty result as a CAS miss. `isNull` handles the null-expected case correctly.
+- **`src/contexts/ops/assignment.ts`** service layer:
+  - `claimCase({caseId, actor}, deps)` — any staff role may claim; idempotent self-claim returns `{ok:true, alreadyOwned:true}` without an audit row; already-owned returns `{ok:false, reason:'already_claimed', currentOwnerStaffId}`; CAS miss re-reads to surface the actual winner. Non-staff actors rejected with `not_staff`.
+  - `releaseCase({caseId, actor}, deps)` — owner-of-record OR admin may release; non-owner non-admin rejected with `not_owner`; unowned case rejected with `not_claimed`.
+  - `reassignCase({caseId, actor, toStaffId}, deps)` — coordinator + admin only; analyst / validator rejected with `not_authorized`; can reassign an unowned case directly.
+- Every successful action writes an audit row — `case.claimed` / `case.released` / `case.reassigned` — with `{fromOwnerStaffId, toOwnerStaffId}` payload so the timeline renders attribution.
+
+14 new tests including a real race: `Promise.all` of two concurrent claims → exactly one wins (idempotency check on the result array).
+
+Public surface exports the services + types from `@contexts/ops`.
+
+988/988 pass.
+
+## Previously completed this wave
 
 **#79 — Case timeline + audit log viewer**
 
@@ -256,12 +275,12 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 
 ## Next eligible
 
-- Task #80 — deps satisfied. **Eligible — lowest id.** (Case claim / release / assignment.)
-- Tasks #81..#82 — ops-console workstream continues.
-- Tasks #83 (USER-TEST ops staff), #84 (cross-context lint rule), #85 (funnel metrics), #86 (final USER-TEST) follow.
+- Task #81 — deps satisfied. **Eligible — lowest id.** (SLA timer + breach indicators.)
+- Task #82 — eligible.
+- Tasks #83..#86 — USER-TEST + cross-cutting.
 
 ## Notes
 
-- 79/86 v1 done — 91.9% of Phase 0.
+- 80/86 v1 done — 93.0% of Phase 0.
 - Post-v1 backlog includes AI-copy funnel task #401.
-- Loop will continue with #80 next iteration.
+- Loop will continue with #81 next iteration.

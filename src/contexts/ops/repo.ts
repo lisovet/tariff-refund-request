@@ -103,4 +103,22 @@ export interface CaseRepo {
     readonly limit?: number
     readonly offset?: number
   }): Promise<readonly CaseRecord[]>
+
+  /**
+   * Optimistic-concurrency ownership change. Compares-and-swaps on
+   * `ownerStaffId`: the write succeeds only when the repo's
+   * observed current owner matches `expectedOwnerStaffId`. Returns
+   * the updated record on success, or `undefined` when the CAS
+   * failed (another actor won the race OR the case is gone).
+   *
+   * Used by the claim / release / reassign service
+   * (`src/contexts/ops/assignment.ts`) to avoid two analysts
+   * claiming the same case simultaneously.
+   */
+  casSetOwner(input: {
+    readonly caseId: string
+    readonly expectedOwnerStaffId: string | null
+    readonly nextOwnerStaffId: string | null
+    readonly occurredAt: Date
+  }): Promise<CaseRecord | undefined>
 }
