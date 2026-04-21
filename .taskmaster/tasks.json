@@ -231,12 +231,14 @@
         "epic": "E3. Marketing site",
         "title": "Build /how-it-works",
         "description": "Three-stage explainer (Recovery → Prep → Concierge) with editorial typography.",
-        "details": "Mirrors hero rhythm of homepage. Each stage is a typeset 'movement' with hairline rule between sections.",
+        "details": "Editorial long-read at src/app/(marketing)/how-it-works/page.tsx. Eyebrow + display H1 pattern, three stage movements separated by labeled hairline section breaks. Each stage: editorial tagline, mono price label, parallel 'What we do' / 'What you do' columns, and an artifact-callout in display face on a left border-rule. Closing CTA back to /screener.",
         "testStrategy": "Lighthouse ≥95; A11y clean; design review passes.",
         "priority": "high",
         "dependencies": [14],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 4,
+        "completedAt": "2026-04-21T07:04:00Z",
+        "completedNotes": "Editorial long-read at src/app/(marketing)/how-it-works/page.tsx. Eyebrow ('How it works') + display H1 ('Three movements, paid in stages.') matching the homepage rhythm. Three stage movements (01 Recovery / 02 Filing prep / 03 Concierge) each with: editorial tagline in serif at xl size, mono price label in accent, parallel 'What we do' / 'What you do' columns under uppercase mono sub-headings, and a display-face artifact-callout on a left border-rule. Hairline-with-label section breaks between stages. Closing CTA back to /screener. 4 component tests + 1 Playwright spec RED-then-GREEN; 161/161 pass; lint + typecheck clean; build green (/how-it-works static at 146B). HUMAN-VERIFICATION: Lighthouse ≥95 + a11y audit + design taste review at the dev server.",
         "source": ["PRD 05"]
       },
       {
