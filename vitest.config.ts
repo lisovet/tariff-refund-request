@@ -27,7 +27,10 @@ export default defineConfig({
     },
     pool: 'threads',
     isolate: true,
-    setupFiles: ['./tests/setup/per-worker-schema.ts'],
+    setupFiles: [
+      './tests/setup/per-worker-schema.ts',
+      './tests/setup/jest-dom.ts',
+    ],
   },
   resolve: {
     alias: {

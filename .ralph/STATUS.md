@@ -1,48 +1,46 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T07:24:00Z
+**Updated**: 2026-04-21T07:32:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 18 → 19)
+**Loop state**: active (iteration 19 → 20)
 
 ## Counts
 
 | Status | Count |
 | --- | --- |
-| completed | 18 |
+| completed | 19 |
 | in-progress | 0 |
-| pending | 68 |
+| pending | 67 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 36 files, 218 tests pass |
+| `npm test` | green — 39 files, 238 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
-| `npm run build` | green — 13 routes (no new routes; context code only) |
-| `npm run test:coverage` | screener context: 96% lines / 95.9% branches / 100% functions — exceeds ≥95% acceptance |
+| `npm run build` | green — 14 routes (`/screener` is the first interactive client component, 4.79kB / 107kB first-load) |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
 
-**#20 — Screener domain logic + branching engine**
+**#21 — Screener UI: one-question-per-screen flow**
 
-Wave 4 (Eligibility screener) begins. Five new modules in `src/contexts/screener/`:
-
-- `types.ts` — `ScreenerAnswers` + `ScreenerResult` per PRD 01.
-- `questions.ts` — 10-question frozen metadata (`q1`..`q10`).
-- `branching.ts` — `nextQuestion(answers)` advances Q1..Q10 in order with terminal-DQ shortcuts on `q1=no` (no_imports_in_window) and `q3=no` (not_ior). `isComplete()` flags terminal states.
-- `estimator.ts` — `ESTIMATOR_VERSION='v1'`. `estimateRefund(answers)` maps the duty-band answer to a (low, high) range with confidence rules: `q2=unknown` → low, both `q8` known + `q9=yes` → high, otherwise moderate.
-- `qualification.ts` — `computeResult(answers)` outputs the full `ScreenerResult`: qualification, refund estimate, confidence, recovery path (with TODO for task #49 to extract into `src/contexts/recovery/routing.ts` per ADR 015), prerequisites, recommended next step. `RESULT_VERSION='screener-v1+estimator-v1'` for audit trail.
-
-38 new tests covering every branching path + every duty band + every confidence tier + every qualification outcome + every recovery-path mapping + every recommendedNextStep rule.
+- `src/app/screener/page.tsx` — focused single-column transactional flow per PRD 01 + `docs/DESIGN-LANGUAGE.md`. Lives outside the marketing route group so it gets only the compact `TrustFootnote` (not the full SiteFooter). Inline result card renders the qualified vs disqualified variants on completion.
+- `src/app/_components/screener/QuestionPrompt.tsx` — display H1 in GT Sectra + top-right `Q3 / 10` mono indicator. **No progress bar** (PRD 01 forbids one).
+- `src/app/_components/screener/AnswerInput.tsx` — per-kind affordances: yes/no submit-on-click, yes/no/unknown with the magazine-underline I-don't-know shortcut, country text + unknown shortcut, choice-list for clearance / shipment / duty bands, multi-category checkboxes (Continue disabled until ≥ 1 picked), email-capture with company + RFC-shaped email validation.
+- `src/app/_components/screener/ScreenerFlow.tsx` — orchestrator: `useState` seeded from `sessionStorage`, `useEffect` persists on every change + fires `onComplete` the moment `isComplete` becomes true, back-button removes the most recently answered question, sessionStorage cleared on completion.
+- Wired `@testing-library/jest-dom` for component tests via a new `tests/setup/jest-dom.ts` setupFile.
+- 18 new tests + 1 Playwright spec (happy / DQ / back-button) RED-then-GREEN.
 
 ## Next eligible
 
-Task #21 — Screener UI (one-question-per-screen flow). Depends on `[12, 20]` — both done.
+Task #22 — Refund estimator (v1) — already shipped as part of task #20 (estimator.ts). Loop should mark this as a duplicate and skip OR mark complete with a pointer.
+
+Per PRD 01 / tasks.json: task #22 = "Refund estimator (v1) — Pure function from screener answers → refund estimate range + confidence label." That's exactly what `src/contexts/screener/estimator.ts` (built in task #20) does. The loop will mark task #22 complete with a pointer to task #20, then move to task #23 (Email capture + magic-link resume).
 
 ## Notes
 
-- Wave 4 (Eligibility screener) 1/7 done.
-- Loop will continue with task #21 next iteration.
+- Wave 4 (Eligibility screener) 2/7 done.
+- Loop will continue with task #22 → task #23 next iterations.

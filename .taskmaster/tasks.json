@@ -317,13 +317,15 @@
         "epic": "E4. Eligibility screener",
         "title": "Screener UI — one-question-per-screen flow",
         "description": "Build /screener route flow: question screen, transitions, persistence (sessionStorage + DB on completion).",
-        "details": "Question rendered in GT Sectra display. Top-right `Q3 / 10` mono indicator. Resumable within 7 days via emailed magic link.",
+        "details": "src/app/screener/page.tsx (top-level, focused single-column flow with TrustFootnote). 3 components in src/app/_components/screener/: QuestionPrompt (display H1 + top-right `Q3/10` mono indicator, no progress bar per PRD 01), AnswerInput (per-kind: yes_no submit-on-click, yes_no_unknown with the I-don't-know magazine-underline shortcut, country with input + I-don't-know shortcut, choice-list for clearance/shipment/duty bands, multi-category checkbox grid with disabled-until-picked Continue, email_capture with company + email validation), ScreenerFlow (orchestrator using nextQuestion + isComplete + computeResult, sessionStorage persistence on every change, back-button removes last answered). Inline result card on completion (qualified vs disqualified variants); dedicated photographable Results page lands in task #24. DB persistence + magic-link resume in tasks #25/#23.",
         "testStrategy": "Playwright: complete a happy-path screener; complete with backtracking; resume after refresh.",
         "priority": "high",
         "dependencies": [20, 12],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 8,
-        "source": ["PRD 01", "DESIGN-LANGUAGE.md"]
+        "source": ["PRD 01", "DESIGN-LANGUAGE.md"],
+        "completedAt": "2026-04-21T07:32:00Z",
+        "completedNotes": "src/app/screener/page.tsx ('use client'-rooted, focused single-column flow outside the marketing route group so it doesn't inherit SiteFooter — only the compact TrustFootnote per .claude/rules/disclosure-language-required.md). 3 components in src/app/_components/screener/: QuestionPrompt (display H1 in GT Sectra + top-right `Q3/10` mono indicator, NO progress bar per PRD 01), AnswerInput (per-kind: yes_no submit-on-click, yes_no_unknown with I-don't-know magazine-underline shortcut, country text input + unknown shortcut, choice-list for clearance/shipment/duty/multi-category bands, email_capture with company + RFC-shaped email validation), ScreenerFlow (orchestrator: useState seeded from sessionStorage, useEffect persists on every change + fires onComplete the moment isComplete becomes true, back removes the most recently answered q, also clears sessionStorage on completion). Inline ScreenerResultCard renders disqualified vs qualified variants with refund range in Berkeley Mono display size and recommended next step. Wired @testing-library/jest-dom for component tests via a new tests/setup/jest-dom.ts setupFile. 18 new tests + 1 Playwright spec (happy + DQ + back-button) RED-then-GREEN; 238/238 pass; lint + typecheck clean; build green (/screener is the first interactive client-component route at 4.79kB / 107kB first-load). HUMAN-VERIFICATION: live walkthrough at the dev server."
       },
       {
         "id": 22,
