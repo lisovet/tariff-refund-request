@@ -7,13 +7,6 @@ import { Hairline, TrustFootnote } from '@/app/_components/ui'
  * the disclosure block.
  */
 
-/**
- * Only working routes appear here. /recovery, /cape-prep, /concierge,
- * /for-agencies, and /trust/legal-requests are real pages in PRD
- * scope but haven't shipped — linking to 404s would erode trust on
- * the very footer where the trust posture lives. They return when
- * the pages exist.
- */
 const SECTIONS: ReadonlyArray<{
   readonly heading: string
   readonly links: ReadonlyArray<{ readonly label: string; readonly href: string }>
@@ -23,6 +16,9 @@ const SECTIONS: ReadonlyArray<{
     links: [
       { label: 'How it works', href: '/how-it-works' },
       { label: 'Pricing', href: '/pricing' },
+      { label: 'Recovery', href: '/recovery' },
+      { label: 'Filing prep', href: '/cape-prep' },
+      { label: 'Concierge', href: '/concierge' },
       { label: 'Check eligibility', href: '/screener' },
     ],
   },
@@ -32,14 +28,12 @@ const SECTIONS: ReadonlyArray<{
       { label: 'How we handle your data', href: '/trust' },
       { label: 'Sub-processors', href: '/trust/sub-processors' },
       { label: 'Security', href: '/trust/security' },
+      { label: 'Legal requests', href: '/trust/legal-requests' },
     ],
   },
   {
-    heading: 'Account',
-    links: [
-      { label: 'Sign in', href: '/sign-in' },
-      { label: 'Sign up', href: '/sign-up' },
-    ],
+    heading: 'For partners',
+    links: [{ label: 'Agencies & brokers', href: '/for-agencies' }],
   },
 ]
 

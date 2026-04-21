@@ -5,6 +5,7 @@ import {
   priceFor,
   type Sku,
 } from '@contexts/billing'
+import { dollars } from '../_components/formatDollars'
 
 /**
  * /pricing — stage-by-stage ladder per PRD 05 + PRD 06.
@@ -39,14 +40,6 @@ interface Stage {
   readonly title: string
   readonly tagline: string
   readonly rows: readonly StageRow[]
-}
-
-function dollars(cents: number): string {
-  const whole = Math.trunc(cents / 100)
-  const formatted = whole.toLocaleString('en-US')
-  if (cents % 100 === 0) return `$${formatted}`
-  const fractional = String(cents % 100).padStart(2, '0')
-  return `$${formatted}.${fractional}`
 }
 
 const STAGES: readonly Stage[] = [
