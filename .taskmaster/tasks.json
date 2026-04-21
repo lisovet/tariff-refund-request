@@ -80,13 +80,15 @@
         "epic": "E1. Foundation",
         "title": "Set up Sentry + Axiom logging",
         "description": "Sentry on browser + server + Inngest. Axiom transport for structured logs and audit-log mirroring.",
-        "details": "Sentry init wrapped behind src/shared/infra/observability/. Axiom client emits to a single dataset; sampling rules per environment.",
+        "details": "Logger + ErrorTracker interfaces in src/shared/infra/observability/types.ts. Real transports in axiom.ts and sentry.ts. No-op fallbacks in noop.ts. Factory in index.ts caches per-process transport, switches via SENTRY_DSN / AXIOM_TOKEN+AXIOM_DATASET env. Platform code calls getLogger()/getErrorTracker() and never branches on env.",
         "testStrategy": "Trigger a thrown error in dev; appears in Sentry dev project. Trigger a log; appears in Axiom.",
         "priority": "high",
         "dependencies": [1],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 3,
-        "source": ["ADR 013"]
+        "source": ["ADR 013"],
+        "completedAt": "2026-04-21T06:01:45Z",
+        "completedNotes": "@sentry/nextjs + @axiomhq/js installed. Logger and ErrorTracker interfaces define the platform-facing contract. Axiom-backed Logger ingests structured events with service+env+level base attrs. Sentry-backed ErrorTracker maps our LogLevel to Sentry SeverityLevel. No-op fallbacks satisfy the interfaces silently for dev/tests/missing keys. Factory caches transports and is reset-able for tests. 6 new tests RED-then-GREEN; 46/46 pass; lint + typecheck clean. Real Sentry/Axiom keys are human-action; live error+log delivery verification needs the dev environment with keys configured."
       },
       {
         "id": 6,
