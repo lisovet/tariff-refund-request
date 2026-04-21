@@ -399,13 +399,15 @@
         "epic": "E12. Lifecycle email + Inngest",
         "title": "Resend integration + React Email setup",
         "description": "Install Resend, configure transactional sending domain, set up React Email render pipeline.",
-        "details": "src/shared/infra/email/. Render → HTML/text via React Email. DKIM/SPF on sending domain.",
+        "details": "EmailTransport contract in src/shared/infra/email/types.ts; Resend transport + console transport (dev/test fallback per .ralph/PROMPT.md local-stub policy); cached factory chooses by RESEND_API_KEY env. renderEmail() returns HTML + plaintext via @react-email/render. EmailLayout shell wraps every template with the canonical 'Not legal advice' disclosure verbatim per .claude/rules/disclosure-language-required.md. ScreenerResultsEmail is the first template (used by tasks #23/#28 for the magic-link results delivery).",
         "testStrategy": "Send a test email to a dev address; render snapshot test for the template.",
         "priority": "high",
         "dependencies": [4],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 4,
-        "source": ["ADR 012"]
+        "source": ["ADR 012"],
+        "completedAt": "2026-04-21T07:42:00Z",
+        "completedNotes": "resend + @react-email/components + @react-email/render installed. EmailTransport contract in types.ts (SendEmailInput / SendEmailResult / EmailTransport interfaces). Resend transport at resend-transport.ts (idempotency-key passthrough, error normalization). Console transport at console-transport.ts (logs + synthetic id, used in dev/tests when RESEND_API_KEY missing per .ralph/PROMPT.md local-stub policy). Factory in index.ts caches the selection per-process; throws if RESEND_API_KEY is set but EMAIL_FROM missing (refuses to send from unintended address). renderEmail() at render.ts returns HTML + plaintext via @react-email/render. EmailLayout shell at templates/_layout.tsx wraps every template with the canonical NOT_LEGAL_ADVICE_DISCLOSURE verbatim per .claude/rules/disclosure-language-required.md (imported from the same Disclosure module that the SiteFooter uses — single source of truth). First template ScreenerResultsEmail.tsx (used by tasks #23 + #28 for the screener-results magic-link delivery). 8 new tests RED-then-GREEN; 246/246 pass; lint + typecheck clean; build green. HUMAN-VERIFICATION: provision Resend account, configure DKIM/SPF on the sending domain, set RESEND_API_KEY + EMAIL_FROM env, send a real test message and confirm DKIM passes."
       },
       {
         "id": 28,
