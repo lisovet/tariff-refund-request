@@ -41,3 +41,13 @@ export type {
   SuggestBatchesOptions,
 } from './grouping'
 export { DEFAULT_MAX_BATCH_SIZE, suggestBatches } from './grouping'
+
+export type {
+  ChecklistSubmission,
+  QaChecklistItem,
+  SignOffBatchDeps,
+  SignOffBatchInput,
+  SignOffBatchResult,
+  SignOffRecord,
+} from './sign-off'
+export { QA_CHECKLIST_ITEMS, signOffBatch } from './sign-off'

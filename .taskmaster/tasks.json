@@ -1312,11 +1312,13 @@
           62,
           41
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 5,
         "source": [
           "PRD 04"
-        ]
+        ],
+        "completedAt": "2026-04-21T13:05:00Z",
+        "completedNotes": "QA checklist + analyst sign-off gate per PRD 04 + .claude/rules/human-qa-required.md hard rule. QA_CHECKLIST_ITEMS: 5 non-bypassable items (entries_match_source_documents, no_blocking_issues, prerequisites_reviewed, warnings_reviewed, csv_spot_checked) each with id + label + description for the analyst surface. signOffBatch({caseId, batchId, actor, note, readinessReport, checklist}, deps) \u2192 SignOffBatchResult discriminated by ok + reason. Four non-bypassable gates, checked in order: (1) actor.role === \"validator\" \u2014 rejects analyst/coordinator/admin with reason=not_validator_role + attemptedRole; (2) note non-empty \u2014 sign-off appears on customer-facing Readiness Report; (3) readinessReport.blockingCount === 0 \u2014 no unresolved blocking issues; (4) every QA_CHECKLIST_ITEMS item submitted AND checked \u2014 missing items surface specifically. On success: calls the injected transition() with VALIDATOR_SIGNED_OFF + actor (the machine guard double-checks the role as defense in depth), then writes a qa.sign_off audit row with the note + checklistItemIds + readinessReportId as payload. Case advances batch_qa \u2192 submission_ready. 13 new tests covering checklist items shape, happy path, checklist-incomplete (unchecked + missing), blocking-issues rejection, role gate (analyst, admin), empty-note rejection, wrong-state rejection (case not in batch_qa \u2192 transition_failed). Implementation-side scaffolding for #66 (USER-TEST validator passes/fails on real fixtures). 792/792 pass; lint + typecheck clean; build green (24 routes \u2014 pure service module)."
       },
       {
         "id": 66,
