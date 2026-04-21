@@ -158,7 +158,7 @@ exports[`recoveryPlanFor — snapshot (full plan content frozen) > plan content 
 
 Because your shipments cleared through more than one path (broker + carrier or ACE + broker), we will collect entries from each path you used. The workspace lets you upload documents from any source — broker 7501s, carrier invoices, and ACE exports are all accepted in the same case.
 
-An analyst will reconcile the entries across sources and flag any duplicates before the entry list is finalized.",
+For the date range {{windowStart}} to {{windowEnd}}, an analyst will reconcile the entries across sources and flag any duplicates before the entry list is finalized.",
     "placeholders": [
       "importerName",
       "windowStart",

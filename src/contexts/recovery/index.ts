@@ -49,3 +49,14 @@ export {
   determineRecoveryPath,
   recoveryPlanFor,
 } from './routing'
+
+export type {
+  OutreachKitTemplate,
+  OutreachKitTokens,
+  RenderedOutreachKit,
+} from './templates'
+export {
+  OUTREACH_KIT_TEMPLATES,
+  OUTREACH_TEMPLATE_VERSION,
+  renderOutreachKit,
+} from './templates'

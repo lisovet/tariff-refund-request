@@ -1,0 +1,58 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`renderOutreachKit — snapshot per path > ace-self-export renders deterministically — snapshot freezes the wording 1`] = `
+{
+  "body": "Hi Acme Imports LLC,
+
+You have an ACE account, which is the cleanest path. Sign in at https://ace.cbp.dhs.gov, run the Entry Summary report for the date range 2024-04-01 to 2024-12-31, export as CSV, and upload it through the secure portal below.
+
+Step-by-step screenshots are linked from the workspace. If you would prefer, an analyst can join a 30-minute screen-share and walk through the export with you — just reply to this email.",
+  "path": "ace-self-export",
+  "subject": "ACE entry export walkthrough",
+  "version": "v1",
+}
+`;
+
+exports[`renderOutreachKit — snapshot per path > broker renders deterministically — snapshot freezes the wording 1`] = `
+{
+  "body": "Hi Flexport Inc.,
+
+We are working with Acme Imports LLC on an IEEPA tariff refund. Could you send the entry summaries (CBP Form 7501) for every entry filed under their importer of record number between 2024-04-01 and 2024-12-31? Please include any associated broker spreadsheets or reconciliation reports you produced for that period.
+
+If a CSV export is easier than individual 7501 PDFs, that works too — we accept .pdf, .xlsx, .csv, and forwarded .eml.
+
+Thank you,
+Acme Imports LLC",
+  "path": "broker",
+  "subject": "Request for IEEPA tariff entry summaries",
+  "version": "v1",
+}
+`;
+
+exports[`renderOutreachKit — snapshot per path > carrier renders deterministically — snapshot freezes the wording 1`] = `
+{
+  "body": "Hi Acme Imports LLC,
+
+For the carrier path you log into the carrier portal (DHL MyDHL+, FedEx eCustoms, UPS Quantum View) and pull every duty invoice for entries between 2024-04-01 and 2024-12-31. Export each invoice as a PDF or CSV and upload them through the secure portal below.
+
+If multiple carriers handled your shipments, repeat the process for each one. The accepted formats are .pdf, .xlsx, and .csv.
+
+Need help with a specific carrier — reply to this email and an analyst will walk you through it.",
+  "path": "carrier",
+  "subject": "IEEPA duty invoices — historical entries",
+  "version": "v1",
+}
+`;
+
+exports[`renderOutreachKit — snapshot per path > mixed renders deterministically — snapshot freezes the wording 1`] = `
+{
+  "body": "Hi Acme Imports LLC,
+
+Because your shipments cleared through more than one path (broker + carrier or ACE + broker), we will collect entries from each path you used. The workspace lets you upload documents from any source — broker 7501s, carrier invoices, and ACE exports are all accepted in the same case.
+
+For the date range 2024-04-01 to 2024-12-31, an analyst will reconcile the entries across sources and flag any duplicates before the entry list is finalized.",
+  "path": "mixed",
+  "subject": "IEEPA tariff entry collection — mixed clearance",
+  "version": "v1",
+}
+`;

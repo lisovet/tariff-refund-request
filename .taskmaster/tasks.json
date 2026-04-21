@@ -1002,11 +1002,13 @@
         "dependencies": [
           49
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 5,
         "source": [
           "PRD 02"
-        ]
+        ],
+        "completedAt": "2026-04-21T10:55:00Z",
+        "completedNotes": "Outreach kit templates promoted to versioned per-path files in src/contexts/recovery/templates/ (broker.ts, carrier.ts, ace.ts, mixed.ts) plus a shared types.ts (OUTREACH_TEMPLATE_VERSION=\"v1\") and an index.ts that exports OUTREACH_KIT_TEMPLATES + renderOutreachKit. renderOutreachKit takes a path + tokens (importerName/brokerName/windowStart/windowEnd) and substitutes every {{placeholder}} via a pure regex pass; throws on missing required placeholder so we never email a customer with {{brokerName}} literals embedded. routing.ts now consumes the canonical templates via planTemplate() rather than duplicating the wording inline \u2014 single source of truth for the outreach copy. Cross-template invariants enforced by tests: every body {{placeholder}} is declared in placeholders[]; every declared placeholder is used at least once in subject or body. The mixed template body now references the date range so the windowStart/windowEnd placeholders are not orphaned (deliberate change; routing.ts snapshot updated). 25 new template tests + 4 frozen snapshots; 558/558 pass; lint + typecheck clean; build green (21 routes \u2014 pure module)."
       },
       {
         "id": 51,

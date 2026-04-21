@@ -1,5 +1,6 @@
 import type { ScreenerAnswers } from '@contexts/screener'
 import type { DocumentKind, RecoveryPath as SchemaRecoveryPath } from '@shared/infra/db/schema'
+import { OUTREACH_KIT_TEMPLATES } from './templates'
 
 /**
  * Recovery routing per ADR 015 + PRD 02.
@@ -74,18 +75,7 @@ export function determineRecoveryPath(
 
 const BROKER_PLAN: RecoveryPlan = {
   path: 'broker',
-  outreachTemplate: {
-    subject: 'Request for IEEPA tariff entry summaries',
-    body:
-      'Hi {{brokerName}},\n\n' +
-      'We are working with {{importerName}} on an IEEPA tariff refund. ' +
-      'Could you send the entry summaries (CBP Form 7501) for every entry filed under their importer of record number ' +
-      'between {{windowStart}} and {{windowEnd}}? Please include any associated broker spreadsheets or reconciliation ' +
-      'reports you produced for that period.\n\n' +
-      'If a CSV export is easier than individual 7501 PDFs, that works too — we accept .pdf, .xlsx, .csv, and forwarded .eml.\n\n' +
-      'Thank you,\n{{importerName}}',
-    placeholders: ['brokerName', 'importerName', 'windowStart', 'windowEnd'],
-  },
+  outreachTemplate: planTemplate('broker'),
   acceptedDocs: ['broker_7501', 'broker_spreadsheet', 'other'] as const,
   opsQueue: RECOVERY_QUEUES.broker,
   sla: { firstTouchHours: 4, completionHours: 24 },
@@ -98,16 +88,7 @@ const BROKER_PLAN: RecoveryPlan = {
 
 const CARRIER_PLAN: RecoveryPlan = {
   path: 'carrier',
-  outreachTemplate: {
-    subject: 'IEEPA duty invoices — historical entries',
-    body:
-      'Hi {{importerName}},\n\n' +
-      'For the carrier path you log into the carrier portal (DHL MyDHL+, FedEx eCustoms, UPS Quantum View) and pull every duty invoice ' +
-      'for entries between {{windowStart}} and {{windowEnd}}. Export each invoice as a PDF or CSV and upload them through the secure portal below.\n\n' +
-      'If multiple carriers handled your shipments, repeat the process for each one. The accepted formats are .pdf, .xlsx, and .csv.\n\n' +
-      'Need help with a specific carrier — reply to this email and an analyst will walk you through it.',
-    placeholders: ['importerName', 'windowStart', 'windowEnd'],
-  },
+  outreachTemplate: planTemplate('carrier'),
   acceptedDocs: ['carrier_invoice', 'broker_7501', 'other'] as const,
   opsQueue: RECOVERY_QUEUES.carrier,
   sla: { firstTouchHours: 4, completionHours: 48 },
@@ -120,16 +101,7 @@ const CARRIER_PLAN: RecoveryPlan = {
 
 const ACE_PLAN: RecoveryPlan = {
   path: 'ace-self-export',
-  outreachTemplate: {
-    subject: 'ACE entry export walkthrough',
-    body:
-      'Hi {{importerName}},\n\n' +
-      'You have an ACE account, which is the cleanest path. Sign in at https://ace.cbp.dhs.gov, run the Entry Summary report ' +
-      'for the date range {{windowStart}} to {{windowEnd}}, export as CSV, and upload it through the secure portal below.\n\n' +
-      'Step-by-step screenshots are linked from the workspace. If you would prefer, an analyst can join a 30-minute screen-share ' +
-      'and walk through the export with you — just reply to this email.',
-    placeholders: ['importerName', 'windowStart', 'windowEnd'],
-  },
+  outreachTemplate: planTemplate('ace-self-export'),
   acceptedDocs: ['ace_export', 'other'] as const,
   opsQueue: RECOVERY_QUEUES.ace,
   sla: { firstTouchHours: 8, completionHours: 24 },
@@ -142,16 +114,7 @@ const ACE_PLAN: RecoveryPlan = {
 
 const MIXED_PLAN: RecoveryPlan = {
   path: 'mixed',
-  outreachTemplate: {
-    subject: 'IEEPA tariff entry collection — mixed clearance',
-    body:
-      'Hi {{importerName}},\n\n' +
-      'Because your shipments cleared through more than one path (broker + carrier or ACE + broker), we will collect entries ' +
-      'from each path you used. The workspace lets you upload documents from any source — broker 7501s, carrier invoices, and ACE exports ' +
-      'are all accepted in the same case.\n\n' +
-      'An analyst will reconcile the entries across sources and flag any duplicates before the entry list is finalized.',
-    placeholders: ['importerName', 'windowStart', 'windowEnd'],
-  },
+  outreachTemplate: planTemplate('mixed'),
   acceptedDocs: [
     'ace_export',
     'broker_7501',
@@ -169,6 +132,15 @@ const MIXED_PLAN: RecoveryPlan = {
     { id: 'ach_on_file', label: 'ACH refund authorization on file', required: false },
   ] as const,
 } as const
+
+function planTemplate(path: RecoveryPath): OutreachEmailTemplate {
+  const tpl = OUTREACH_KIT_TEMPLATES[path]
+  return {
+    subject: tpl.subject,
+    body: tpl.body,
+    placeholders: tpl.placeholders as readonly string[],
+  }
+}
 
 export function recoveryPlanFor(path: RecoveryPath): RecoveryPlan {
   switch (path) {
