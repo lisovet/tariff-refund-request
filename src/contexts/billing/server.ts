@@ -1,6 +1,8 @@
 import 'server-only'
 import Stripe from 'stripe'
 import { createDbClient } from '@shared/infra/db/client'
+import { createStripeCheckoutClient as buildStripeCheckoutClient } from './checkout-client'
+import type { CheckoutClient } from './checkout'
 import { createDrizzleBillingRepo } from './drizzle-repo'
 import { createInMemoryBillingRepo } from './in-memory-repo'
 import type { BillingRepo } from './repo'
@@ -27,6 +29,30 @@ export {
 export { createStripeCheckoutClient } from './checkout-client'
 export { createInMemoryPaymentRepo } from './in-memory-payment-repo'
 export { createDrizzlePaymentRepo } from './drizzle-payment-repo'
+export {
+  conciergeCheckoutOnSignedWorkflow,
+  conciergeCheckoutOnSignedHandler,
+  type ConciergeCheckoutOnSignedDeps,
+  type ConciergeCheckoutOnSignedInput,
+  type ConciergeCheckoutOnSignedResult,
+} from './workflows/concierge-checkout-on-signed'
+
+/**
+ * Resolve the live Stripe-backed checkout client. Workflows inject
+ * this at invocation time.
+ */
+export function getStripeCheckoutClient(): CheckoutClient {
+  return buildStripeCheckoutClient(getStripeClient())
+}
+
+/**
+ * App origin used by Stripe Checkout success/cancel URLs.
+ * TODO(human-action): Set APP_ORIGIN to the production domain when
+ * the deployment target is provisioned; defaults to a local URL.
+ */
+export function getAppOrigin(): string {
+  return process.env.APP_ORIGIN ?? 'http://localhost:3000'
+}
 
 let cachedRepo: BillingRepo | undefined
 let cachedClient: Stripe | undefined

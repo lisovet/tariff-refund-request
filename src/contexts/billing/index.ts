@@ -111,3 +111,26 @@ export {
   renderAgreement,
   resolveAgreement,
 } from './agreements/registry'
+
+export type {
+  ESignProvider,
+  SignedAgreementRecord,
+  SignedAgreementRepo,
+  SignedAgreementStatus,
+  RequestSignatureInput,
+  RequestSignatureResult,
+  RequestSignatureDeps,
+  HandleSignatureInput,
+  HandleSignatureResult,
+  HandleSignatureDeps,
+  ConciergeSignedEventData,
+  ConciergeCheckoutGate,
+} from './e-sign'
+export {
+  SIGNED_AGREEMENT_STATUSES,
+  createInMemoryESignProvider,
+  createInMemorySignedAgreementRepo,
+  requestConciergeSignature,
+  handleSignatureCompleted,
+  conciergeCheckoutGate,
+} from './e-sign'

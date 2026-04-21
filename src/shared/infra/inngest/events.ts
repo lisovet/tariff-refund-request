@@ -62,6 +62,27 @@ export const paymentCompleted = eventType('platform/payment.completed', {
 })
 
 /**
+ * Fired by `handleSignatureCompleted` (task #73) once the Concierge
+ * engagement-letter webhook confirms the customer has countersigned.
+ * This is the PAYMENT GATE — the Stripe Checkout workflow wired to
+ * this event is the only code path that opens Concierge checkout.
+ */
+export const conciergeSigned = eventType('platform/concierge.signed', {
+  schema: staticSchema<{
+    data: {
+      caseId: string
+      sku: string
+      agreementId: string
+      agreementVersion: number
+      envelopeId: string
+      signedAtIso: string
+      signerEmail: string
+      signerName: string
+    }
+  }>(),
+})
+
+/**
  * Fired by `signOffBatch` (task #65) after the case transitions to
  * `submission_ready`. Drives the artifact generation pipeline
  * (task #70): CSV + PDF rendering, R2 upload, Prep-Ready email.

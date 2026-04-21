@@ -1,29 +1,55 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T14:04:00Z
+**Updated**: 2026-04-21T14:13:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 71 → 72)
+**Loop state**: active (iteration 72 → 73)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 72 |
+| completed | 73 |
 | in-progress | 0 |
-| pending | 14 |
+| pending | 13 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 102 files, 870 tests pass |
+| `npm test` | green — 104 files, 883 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 24 routes |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
+
+**#73 — E-sign flow integration**
+
+Full e-sign adapter + payment gate per PRD 10 §Engagement letters:
+
+- **`ESignProvider` contract** + in-memory stub (`createInMemoryESignProvider`). Real DocuSign/HelloSign/BoldSign implementation is a TODO(human-action) at the env boundary — the contract + test seam are ready.
+- **`SignedAgreementRepo`** (contract + in-memory impl) — persists rendered-body archival snapshots, `agreementId` + `version`, envelope id UNIQUE, status (pending / signed / voided).
+- **`requestConciergeSignature(input, deps)`** — resolves concierge-v1, renders with all six variables, requests envelope via provider, records pending row, returns `{envelopeId, signingUrl, agreementId}`. Refuses non-concierge SKUs (lightweight clickwrap doesn't use this flow).
+- **`handleSignatureCompleted(input, deps)`** — idempotent webhook handler: already-signed envelopes short-circuit without republishing; unknown envelopes return `envelope_not_found` discriminated-union failure. On first write, publishes `platform/concierge.signed`.
+- **`conciergeCheckoutGate(repo)`** — read-side gate for consumers about to open Checkout: `canOpenCheckout(caseId)` refuses with `no_signed_agreement` until a signed record exists.
+- **`conciergeCheckoutOnSignedWorkflow`** — Inngest workflow triggered by `platform/concierge.signed`. Calls existing `createCheckoutForSku` with `envelopeId` as the idempotency scope so retries dedupe server-side. Refuses non-concierge SKUs (defense in depth).
+- **Event** `platform/concierge.signed` added to the typed catalog.
+- `src/contexts/billing/server.ts` gains `getStripeCheckoutClient()` + `getAppOrigin()` helpers used by the workflow at invocation time.
+
+Public surface on `@contexts/billing`: e-sign types + factories + services all re-exported.
+
+13 new tests: 10 e-sign (request flow + idempotency + gate + provider + repo), 3 workflow (opens Checkout, refuses non-concierge, envelope-scoped idempotency).
+
+## Human-verification still owes (task #73)
+
+- Choose a production e-sign provider + wire its real adapter; the stub is the test seam, not the shipping implementation.
+- Wire the provider's webhook signature verification (`verifyWebhook` hook in the `ESignProvider` contract) before enabling prod traffic.
+- Drizzle persistence for `signed_agreements` (the in-memory repo is the v1 seam; schema migration lands with the real-DB cutover).
+- End-to-end Playwright spec against the provider sandbox (skipped for v1 because no provider selected).
+
+## Previously completed this wave
 
 **#72 — Engagement letter templates + version registry**
 
@@ -129,15 +155,14 @@ Post-v1 (id > 86) growth task capturing the user's mandate to surface "how the p
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #73 — deps satisfied (72 done). **Eligible — lowest id.** (E-sign flow integration.)
-- Task #74 — eligible.
+- Task #74 — deps satisfied (73 done). **Eligible — lowest id.** (/trust/security + sub-processor automation.)
 - Task #75 — eligible.
 - Task #77 — eligible.
 
-Lowest-id eligible is **task #73**.
+Lowest-id eligible is **task #74**.
 
 ## Notes
 
-- 72/86 v1 done — 83.7% of Phase 0.
+- 73/86 v1 done — 84.9% of Phase 0.
 - Post-v1 backlog includes AI-copy funnel task #401.
-- Loop will continue with #73 next iteration.
+- Loop will continue with #74 next iteration.

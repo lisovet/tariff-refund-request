@@ -1,3 +1,4 @@
+import { conciergeCheckoutOnSignedWorkflow } from '@contexts/billing/server'
 import { artifactGenerationWorkflow } from '@contexts/cape/server'
 import { auditLogMirrorWorkflow, stalledCadenceWorkflow } from '@contexts/ops/server'
 import {
@@ -27,6 +28,7 @@ export const workflows = [
   auditLogMirrorWorkflow,
   stalledCadenceWorkflow,
   artifactGenerationWorkflow,
+  conciergeCheckoutOnSignedWorkflow,
 ] as const
 
 export {
@@ -36,4 +38,5 @@ export {
   auditLogMirrorWorkflow,
   stalledCadenceWorkflow,
   artifactGenerationWorkflow,
+  conciergeCheckoutOnSignedWorkflow,
 }
