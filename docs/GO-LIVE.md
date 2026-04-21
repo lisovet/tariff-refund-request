@@ -8,11 +8,11 @@ Each section is a hard gate — do not move past it until the "verify" step pass
 
 ## 0. Pre-flight (30 min)
 
-- [ ] Pick the production domain (e.g., `tariffrefund.co`, `takemaya.trade`) and confirm you own the registrar login.
+- [x] **Production domain:** `tariffrefundrequest.com`. Confirm the registrar login + that DNS is controllable from there.
 - [ ] Pick the governing-law state for the engagement letter (currently defaults to Delaware in the Concierge letter). Decide: Delaware, California, or your incorporation state.
-- [ ] Confirm you have the legal entity name that appears in the engagement letter (currently `Takemaya Software, Inc.`).
-- [ ] Pick the sending email (`noreply@<domain>` or `hello@<domain>`).
-- [ ] **Verify:** the domain, entity name, and sending email are written down somewhere you won't lose them (1Password / Notion).
+- [ ] Confirm the legal entity name that appears in the engagement letter (currently `Takemaya Software, Inc.`).
+- [ ] **Sending email:** `noreply@tariffrefundrequest.com` (or `hello@tariffrefundrequest.com` if marketing-forward).
+- [ ] **Verify:** the entity name + sending email are written down somewhere you won't lose them (1Password / Notion).
 
 ---
 
@@ -43,7 +43,7 @@ Each section is a hard gate — do not move past it until the "verify" step pass
 - [ ] Enable: Email + passkey, SSO (Google + Microsoft), Magic link.
 - [ ] Create a Clerk **organization** for staff. Require MFA on the organization (Settings → Security → Multi-factor → Require for all members).
 - [ ] In the staff org, define four roles matching the code: `coordinator`, `analyst`, `validator`, `admin`.
-- [ ] Register the Clerk webhook endpoint: `https://<staging-domain>/api/webhooks/clerk`. Copy the svix signing secret.
+- [ ] Register the Clerk webhook endpoint: `https://staging.tariffrefundrequest.com/api/webhooks/clerk`. Copy the svix signing secret.
 - [ ] Set env vars (staging AND prod): `CLERK_SECRET_KEY`, `CLERK_PUBLISHABLE_KEY` (the `NEXT_PUBLIC_*` prefix if your code uses it), `CLERK_WEBHOOK_SECRET`.
 - [ ] Invite yourself to the staff org as `admin`.
 - [ ] **Verify:** `/ops` redirects an unauthenticated visitor to `/sign-in`, and after signing in as admin you land on the queue page.
@@ -63,7 +63,7 @@ Each section is a hard gate — do not move past it until the "verify" step pass
 
 - [ ] Enable **Live Mode** on your Stripe account. Enable **automatic tax** (Dashboard → Settings → Tax).
 - [ ] Locally: `STRIPE_SECRET_KEY=<live-key> npm run stripe:sync` — creates every product + price with lookup_keys `trr__<sku>__<tier>`. Run once against Test Mode first, then Live.
-- [ ] Register the webhook `https://<prod-domain>/api/webhooks/stripe` for events: `checkout.session.completed`, `charge.refunded`, `invoice.payment_failed`, `invoice.payment_succeeded`. Copy the signing secret.
+- [ ] Register the webhook `https://tariffrefundrequest.com/api/webhooks/stripe` for events: `checkout.session.completed`, `charge.refunded`, `invoice.payment_failed`, `invoice.payment_succeeded`. Copy the signing secret.
 - [ ] Set env vars: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PUBLISHABLE_KEY`.
 - [ ] **Verify:** `stripe trigger checkout.session.completed` from the Stripe CLI delivers to staging; `SELECT * FROM processed_stripe_events` shows the event id + `ON CONFLICT DO NOTHING` dedup works on a second trigger.
 
@@ -71,10 +71,10 @@ Each section is a hard gate — do not move past it until the "verify" step pass
 
 ## 6. Resend — email (30 min)
 
-- [ ] Create a Resend account. Add your sending domain (`<domain>`).
-- [ ] Publish the DNS records Resend gives you: **SPF**, **DKIM** (3 CNAMEs), **DMARC** (`v=DMARC1; p=quarantine; rua=mailto:postmaster@<domain>`).
+- [ ] Create a Resend account. Add your sending domain (`tariffrefundrequest.com`).
+- [ ] Publish the DNS records Resend gives you: **SPF**, **DKIM** (3 CNAMEs), **DMARC** (`v=DMARC1; p=quarantine; rua=mailto:postmaster@tariffrefundrequest.com`).
 - [ ] Create an API key scoped to "sending only".
-- [ ] Set env vars: `RESEND_API_KEY`, `EMAIL_FROM=noreply@<domain>`.
+- [ ] Set env vars: `RESEND_API_KEY`, `EMAIL_FROM=noreply@tariffrefundrequest.com`.
 - [ ] **Verify:** trigger a staging screener submission → receive the `ScreenerResultsEmail` in a real inbox with no spam-folder placement, DKIM + SPF both pass, DMARC aligned.
 
 ---
@@ -82,7 +82,7 @@ Each section is a hard gate — do not move past it until the "verify" step pass
 ## 7. Inngest — durable workflows (20 min)
 
 - [ ] Create an Inngest account + a production + staging environment.
-- [ ] Register the serve endpoint: `https://<staging-domain>/api/inngest`. Inngest auto-discovers the workflows registered in `src/shared/infra/inngest/workflows/index.ts`.
+- [ ] Register the serve endpoint: `https://staging.tariffrefundrequest.com/api/inngest`. Inngest auto-discovers the workflows registered in `src/shared/infra/inngest/workflows/index.ts`.
 - [ ] Confirm these 12 workflows appear in the Inngest dashboard:
   - `smoke-hello-world`
   - `screener-completed`
@@ -131,7 +131,7 @@ Each section is a hard gate — do not move past it until the "verify" step pass
 - [ ] Pick a provider: DocuSign, HelloSign (Dropbox Sign), BoldSign, or PandaDoc. BoldSign has the simplest API and generous free tier for v1 volumes.
 - [ ] Create an account + a developer API key.
 - [ ] Implement `src/contexts/billing/e-sign/<provider>-provider.ts` conforming to the `ESignProvider` contract in `types.ts`. Two methods: `requestSignature` + `verifyWebhook`.
-- [ ] Register the completion webhook at the provider: `https://<prod-domain>/api/webhooks/e-sign`.
+- [ ] Register the completion webhook at the provider: `https://tariffrefundrequest.com/api/webhooks/e-sign`.
 - [ ] Wire a Next route handler at `src/app/api/webhooks/e-sign/route.ts` that calls `provider.verifyWebhook()` then `handleSignatureCompleted()` from `@contexts/billing`.
 - [ ] Set env vars: `ESIGN_PROVIDER=<name>`, `ESIGN_API_KEY`, `ESIGN_WEBHOOK_SECRET`.
 - [ ] **Verify:** send yourself an engagement letter from staging → sign it → Inngest dashboard shows `platform/concierge.signed` delivered + `concierge-checkout-on-signed` workflow opens a Stripe Checkout session → the session URL lands in your email via the lifecycle cadence (lands with the purchase flow; v1 just creates the session).
@@ -152,10 +152,10 @@ Each section is a hard gate — do not move past it until the "verify" step pass
 
 ## 12. Domain + SSL (30 min)
 
-- [ ] In Railway → production service → Settings → Custom Domain → add `<domain>` + `www.<domain>`.
+- [ ] In Railway → production service → Settings → Custom Domain → add `tariffrefundrequest.com` + `www.tariffrefundrequest.com`.
 - [ ] Update DNS at your registrar: CNAME `www` → `<project>.up.railway.app`; ALIAS/ANAME apex → Railway's target.
 - [ ] Let Railway auto-issue the Let's Encrypt cert (usually <2 min).
-- [ ] **Verify:** `https://<domain>` loads the marketing homepage with a valid certificate and no mixed-content warnings.
+- [ ] **Verify:** `https://tariffrefundrequest.com` loads the marketing homepage with a valid certificate and no mixed-content warnings.
 
 ---
 
