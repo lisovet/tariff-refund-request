@@ -1,23 +1,23 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T12:30:00Z
+**Updated**: 2026-04-21T12:38:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 59 → 60)
+**Loop state**: active (iteration 60 → 61)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 60 |
+| completed | 61 |
 | in-progress | 0 |
-| pending | 26 |
+| pending | 25 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 89 files, 705 tests pass |
+| `npm test` | green — 90 files, 736 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 24 routes |
@@ -25,38 +25,36 @@
 
 ## Last completed task
 
-**#60 — USER-TEST checkpoint #9 (ingestion handles real-world ACE export)**
+**#61 — CAPE Zod schemas**
 
-Implementation-side composition check codified as a permanent integration test (`tests/integration/ingestion/ace-pipeline.test.ts`) that exercises `parseAceCsv → classifyEntries → tagEntry` as a single pipeline against a synthetic 6-row ACE fixture:
+Three top-level shapes per ADR 014 + PRD 03 in `src/contexts/cape/schema.ts`:
 
-1. Brand-new in-window row → `outcome=new` + `phaseFlag` set.
-2. Duplicates an existing entry → `outcome=exact_duplicate`.
-3. Fuzzy match on `(date+IOR)` against existing → `outcome=fuzzy_review_pair`.
-4. Pre-window date → `outcome=new` but `inWindow=false` + `phaseFlag=null`.
-5. Post-window date → same shape as 4.
-6. Gibberish entry number + bad date → parser drops + records `AceParseError` on CSV row 7 (header is row 1).
-
-Asserts every parsed row stamps `sourceConfidence='high'` and every `tagEntry` result pins the `windowVersion` (whether in-window or out).
+- **`CapeEntryRowSchema`** — id, entryNumber matching `CANONICAL_ENTRY_NUMBER_RE`, entryDate `YYYY-MM-DD`, IOR non-empty, `dutyAmountUsdCents` non-negative integer, `htsCodes` ≥1 with 4.2.4 digit-dot pattern, phaseFlag, windowVersion, sourceConfidence (`high | medium | low`).
+- **`BatchSchema`** — id, caseId, label, `entryRecordIds` ≥1, phaseFlag, validationRunId, status from `BATCH_STATUSES` (`draft | validated | qa_pending | ready | submitted`).
+- **`ReadinessReportSchema`** — id, batchId, generatedAt ISO datetime, `entries[]` with `{entryId, status (ok|warning|blocking), notes[]}`, `prerequisites[]` `{id, label, met:bool}`, `blockingCount`/`warningCount`/`infoCount` non-negative ints, `artifactKeys {csvKey, pdfKey}`, optional `analystSignoff {staffUserId, signedAt, note}`.
+- `superRefine` cross-validates that `blockingCount` and `warningCount` match the actual entry-row totals — prevents lying about the dashboard counts.
+- `PrerequisiteCheckSchema` as a separate export. `SEVERITIES` + `ENTRY_STATUSES` enum constants.
+- 31 new tests covering happy + 5+ edge cases per shape (canonical entry-number, ISO date, integer duty, HTS pattern, batch status enum, severity enums, count-vs-entries cross-validation, prerequisite shape, optional signoff).
 
 ## Human-verification still owes
 
-- Run an anonymized REAL ACE export from a customer through the pipeline.
-- Verify header coverage; add synonyms if missing.
-- Confirm the analyst review queue surfaces `fuzzy_review_pair` + `invalid` + out-of-window correctly once the workspace UI for ingestion lands (#62+).
+- Confirm `BATCH_STATUSES` matches the ops console state lifecycle once #82 lands; tighten the enum if status names diverge.
+- Decide whether `ReadinessReport.entries[].notes[]` should be free-text or a controlled vocabulary (PRD 03 leaves it open; v1 accepts free-text).
+- Sign off on the cross-validation invariant — `blockingCount`/`warningCount` must equal the entry-row totals; some pipelines might want to allow drift for "in-flight" reports.
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #61 — deps satisfied. **Eligible — lowest id.**
-- Task #67 (CAPE prep workflow scaffold) — eligible.
-- Task #72 (admin dashboard scaffold) — eligible.
+- Task #62 — deps satisfied. **Eligible — lowest id.** This is the validator that consumes the schemas + produces the `ReadinessReport` aggregate.
+- Task #67 — eligible.
+- Task #72 — eligible.
 - Task #74 — eligible.
 - Task #75 — eligible.
 
-Lowest-id eligible is **task #61**.
+Lowest-id eligible is **task #62** — CAPE validator.
 
 ## Notes
 
-- 60/86 v1 done — past 70% of Phase 0.
-- Wave 9 (Entry ingestion + normalization) checkpointed.
-- Loop will continue with #61 next iteration.
+- 61/86 v1 done — 70.9% of Phase 0.
+- Wave 10 (CAPE schema + validator + CSV) starts. The schema is the canonical contract; #62 builds the validator on top.
+- Loop will continue with #62 next iteration.

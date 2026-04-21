@@ -1233,12 +1233,14 @@
         "dependencies": [
           55
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 4,
         "source": [
           "PRD 03",
           "ADR 014"
-        ]
+        ],
+        "completedAt": "2026-04-21T12:38:00Z",
+        "completedNotes": "CAPE Zod schemas per ADR 014 + PRD 03. Three top-level shapes in src/contexts/cape/schema.ts: CapeEntryRowSchema (id, entryNumber matching CANONICAL_ENTRY_NUMBER_RE, entryDate ISO YYYY-MM-DD, IOR non-empty, dutyAmountUsdCents non-negative integer, htsCodes \u22651 with 4.2.4 digit-dot pattern, phaseFlag, windowVersion, sourceConfidence high|medium|low). BatchSchema (id, caseId, label, entryRecordIds \u22651, phaseFlag, validationRunId, status from BATCH_STATUSES draft|validated|qa_pending|ready|submitted). ReadinessReportSchema (id, batchId, generatedAt ISO datetime, entries[] {entryId, status ok|warning|blocking, notes[]}, prerequisites[] {id, label, met:bool}, blockingCount/warningCount/infoCount non-negative ints, artifactKeys{csvKey, pdfKey}, optional analystSignoff{staffUserId, signedAt, note}). superRefine cross-validates that blockingCount and warningCount match the actual entry-row totals \u2014 prevents lying about the dashboard counts. PrerequisiteCheckSchema as a separate export. SEVERITIES + ENTRY_STATUSES enum constants. 31 new tests covering happy + 5+ edge cases per shape (entry-number canonical, ISO date, integer duty, HTS pattern, batch status enum, severity enums, ReadinessReport count-vs-entries cross-validation, prerequisite check shape, optional signoff). 736/736 pass; lint + typecheck clean; build green (24 routes \u2014 pure module)."
       },
       {
         "id": 62,
