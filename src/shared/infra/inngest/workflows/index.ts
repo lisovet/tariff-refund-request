@@ -1,4 +1,7 @@
-import { screenerCompletedWorkflow } from '@contexts/screener/server'
+import {
+  nudgeCadenceWorkflow,
+  screenerCompletedWorkflow,
+} from '@contexts/screener/server'
 import { smokeHelloWorld } from './smoke-hello-world'
 
 /**
@@ -15,6 +18,10 @@ import { smokeHelloWorld } from './smoke-hello-world'
  * re-exported from each context's `server.ts` (per ADR 001's
  * public-surface boundary). The registry just wires them together.
  */
-export const workflows = [smokeHelloWorld, screenerCompletedWorkflow] as const
+export const workflows = [
+  smokeHelloWorld,
+  screenerCompletedWorkflow,
+  nudgeCadenceWorkflow,
+] as const
 
-export { smokeHelloWorld, screenerCompletedWorkflow }
+export { smokeHelloWorld, screenerCompletedWorkflow, nudgeCadenceWorkflow }

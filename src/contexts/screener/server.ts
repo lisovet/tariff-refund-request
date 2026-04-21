@@ -37,6 +37,14 @@ export {
   type ScreenerCompletedHandlerDeps,
   type ScreenerCompletedResult,
 } from './workflows/screener-completed'
+export {
+  nudgeCadenceWorkflow,
+  nudgeCadenceHandler,
+  type NudgeCadenceHandlerInput,
+  type NudgeCadenceHandlerDeps,
+  type NudgeCadenceResult,
+  type CancelReason,
+} from './workflows/nudge-cadence'
 
 let cachedRepo: ScreenerRepo | undefined
 

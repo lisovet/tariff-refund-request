@@ -438,13 +438,15 @@
         "epic": "E12. Lifecycle email + Inngest",
         "title": "Lifecycle nudge cadence (24h, 72h)",
         "description": "Inngest schedules at 24h and 72h post-screener if no purchase; sends nudge templates.",
-        "details": "Cancellation if purchase event arrives.",
+        "details": "nudgeCadenceWorkflow triggered by platform/screener.completed. Two waitForEvent windows (24h + 48h additional) listening for platform/payment.completed filtered to the same sessionId. Nudge templates ScreenerNudge24hEmail (soft 'recovery comes first' framing) + ScreenerNudge72hEmail (founder-style 'hard part is records' framing). Both honour the canonical disclosure footer. Distinct idempotency keys per cadence step ('screener-nudge-24h:<sessionId>', 'screener-nudge-72h:<sessionId>'). platform/payment.completed event added to the catalog (Stripe webhook in task #33 will publish it).",
         "testStrategy": "Workflow test: simulate time advance; assert correct emails fire and stop on purchase.",
         "priority": "medium",
         "dependencies": [28],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 4,
-        "source": ["PRD 05"]
+        "source": ["PRD 05"],
+        "completedAt": "2026-04-21T08:35:00Z",
+        "completedNotes": "nudgeCadenceWorkflow triggered by platform/screener.completed (runs in parallel with the screener-completed workflow — results email goes out instantly, nudges wait). Two step.waitForEvent windows (24h then 48h more) listening for platform/payment.completed filtered to the same sessionId via Inngest's `if` expression. On purchase: cadence stops with cancelledBy ('purchase-during-24h-window' or '...-72h-window'). On timeout: send nudge with sessionId-scoped idempotencyKey for retry safety. Two new email templates (ScreenerNudge24hEmail soft-recovery framing + ScreenerNudge72hEmail founder-style records framing); both wrap in EmailLayout so the canonical disclosure rides on every send. platform/payment.completed event added to the typed catalog (Stripe webhook in task #33 will publish it). 4 new workflow tests (no-purchase fires both, purchase-in-window-1 cancels both, purchase-in-window-2 sends nudge 1 only, idempotencyKey assertions); 277/277 pass; lint + typecheck clean; build green. HUMAN-VERIFICATION: walk the cadence in Inngest dev UI — observe the two waitForEvent steps, simulate a payment.completed event mid-window, confirm the cadence cancels."
       },
       {
         "id": 30,

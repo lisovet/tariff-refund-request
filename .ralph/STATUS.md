@@ -1,23 +1,23 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T08:27:00Z
+**Updated**: 2026-04-21T08:35:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 26 → 27)
+**Loop state**: active (iteration 27 → 28)
 
 ## Counts
 
 | Status | Count |
 | --- | --- |
-| completed | 26 |
+| completed | 27 |
 | in-progress | 0 |
-| pending | 60 |
+| pending | 59 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 47 files, 273 tests pass |
+| `npm test` | green — 48 files, 277 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 16 routes |
@@ -25,25 +25,30 @@
 
 ## Last completed task
 
-**#28 — Lifecycle workflow #1: screener-completed**
+**#29 — Lifecycle nudge cadence (24h, 72h)**
 
-Refactor: the screener-results email is now sent durably via Inngest instead of inline in the route handler. Same end-user experience; the email survives transient failures via retries, and the same event triggers the downstream cadence chain (#29 / #30).
-
-- `platform/screener.completed` event added to the typed catalog (`eventType` + `staticSchema`).
-- `src/contexts/screener/workflows/screener-completed.ts` — handler with two `step.run` calls (render-email + send-email), idempotencyKey `screener-results:<sessionId>` so Inngest retries are safe. Wrapped via `inngest.createFunction` with `triggers: [screenerCompleted]`; handler exported separately so unit tests bypass the Inngest runtime.
-- Workflows registry includes `screenerCompletedWorkflow` alongside the smoke workflow.
-- `finalize.ts` refactored: was render+send inline; now publishes via a `publishCompleted` callback. The route handler wires `inngest.send` into it. Disqualified paths skip the publish (no email).
-- Bug caught + fixed during gates: Inngest's runtime context types its event union to include the synthetic `inngest/function.invoked` event; cast through `unknown` to satisfy TS without weakening the handler contract. Vitest's existing Inngest test transitively pulled `server-only` and tripped its client-only check; aliased `server-only` to a no-op module in `vitest.config.ts`.
+- `nudgeCadenceWorkflow` triggered by `platform/screener.completed` (runs in parallel with the screener-completed workflow — results email goes out instantly, nudges wait).
+- Two `step.waitForEvent` windows (24h then 48h more) listening for `platform/payment.completed` filtered to the same `sessionId` via Inngest's `if` expression.
+- On purchase: cadence stops with `cancelledBy` (`purchase-during-24h-window` or `...-72h-window`).
+- On timeout: send nudge with sessionId-scoped `idempotencyKey` for retry safety.
+- Two new email templates: `ScreenerNudge24hEmail` (soft-recovery framing) + `ScreenerNudge72hEmail` (founder-style records framing). Both wrap in `EmailLayout` so the canonical disclosure rides on every send.
+- `platform/payment.completed` event added to the typed catalog — Stripe webhook in task #33 will publish it.
+- 4 new workflow tests (no-purchase fires both, purchase-in-window-1 cancels both, purchase-in-window-2 sends nudge 1 only, idempotencyKey assertions).
 
 ## Human-verification still owes
 
-- Live `npm run dev` walkthrough: complete the screener; observe the event in the Inngest dev-server UI; confirm the workflow fires and delivers the email via the configured transport.
+- Walk the cadence in the Inngest dev UI — observe the two `waitForEvent` steps; simulate a `platform/payment.completed` event mid-window; confirm the cadence cancels.
 
 ## Next eligible
 
-Per dependency check: lowest-id eligible is **task #29** — Lifecycle nudge cadence (24h, 72h). Deps `[28]` now satisfied.
+Task #30 — Stalled-case cadence (48h, 96h, day-7). Deps `[28, 51]` — task #51 (recovery workspace UI) is later. Task #30 is task-blocked.
+
+Lowest-id eligible:
+- Task #31 (Lifecycle templates 4–9) — deps `[27]` satisfied. Eligible.
+
+Loop will pick **task #31** next iteration.
 
 ## Notes
 
-- Wave 5 (Lifecycle email + Inngest) 2/5 done.
-- Loop will continue with task #29 next iteration.
+- Wave 5 (Lifecycle email + Inngest) 3/5 done.
+- Loop will continue with task #31 next iteration.

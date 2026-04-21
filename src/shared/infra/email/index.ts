@@ -21,6 +21,8 @@ export { createConsoleTransport } from './console-transport'
 export { createResendTransport } from './resend-transport'
 export { renderEmail, type RenderedEmail } from './render'
 export { ScreenerResultsEmail } from './templates/ScreenerResultsEmail'
+export { ScreenerNudge24hEmail } from './templates/ScreenerNudge24hEmail'
+export { ScreenerNudge72hEmail } from './templates/ScreenerNudge72hEmail'
 
 let cached: EmailTransport | undefined
 

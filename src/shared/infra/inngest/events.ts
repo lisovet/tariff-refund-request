@@ -39,3 +39,21 @@ export const screenerCompleted = eventType('platform/screener.completed', {
     }
   }>(),
 })
+
+/**
+ * Fired by the Stripe webhook handler (lands in task #33) after a
+ * successful Checkout. Cancels lifecycle nudge cadences keyed on the
+ * same screenerSessionId. Carries enough metadata for the case state
+ * machine (task #41) to advance.
+ */
+export const paymentCompleted = eventType('platform/payment.completed', {
+  schema: staticSchema<{
+    data: {
+      sessionId: string // screener session — used for cadence cancellation
+      sku: string
+      stripeChargeId: string
+      amountUsdCents: number
+      email: string
+    }
+  }>(),
+})
