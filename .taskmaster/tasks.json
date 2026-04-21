@@ -510,13 +510,15 @@
         "epic": "E5. Stripe + pricing ladder",
         "title": "Pricing ladder in code (pricing.ts)",
         "description": "src/contexts/billing/pricing.ts — types, ladder, tier-determining function, success-fee config.",
-        "details": "PRICE_LADDER, SUCCESS_FEE_RATES, determineTier. Fully unit-tested.",
+        "details": "PRICE_LADDER (6 SKUs × 2 tiers, USD cents); SUCCESS_FEE_RATES (SMB 10–12%, mid-market 8–10%); SUCCESS_FEE_HARD_CAP $50k per case. determineTier({ entryCount, dutyAmountUsdCents }) — strict > thresholds (100 entries, $50k duty). priceFor(sku, tier). computeSuccessFeeCents({ refund, tier, rate? }) — clamps rate into the tier band, applies hard cap, rounds to whole cents, 0 on non-positive refund.",
         "testStrategy": "Unit tests cover SMB / mid-market boundaries; success-fee math; clamp logic.",
         "priority": "high",
         "dependencies": [1],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 4,
-        "source": ["PRD 06", "ADR 005"]
+        "source": ["PRD 06", "ADR 005"],
+        "completedAt": "2026-04-21T08:56:00Z",
+        "completedNotes": "src/contexts/billing/pricing.ts: PRICE_LADDER (6 SKUs × 2 tiers, all amounts in USD cents — Stripe's lingua franca); SUCCESS_FEE_RATES per PRD 06 (SMB { min: 0.10, max: 0.12 }, mid-market { min: 0.08, max: 0.10 }); SUCCESS_FEE_HARD_CAP $50k per case (a blanket dollar cap is the simplest defensible policy — if a future case warrants more it's a deliberate ladder change, not quiet drift). determineTier strict > thresholds (entryCount > 100 OR dutyAmount > $50k → mid_market) so the boundary cases land as SMB. priceFor(sku, tier) and computeSuccessFeeCents({ refund, tier, rate? }) helpers; rate is clamped to tier band [min, max], result rounded to whole cents, zero on non-positive refund. Re-exported from src/contexts/billing/index.ts (UI-safe — pure helpers + types). 27 new tests including ladder-table coverage, tier boundary tests, rate clamp behavior (low→min, high→max, default→min), $50k hard cap on a $1M refund, fractional-cent rounding, zero/negative refund handling. 319/319 pass; lint + typecheck clean; build green. Coverage on the pricing module is 100%; the billing context's overall coverage (69%) sits below the 80% threshold because the Drizzle repo can't unit-test without a real DB — qa script doesn't enforce coverage threshold (only test:coverage does), so build is green. HUMAN-VERIFICATION: review SUCCESS_FEE_HARD_CAP with founder/legal — $50k is a reasonable initial policy but worth confirming."
       },
       {
         "id": 35,
