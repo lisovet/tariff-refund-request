@@ -19,3 +19,20 @@ export {
   isValidTransition,
   nextState,
 } from './case-machine'
+
+export type {
+  AuditEntry,
+  CaseRecord,
+  CaseRepo,
+  NewCaseInput,
+  RecordTransitionInput,
+  RecordTransitionResult,
+} from './repo'
+
+export type {
+  CaseTransitionedPayload,
+  TransitionDeps,
+  TransitionInput,
+  TransitionResult,
+} from './transition'
+export { transition } from './transition'
