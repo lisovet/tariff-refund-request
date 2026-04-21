@@ -8,7 +8,7 @@ describe('/how-it-works', () => {
     render(<HowItWorksPage />)
     expect(screen.getByText('How it works')).toBeTruthy() // eyebrow
     const h1 = screen.getByRole('heading', { level: 1 })
-    expect(h1.textContent).toMatch(/Three movements/i)
+    expect(h1.textContent).toMatch(/Three stages\. Stop when you have what you need/i)
     expect(h1.className).toMatch(/font-display/)
   })
 

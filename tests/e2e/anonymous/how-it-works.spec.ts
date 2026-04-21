@@ -5,7 +5,7 @@ test.describe('/how-it-works', () => {
     await page.goto('/how-it-works')
 
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      /Three movements/i,
+      /Three stages\. Stop when you have what you need/i,
     )
     await expect(
       page.getByRole('heading', { name: '01 — Recovery' }),

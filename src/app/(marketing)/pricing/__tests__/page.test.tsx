@@ -34,9 +34,9 @@ describe('/pricing — page structure', () => {
     renderPricing()
     // Heading anchors per stage. Free tier rendered with same weight,
     // not de-emphasized.
-    expect(screen.getByRole('heading', { name: /find out if you qualify/i })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /recover your entries/i })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /prepare your file/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /see if it.?s worth your time/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /rebuild your entry list/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /turn it into a submission-ready package/i })).toBeInTheDocument()
   })
 
   it('renders Concierge as a separate section below', () => {

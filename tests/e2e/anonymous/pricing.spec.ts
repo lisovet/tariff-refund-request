@@ -12,13 +12,13 @@ test.describe('/pricing', () => {
 
     // Each stage section heading exists.
     await expect(
-      page.getByRole('heading', { name: /find out if you qualify/i }),
+      page.getByRole('heading', { name: /see if it.?s worth your time/i }),
     ).toBeVisible()
     await expect(
-      page.getByRole('heading', { name: /recover your entries/i }),
+      page.getByRole('heading', { name: /rebuild your entry list/i }),
     ).toBeVisible()
     await expect(
-      page.getByRole('heading', { name: /prepare your file/i }),
+      page.getByRole('heading', { name: /turn it into a submission-ready package/i }),
     ).toBeVisible()
 
     // Concierge as a separate region with success-fee disclosure.

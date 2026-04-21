@@ -14,7 +14,7 @@ import { Button, Eyebrow, Hairline } from '@/app/_components/ui'
 export const metadata = {
   title: 'How it works',
   description:
-    'Three movements: recover your entry numbers, prepare a CAPE-ready file, hand off to concierge support if you need it.',
+    'Three stages. Rebuild your entry list, prepare a submission-ready file, optionally hand off the filing. Stop when you have what you need.',
 }
 
 interface Stage {
@@ -31,9 +31,9 @@ const STAGES: readonly Stage[] = [
   {
     num: '01',
     title: 'Recovery',
-    priceLabel: '$99 — $499',
+    priceLabel: 'from $99',
     tagline:
-      'You may not know which entries you paid IEEPA on. We help you find them.',
+      'Rebuild the entry list. Every broker, every carrier, every ACE account your shipments touched — reconciled into one provenance-checked record.',
     weDo: [
       'Build a personalized outreach kit for your specific path — broker, carrier, or ACE self-export.',
       'Walk you through a secure upload portal that accepts 7501s, broker spreadsheets, carrier invoices, and ACE CSVs.',
@@ -50,9 +50,9 @@ const STAGES: readonly Stage[] = [
   {
     num: '02',
     title: 'Filing prep',
-    priceLabel: '$199 — $999',
+    priceLabel: 'from $199',
     tagline:
-      'A CBP-compliant CAPE file plus a Readiness Report your broker can submit without changes.',
+      'Turn the entry list into a submission-ready package. CBP-compliant CSV. Signed Readiness Report. Your broker files it unchanged.',
     weDo: [
       'Run the entry list through the CAPE validator: format checks, dedupe, phase segmentation, batch grouping.',
       'Generate a CBP-compliant CSV.',
@@ -68,8 +68,9 @@ const STAGES: readonly Stage[] = [
   {
     num: '03',
     title: 'Concierge',
-    priceLabel: '$999+ + 8–12% success fee',
-    tagline: 'For when you would rather hand the rest off.',
+    priceLabel: 'from $999 + success fee',
+    tagline:
+      'Hand off the filing. We coordinate with your broker, resolve ACE / ACH gaps, and monitor through CBP response. Success fee only if the refund posts.',
     weDo: [
       'Coordinate the actual filing with you or your broker.',
       'Handle ACE / ACH prerequisite gaps with a clear remediation plan.',
@@ -91,11 +92,12 @@ export default function HowItWorksPage() {
       <header className="mx-auto max-w-4xl px-6 pb-16 pt-32 sm:px-10 sm:pb-24 sm:pt-40">
         <Eyebrow>How it works</Eyebrow>
         <h1 className="mt-3 font-display text-5xl tracking-display text-ink sm:text-7xl">
-          Three movements, paid in stages.
+          Three stages. Stop when you have what you need.
         </h1>
         <p className="mt-10 max-w-2xl text-lg text-ink/80">
-          You can stop at any stage. Each one delivers a concrete
-          artifact — not a promise. The last stage is optional.
+          Each stage delivers a concrete artifact — a recovered
+          entry list, a submission-ready file, a monitored claim —
+          and is priced on its own. The last stage is optional.
         </p>
       </header>
 
@@ -161,11 +163,11 @@ export default function HowItWorksPage() {
         <Hairline />
         <div className="mx-auto max-w-3xl px-6 py-24 text-center sm:px-10 sm:py-32">
           <h2 className="font-display text-4xl tracking-display text-ink sm:text-5xl">
-            Ready when you are.
+            Start with the screener.
           </h2>
           <p className="mt-6 text-lg text-ink/80">
-            The screener takes about three minutes. No account required
-            until you see your results.
+            Ten questions. Three minutes. You&apos;ll see a refund
+            estimate at the end — no account required.
           </p>
           <div className="mt-10 inline-block">
             <Button as="a" href="/screener" variant="underline" size="lg">

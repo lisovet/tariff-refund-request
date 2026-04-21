@@ -21,9 +21,9 @@ import {
  */
 
 export const metadata = {
-  title: 'Pricing — paid in stages',
+  title: 'Pricing',
   description:
-    'Three workflow stages, paid only when you reach them. Free screener, recovery, filing prep. Concierge below — bespoke + success fee against the realized refund.',
+    'Paid in stages. Free screener, then recovery and filing prep only when you reach them. Concierge is optional — base fee plus a success fee tied to the realized refund.',
 }
 
 interface StageRow {
@@ -53,9 +53,9 @@ const STAGES: readonly Stage[] = [
   {
     id: 'screener',
     num: '00',
-    title: 'Find out if you qualify',
+    title: 'See if it’s worth your time',
     tagline:
-      'A focused, ten-question screener with a real estimate at the end. Three minutes. No account required.',
+      'Ten questions. Three minutes. A real refund estimate at the end — no account required, no paywall.',
     rows: [
       {
         sku: 'free',
@@ -68,9 +68,9 @@ const STAGES: readonly Stage[] = [
   {
     id: 'recovery',
     num: '01',
-    title: 'Recover your entries',
+    title: 'Rebuild your entry list',
     tagline:
-      'Find the entry numbers and source documents. Self-serve kit or analyst-extracted, depending on how much you have on hand.',
+      'Every entry you made during the IEEPA window, with its source document. Run it yourself with our outreach kit, or hand us the documents and an analyst extracts them.',
     rows: [
       {
         sku: 'recovery_kit',
@@ -89,9 +89,9 @@ const STAGES: readonly Stage[] = [
   {
     id: 'prep',
     num: '02',
-    title: 'Prepare your file',
+    title: 'Turn it into a submission-ready package',
     tagline:
-      'A CBP-compliant CSV plus a Readiness Report your broker can submit without changes. Validator sign-off before it reaches you.',
+      'A CBP-compliant CSV and a signed Readiness Report your broker can file unchanged. Reviewed by a named validator before it reaches you.',
     rows: [
       {
         sku: 'cape_prep_standard',
@@ -118,14 +118,15 @@ export default function PricingPage() {
           Paid in stages.
         </h1>
         <p className="mt-10 max-w-2xl text-lg text-ink/80">
-          You can stop at any stage. Each stage delivers a concrete
-          artifact — a recovered entry list, a CBP-compliant file, a
-          monitored claim — and is priced on its own.
+          You can stop at any stage. Each one delivers a concrete
+          artifact — a recovered entry list, a submission-ready file,
+          a monitored claim — and is priced on its own.
         </p>
         <p className="mt-6 max-w-2xl text-base text-ink/65">
-          Bands span SMB and mid-market. Tier is determined when you
-          start a case (over 100 entries or over $50,000 in IEEPA duty
-          paid puts you in mid-market).
+          Bands span SMB and mid-market. You land in mid-market if
+          your case has more than 100 entries or more than
+          <span className="font-mono"> $50,000 </span>
+          in IEEPA duty paid.
         </p>
       </header>
 
@@ -197,8 +198,9 @@ export default function PricingPage() {
             Concierge
           </h2>
           <p className="mt-8 max-w-2xl text-xl text-ink/85">
-            For when you would rather hand the rest off. Coordination,
-            prerequisite remediation, monitoring through refund posting.
+            Hand off the filing. We coordinate with your broker,
+            resolve ACE / ACH prerequisite gaps, and monitor through
+            CBP response. Success fee only when the refund posts.
           </p>
 
           <div
@@ -248,7 +250,7 @@ export default function PricingPage() {
         <div className="mx-auto max-w-4xl px-6 py-24 sm:px-10 sm:py-32">
           <Eyebrow>Monitoring</Eyebrow>
           <h2 className="mt-3 font-display text-3xl tracking-display text-ink sm:text-4xl">
-            Once you are filed, you can leave a watch on.
+            Stay informed after you file.
           </h2>
           <div
             data-sku="monitoring"
@@ -280,8 +282,8 @@ export default function PricingPage() {
             Start with the screener.
           </h2>
           <p className="mt-6 text-lg text-ink/80">
-            The first stage is free. You only meet a paywall once we
-            have something concrete to give you.
+            The screener is free. You only hit a paywall once we have
+            something concrete to give you in return.
           </p>
           <div className="mt-10 inline-block">
             <Button as="a" href="/screener" variant="underline" size="lg">
