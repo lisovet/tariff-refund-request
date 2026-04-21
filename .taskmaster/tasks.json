@@ -65,13 +65,15 @@
         "epic": "E1. Foundation",
         "title": "Set up Inngest client + dev server",
         "description": "Install Inngest, configure Vercel adapter route at /api/inngest, register dev server in `npm run dev`.",
-        "details": "src/shared/infra/inngest/client.ts. Workflow files co-located in contexts. Dev server runs via `npx inngest-cli@latest dev` concurrently with Next dev.",
+        "details": "Inngest 4.x SDK. Client at src/shared/infra/inngest/client.ts. Typed event catalog in events.ts via eventType + staticSchema. Workflows registry in workflows/index.ts (additive — downstream tasks append). Smoke workflow in workflows/smoke-hello-world.ts (handler exported separately for testing). Next route handler at src/app/api/inngest/route.ts via inngest/next adapter. npm run dev now runs Next + Inngest dev server in parallel via npm-run-all2.",
         "testStrategy": "Hello-world workflow fires and completes locally.",
         "priority": "high",
         "dependencies": [1],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 3,
-        "source": ["ADR 007"]
+        "source": ["ADR 007"],
+        "completedAt": "2026-04-21T05:58:00Z",
+        "completedNotes": "inngest@4.2 installed. Client constructed with stable id 'tariff-refund-platform'. Typed event catalog (platform/smoke.hello + platform/case.state.transitioned) using new eventType+staticSchema API. Smoke workflow with handler exported separately so unit tests bypass the Inngest wrapper. Next route handler at /api/inngest using the inngest/next serve adapter and the workflows registry. npm run dev now starts Next + Inngest dev server in parallel via npm-run-all2. 4 new tests (client + workflows registry + handler) RED-then-GREEN. All qa gates green: 38/38 tests, lint + typecheck clean. Live workflow firing is human-action (start the dev server)."
       },
       {
         "id": 5,
