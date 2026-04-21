@@ -1,3 +1,4 @@
+import { processedStripeEvents } from './schema/billing'
 import { customers, staffUsers } from './schema/identity'
 import { leads, screenerSessions } from './schema/screener'
 
@@ -16,12 +17,20 @@ export const schema = {
     staffUsers,
     screenerSessions,
     leads,
+    processedStripeEvents,
   },
 } as const
 
 export type Schema = typeof schema
 
 // Re-export tables for direct use by drizzle queries.
-export { customers, staffUsers, screenerSessions, leads }
+export {
+  customers,
+  staffUsers,
+  screenerSessions,
+  leads,
+  processedStripeEvents,
+}
 export type { CustomerRow, StaffUserRow } from './schema/identity'
 export type { ScreenerSessionRow, LeadRow } from './schema/screener'
+export type { ProcessedStripeEventRow } from './schema/billing'

@@ -1,67 +1,55 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T08:42:00Z
+**Updated**: 2026-04-21T08:50:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 28 → 29)
+**Loop state**: active (iteration 29 → 30)
 
 ## Counts
 
 | Status | Count |
 | --- | --- |
-| completed | 28 |
+| completed | 29 |
 | in-progress | 0 |
-| pending | 58 |
+| pending | 57 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 49 files, 283 tests pass |
+| `npm test` | green — 51 files, 292 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
-| `npm run build` | green — 16 routes |
+| `npm run build` | green — 17 routes (`/api/webhooks/stripe` added) |
+| `npm run db:generate` | green — 5 tables tracked, drizzle/0002_billing.sql committed |
 | `npm run qa` (combined) | green |
 
 ## Last completed task
 
-**#31 — Lifecycle templates 4–9**
+**#33 — Stripe SDK + webhook handler + idempotent dedupe**
 
-Six new React Email templates, each wrapping `EmailLayout` so the canonical "Not legal advice" disclosure rides on every send.
+Wave 6 (Stripe + pricing) begins.
 
-- `RecoveryPurchasedEmail` (#4) — welcome + first task framing.
-- `RecoveryMissingDocsEmail` (#5) — 96h check-in with a 15-minute call offer.
-- `EntryListReadyEmail` (#6) — restrained celebration + entry count + Prep next step.
-- `PrepReadyEmail` (#7) — Readiness Report delivered + Concierge upsell secondary link.
-- `ConciergeUpsellEmail` (#8) — at-the-moment-of-need framing with the success-fee mechanic spelled out.
-- `ReengagementEmail` (#9) — day-14 soft re-entry; "we don't auto-renew anything; the case stays in your account either way."
+- `stripe` SDK installed.
+- `src/shared/infra/db/schema/billing.ts` — `processed_stripe_events` table (event_id PK + event_type + processedAt) backs `ON CONFLICT DO NOTHING` dedupe per ADR 005.
+- `drizzle/0002_billing.sql` generated cleanly (5 tables tracked total).
+- `BillingRepo` contract + in-memory + Drizzle implementations.
+- `handleStripeEvent` dispatcher: marks-then-dispatches. Duplicate returns `{status: 'duplicate'}` without firing the publish callback. `checkout.session.completed` extracts metadata and publishes `platform/payment.completed` (which cancels the nudge cadence from #29 and will advance the case state machine in #41). Other event types are silent no-ops recorded in the dedupe table for audit.
+- `POST /api/webhooks/stripe` verifies the Stripe-Signature header via `stripe.webhooks.constructEventAsync` + `STRIPE_WEBHOOK_SECRET`; logs success/duplicate/error via observability adapters.
+- Public-surface split: `src/contexts/billing/index.ts` is UI-safe (types + handler); `src/contexts/billing/server.ts` (with `import 'server-only'`) exposes `getBillingRepo` + `getStripeClient` (Stripe client uses `2026-03-25.dahlia`).
+- 9 new tests RED-then-GREEN including the explicit REPLAY assertion (same event id twice → publish called once).
 
-Shared editorial primitives extracted to `templates/_components.tsx` (`H1`, `P` with size/muted variants, `PrimaryCta` ink-on-paper button, `SecondaryLink` accent-underlined, `greetingFor` helper) so the templates stay short and consistent.
+## Human-verification still owes
 
-6 new render-snapshot tests RED-then-GREEN.
-
-## Workflows that publish these emails
-
-The templates are ready when their publishing workflows land:
-
-- `recovery-purchased` workflow → fires on the Stripe webhook (task #33) for Recovery SKUs.
-- `recovery-missing-docs` cadence → 96h after recovery purchase, no documents (Phase-1 ops scaling).
-- `entry-list-ready` → fires when an analyst marks the entry list ready (task #41 case state machine + the recovery context).
-- `prep-ready` → fires on validator sign-off (task #65).
-- `concierge-upsell` → fires when prep is ready and Concierge isn't already active.
-- `re-engagement` → day-14 stalled-case sweep (Phase-1 ops scaling).
+- Provision Stripe test mode; set `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET`.
+- Use stripe-cli `stripe listen` to forward events locally.
+- Verify a real `checkout.session.completed` publishes the cadence-cancel event.
 
 ## Next eligible
 
-Per dependency check:
-- Task #32 (USER-TEST: Lifecycle emails reviewed) — deps `[28, 29, 30, 31]`. Task #30 is task-blocked on #51, so #32 is task-blocked too.
-- Task #33 (Stripe SDK + webhook handler) — deps `[2]` satisfied. Eligible.
-- Task #34 (pricing.ts) — deps `[1]` satisfied. Eligible.
-- Task #39 (cases + audit_log schema) — deps `[2]` satisfied. Eligible.
-
-Lowest-id eligible is **task #33** — Wave 6 (Stripe + pricing) begins next iteration.
+Task #34 — Pricing ladder in code (`pricing.ts`). Deps `[1]` — eligible.
 
 ## Notes
 
-- Wave 5 (Lifecycle email + Inngest) 4/5 done; #30 + #32 blocked on #51.
-- Loop will pivot to Wave 6 (Stripe + pricing) next iteration with task #33.
+- Wave 6 (Stripe + pricing) 1/5 done.
+- Loop will continue with task #34 next iteration.

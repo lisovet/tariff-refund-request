@@ -495,13 +495,15 @@
         "epic": "E5. Stripe + pricing ladder",
         "title": "Stripe SDK integration + webhook handler",
         "description": "Install Stripe, set up webhook route /api/stripe/webhooks, idempotent event handling.",
-        "details": "Dedupe by Stripe event id (Postgres unique index). All handlers wrapped in transactions.",
+        "details": "stripe SDK installed. processed_stripe_events table (event_id PK + event_type + processedAt) backs ON CONFLICT DO NOTHING dedupe per ADR 005. BillingRepo contract + in-memory + Drizzle implementations. handleStripeEvent dispatcher: marks-then-dispatches (duplicate returns no-op without side effects); checkout.session.completed publishes platform/payment.completed (cancels nudge cadence in #29 + advances case state in #41); other event types are silent no-ops recorded in dedupe table for audit. POST /api/webhooks/stripe verifies signature via constructEventAsync + STRIPE_WEBHOOK_SECRET. Public-surface split: index.ts UI-safe; server.ts (server-only) has the Stripe client + repo factory.",
         "testStrategy": "Replay same event twice — only one DB effect.",
         "priority": "high",
         "dependencies": [2],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 4,
-        "source": ["ADR 005"]
+        "source": ["ADR 005"],
+        "completedAt": "2026-04-21T08:50:00Z",
+        "completedNotes": "stripe SDK installed. src/shared/infra/db/schema/billing.ts adds processed_stripe_events (event_id PK + event_type + processedAt) backing ON CONFLICT DO NOTHING dedupe per ADR 005. drizzle/0002_billing.sql generated cleanly (5 tables tracked total). BillingRepo contract in src/contexts/billing/repo.ts; in-memory + Drizzle implementations. handleStripeEvent in event-handler.ts: marks-then-dispatches (duplicate returns {status: 'duplicate'} without firing the publish callback); checkout.session.completed extracts metadata.screenerSessionId / sku / payment_intent / amount_total / customer_email and publishes platform/payment.completed (which cancels the nudge cadence from #29 and will advance the case state machine in #41); other event types are silent no-ops recorded in the dedupe table for audit. POST /api/webhooks/stripe verifies the Stripe-Signature header via stripe.webhooks.constructEventAsync + STRIPE_WEBHOOK_SECRET; logs success/duplicate/error via observability adapters. Public-surface split: src/contexts/billing/index.ts is UI-safe (types + handler); src/contexts/billing/server.ts (with import 'server-only') exposes getBillingRepo + getStripeClient (Stripe client uses 2026-03-25.dahlia api version). 9 new tests RED-then-GREEN including the explicit REPLAY assertion (same event id twice → publish called once); 292/292 pass; lint + typecheck clean; build green (17 routes — /api/webhooks/stripe added). HUMAN-VERIFICATION: provision Stripe test mode + STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET; use stripe-cli `stripe listen` to forward events locally; verify a real checkout.session.completed publishes the cadence-cancel event."
       },
       {
         "id": 34,

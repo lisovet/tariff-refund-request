@@ -29,4 +29,8 @@ describe('db schema module', () => {
     expect(schema.tables).toHaveProperty('screenerSessions')
     expect(schema.tables).toHaveProperty('leads')
   })
+
+  it('registers billing tables (processed_stripe_events)', () => {
+    expect(schema.tables).toHaveProperty('processedStripeEvents')
+  })
 })
