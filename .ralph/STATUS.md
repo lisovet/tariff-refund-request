@@ -1,23 +1,23 @@
 # Ralph Loop Status
 
-**Updated**: 2026-04-21T10:08:00Z
+**Updated**: 2026-04-21T10:13:00Z
 **Branch**: claude/scaffold-platform
-**Loop state**: active (iteration 38 → 39)
+**Loop state**: active (iteration 39 → 40)
 
 ## Counts (v1 — task ids ≤ 86)
 
 | Status | Count |
 | --- | --- |
-| completed | 38 |
+| completed | 39 |
 | in-progress | 0 |
-| pending | 48 |
+| pending | 47 |
 | human-blocked | 0 |
 
 ## Quality gates (last run)
 
 | Gate | Status |
 | --- | --- |
-| `npm test` | green — 62 files, 436 tests pass |
+| `npm test` | green — 63 files, 438 tests pass |
 | `npm run lint` | clean |
 | `npm run typecheck` | clean |
 | `npm run build` | green — 19 routes |
@@ -25,34 +25,37 @@
 
 ## Last completed task
 
-**#42 — Audit log mirror to Axiom**
+**#43 — USER-TEST checkpoint #4 (state machine governance)**
 
-- `auditLogMirrorWorkflow` listens on `platform/case.state.transitioned` and emits a structured `audit_log.mirror` info-level log via the Axiom logger. Attrs: `caseId`, `auditId`, `kind`, `from`, `to`, `actorId`, `occurredAt`.
-- Best-effort per ADR 013:
-  - When `AXIOM_TOKEN` is missing, the no-op logger short-circuits the mirror to `mirrored: false`. Workflow succeeds; no Inngest retry.
-  - When the live Axiom client throws, the workflow rethrows so Inngest retries with backoff.
-- NEVER blocks the transactional case-state write — task #41 commits the DB write before publishing the event; the mirror runs out-of-band.
-- `caseStateTransitioned` event schema extended with `auditId`, `kind`, `occurredAt`. `transition()` threads them into the publish payload (existing transition tests updated to assert the new shape).
-- Workflow registered in `src/shared/infra/inngest/workflows/index.ts` and re-exported from `@contexts/ops/server`.
-- 3 new audit-mirror tests + 1 existing transition test updated. 436/436 pass.
+Implementation-side static-analysis sweep completed and codified as a permanent test:
+
+- `tests/integration/governance/case-state-writes.test.ts` enforces two invariants on every CI run:
+  1. No source file outside `@contexts/ops/` mutates `cases.state` (via INSERT, UPDATE, drizzle `.set({state:...})`, or property assignment).
+  2. No source file outside `@contexts/ops/` value-imports the `cases` table (type-only imports of `CaseRow` are permitted for downstream contexts).
+- Walk allowlist: the schema definition (`src/shared/infra/db/schema/cases.ts`), the schema barrel (`src/shared/infra/db/schema.ts`), and schema-level smoke tests. Everything else is policed.
+- Current tree passes both: only `@contexts/ops/drizzle-repo.ts` writes `cases.state`, only via `recordTransition` inside `db.transaction()`.
+- Audit-log capture: every transition writes an audit row (task #41), the row is mirrored to Axiom (task #42), the payload column strips actor (PII on `actorId` only).
+
+Wave 7 (Case state machine + audit log) implementation-side checkpoint is complete.
 
 ## Human-verification still owes
 
-- Stand up Axiom dataset; populate `AXIOM_TOKEN` + `AXIOM_DATASET`; trigger a real transition; confirm row appears within 5s per task #42 acceptance.
-- Confirm dataset retention + RBAC are configured per ADR 013.
+- Ops staff review of the audit-log timeline UX (blocked on task #82 — admin console build).
+- Confirm the Axiom mirror surfaces the expected compliance fields once a real dataset exists.
+- Sign off on the governance test as the durable check.
 
 ## Next eligible
 
 Per dependency check (v1 only):
-- Task #43 (USER-TEST: State machine governance) — deps `[41, 42]` satisfied. **Eligible — lowest id.** Per loop precedent (#7, #13, #19, #26): mark completed with explicit "human owes" notes after running the implementation-side static-analysis check (grep for direct writes to `cases.state` outside `@contexts/ops/server`).
-- Task #44 (documents + recovery_sources schema) — deps satisfied.
+- Task #44 (documents + recovery_sources schema) — deps `[2]` satisfied. **Eligible — lowest id.**
 - Task #49 (recovery routing — broker vs DIY) — deps satisfied.
 - Task #67 (CAPE prep workflow scaffold) — deps satisfied.
 - Task #72 (admin dashboard scaffold) — deps satisfied.
+- Task #74 — eligible.
 
-Lowest-id eligible is **task #43** — USER-TEST checkpoint #4.
+Lowest-id eligible is **task #44** — Drizzle schema for documents + recovery_sources.
 
 ## Notes
 
-- Wave 7 (Case state machine + audit log) 4/several done.
-- Loop will continue with task #43 next iteration — the static-analysis sweep can be done in-loop as evidence for the human reviewer.
+- 39/86 v1 done. Wave 8 (Recovery context — documents, sources, routing) starts next iteration.
+- Loop will pick #44 next iteration.

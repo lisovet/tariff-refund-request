@@ -862,11 +862,13 @@
           41,
           42
         ],
-        "status": "pending",
+        "status": "completed",
         "estimateHours": 1,
         "source": [
           "validation-checkpoint"
-        ]
+        ],
+        "completedAt": "2026-04-21T10:13:00Z",
+        "completedNotes": "USER-TEST checkpoint #4 (state machine governance). Implementation-side static-analysis sweep completed + codified as a permanent test (tests/integration/governance/case-state-writes.test.ts). Two governance assertions: (1) no source file outside @contexts/ops/ mutates cases.state via INSERT/UPDATE/property assignment; (2) no source file outside @contexts/ops/ value-imports the cases table (type-only imports allowed for downstream contexts that need CaseRow). The walk allowlist covers the schema definition + barrel + schema-level smoke tests; everything else is policed. Both tests pass against the current tree \u2014 only @contexts/ops/drizzle-repo.ts writes cases.state, only via recordTransition inside db.transaction(). Audit log captures every transition (verified by task #41 happy-path + actor enrichment + audit-mirror tests; payload column strips actor \u2014 PII on actorId only). 438/438 pass; lint + typecheck clean. Human owes: ops staff review of the audit-log timeline UX (blocked on task #82 \u2014 admin console build); confirm the Axiom mirror surfaces the expected compliance fields once a real dataset exists; sign off on the governance test as the durable check."
       },
       {
         "id": 44,
