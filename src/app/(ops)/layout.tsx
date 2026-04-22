@@ -1,5 +1,6 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import { TrustFootnote } from '@/app/_components/ui'
+import { EnsureActiveOrg } from '@/app/_components/auth/EnsureActiveOrg'
 import { ShortcutOverlay } from './_components/ShortcutOverlay'
 
 /**
@@ -21,6 +22,7 @@ export default function OpsLayout({
 }) {
   return (
     <ClerkProvider>
+      <EnsureActiveOrg />
       <div className="flex min-h-[100dvh] flex-col bg-paper">
         <div className="flex-1">{children}</div>
         <TrustFootnote asFooter />
