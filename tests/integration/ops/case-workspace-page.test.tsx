@@ -101,7 +101,8 @@ describe('/ops/case/[id] — happy path', () => {
 
     // Left pane
     expect(screen.getByTestId('case-id').textContent).toBe('cas_test')
-    expect(screen.getByTestId('state-pill').textContent).toBe('AWAITING DOCS')
+    // Source string is sentence case; CSS uppercases the visual.
+    expect(screen.getByTestId('state-pill').textContent).toBe('Awaiting docs')
     expect(screen.getByTestId('case-path').textContent).toBe('BROKER')
 
     // Center pane

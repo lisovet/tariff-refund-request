@@ -5,86 +5,11 @@ import { isCustomer, isStaff } from '@shared/infra/auth/actor'
 import { resolveCurrentActor } from '@shared/infra/auth/resolver'
 import { getIdentityRepo } from '@contexts/identity'
 import { getCaseRepo } from '@contexts/ops/server'
-import type { CaseRecord } from '@contexts/ops'
+import { STATE_COPY, type CaseRecord } from '@contexts/ops'
 
 export const metadata = {
   title: 'Your cases',
   description: 'Your IEEPA refund cases and their current status.',
-}
-
-const STATE_COPY: Record<CaseRecord['state'], { label: string; description: string }> = {
-  new_lead: {
-    label: 'Getting started',
-    description: "We've received your screener — next step is to purchase Recovery so we can rebuild your entry list.",
-  },
-  qualified: {
-    label: 'Eligible',
-    description: 'Your answers qualify. Purchase Recovery to open the case.',
-  },
-  disqualified: {
-    label: 'Not a fit right now',
-    description: "Based on your screener we don't see an obvious IEEPA refund. We'll reach out if that changes.",
-  },
-  awaiting_purchase: {
-    label: 'Awaiting purchase',
-    description: 'Complete the Recovery purchase to move forward.',
-  },
-  awaiting_docs: {
-    label: 'Awaiting documents',
-    description: 'Upload what you have — 7501s, broker spreadsheets, carrier invoices, or ACE CSVs.',
-  },
-  entry_recovery_in_progress: {
-    label: 'Recovery in progress',
-    description: "We're reconciling your entries across broker, carrier, and ACE sources.",
-  },
-  entry_list_ready: {
-    label: 'Entry list ready',
-    description: 'Review the recovered entry list. Next: purchase Filing prep.',
-  },
-  awaiting_prep_purchase: {
-    label: 'Awaiting Filing prep purchase',
-    description: 'Purchase Filing prep to move from entry list to submission-ready file.',
-  },
-  cape_prep_in_progress: {
-    label: 'Filing prep in progress',
-    description: "We're running your entries through the CAPE validator and drafting the Readiness Report.",
-  },
-  batch_qa: {
-    label: 'Human QA',
-    description: 'A validator is reviewing your batch before it ships.',
-  },
-  submission_ready: {
-    label: 'Submission ready',
-    description: 'Your CSV + Readiness Report are available. You or your broker submit to CBP.',
-  },
-  concierge_active: {
-    label: 'Concierge active',
-    description: "We're coordinating the filing with you or your broker.",
-  },
-  filed: {
-    label: 'Filed',
-    description: 'Your claim was filed. Monitoring CBP status.',
-  },
-  pending_cbp: {
-    label: 'Pending CBP',
-    description: 'CBP is reviewing. Refund timing depends on their review.',
-  },
-  deficient: {
-    label: 'Needs remediation',
-    description: 'CBP flagged an issue. Coordinator is on it.',
-  },
-  paid: {
-    label: 'Refund posted',
-    description: 'Your refund has posted. Thank you for trusting us.',
-  },
-  stalled: {
-    label: 'Stalled',
-    description: 'Waiting on your response — check your email for next steps.',
-  },
-  closed: {
-    label: 'Closed',
-    description: 'Case closed. No action needed.',
-  },
 }
 
 export default async function CustomerHome() {
@@ -152,7 +77,7 @@ function EmptyState() {
 }
 
 function CaseCard({ record }: { readonly record: CaseRecord }) {
-  const { label, description } = STATE_COPY[record.state]
+  const { customerLabel, customerDescription } = STATE_COPY[record.state]
   const shortId = record.id.slice(0, 10)
   const canEnterRecovery = record.state === 'awaiting_docs' || record.state === 'entry_recovery_in_progress'
   const workspaceHref = canEnterRecovery ? `/app/case/${record.id}/recovery` : null
@@ -164,10 +89,10 @@ function CaseCard({ record }: { readonly record: CaseRecord }) {
           Case {shortId}
         </p>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent">
-          {label}
+          {customerLabel}
         </p>
       </div>
-      <p className="mt-6 text-lg text-ink/85">{description}</p>
+      <p className="mt-6 text-lg text-ink/85">{customerDescription}</p>
 
       {workspaceHref ? (
         <div className="mt-8">

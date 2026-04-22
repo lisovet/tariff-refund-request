@@ -40,7 +40,9 @@ describe('CaseHeaderPanel', () => {
     )
     const pill = screen.getByTestId('state-pill')
     expect(pill.getAttribute('data-state')).toBe('awaiting_docs')
-    expect(pill.textContent).toBe('AWAITING DOCS')
+    // Source string is sentence case; CSS uppercases the visual.
+    expect(pill.textContent).toBe('Awaiting docs')
+    expect(pill.className).toMatch(/uppercase/)
   })
 
   it('renders SLA hours from the recovery plan in mono', () => {

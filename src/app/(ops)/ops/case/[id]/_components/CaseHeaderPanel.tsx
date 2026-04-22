@@ -1,4 +1,4 @@
-import type { CaseRecord } from '@contexts/ops'
+import { STATE_COPY, type CaseRecord } from '@contexts/ops'
 import type { RecoveryPlan } from '@contexts/recovery'
 import { SlaBadge } from './SlaBadge'
 
@@ -6,28 +6,12 @@ import { SlaBadge } from './SlaBadge'
  * Left pane of the ops case workspace per PRD 04. Bloomberg-terminal
  * energy: dense, mono numerics, hairline-divided rows, status pill
  * driven by case state.
+ *
+ * State labels pull from the shared `STATE_COPY` module in
+ * `@contexts/ops` — same source as the customer dashboard — so the
+ * two surfaces never drift. CSS uppercases the label to match the
+ * ops-console typography; the source of truth stays sentence-case.
  */
-
-const STATE_LABEL_BY_STATE: Readonly<Record<string, string>> = {
-  new_lead: 'NEW LEAD',
-  qualified: 'QUALIFIED',
-  disqualified: 'DISQUALIFIED',
-  awaiting_purchase: 'AWAITING PURCHASE',
-  awaiting_docs: 'AWAITING DOCS',
-  entry_recovery_in_progress: 'RECOVERY IN PROGRESS',
-  entry_list_ready: 'ENTRY LIST READY',
-  awaiting_prep_purchase: 'AWAITING PREP PURCHASE',
-  cape_prep_in_progress: 'CAPE PREP IN PROGRESS',
-  batch_qa: 'BATCH QA',
-  submission_ready: 'SUBMISSION READY',
-  concierge_active: 'CONCIERGE ACTIVE',
-  filed: 'FILED',
-  pending_cbp: 'PENDING CBP',
-  deficient: 'DEFICIENT',
-  paid: 'PAID',
-  stalled: 'STALLED',
-  closed: 'CLOSED',
-}
 
 export interface CaseHeaderPanelProps {
   readonly caseRecord: CaseRecord
@@ -35,7 +19,7 @@ export interface CaseHeaderPanelProps {
 }
 
 export function CaseHeaderPanel({ caseRecord, plan }: CaseHeaderPanelProps) {
-  const stateLabel = STATE_LABEL_BY_STATE[caseRecord.state] ?? caseRecord.state.toUpperCase()
+  const stateLabel = STATE_COPY[caseRecord.state]?.opsLabel ?? caseRecord.state
   const ageMs = Date.now() - caseRecord.updatedAt.getTime()
 
   return (
