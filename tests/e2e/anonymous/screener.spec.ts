@@ -19,7 +19,7 @@ test.describe('/screener', () => {
       page.getByRole('heading', { name: /Probably not a fit/i }),
     ).toBeVisible()
     await expect(
-      page.getByText(/no_imports_in_window/i),
+      page.getByText(/imports fell outside the IEEPA refund window/i),
     ).toBeVisible()
   })
 
