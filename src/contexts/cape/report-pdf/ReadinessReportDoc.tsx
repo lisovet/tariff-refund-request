@@ -7,7 +7,6 @@ import { SignOffBlock, type SignOffBlockProps } from './SignOffBlock'
 import { Footnotes, type FootnoteItem } from './Footnotes'
 import { DisclosureFooter } from './DisclosureFooter'
 import { FONT_FAMILIES, registerReadinessFonts } from './fonts'
-import { SUBMISSION_CONTROL_CLAUSE } from '@/shared/disclosure/constants'
 import type { PrerequisiteCheck } from '../schema'
 
 /**
@@ -69,14 +68,6 @@ const styles = StyleSheet.create({
   },
 })
 
-/**
- * Short disclosure footnote preserved for backwards compatibility
- * with task #67-era tests. The full, multi-line disclosure block is
- * rendered by `DisclosureFooter` via `CANONICAL_TRUST_PROMISE` +
- * siblings (see `src/shared/disclosure/constants.ts`).
- */
-const DISCLOSURE_FOOTNOTE = `Not legal advice. ${SUBMISSION_CONTROL_CLAUSE} Every artifact has been human-reviewed before reaching you.`
-
 export function ReadinessReportDoc(props: ReadinessReportDocProps) {
   registerReadinessFonts()
   const { body } = props
@@ -115,5 +106,3 @@ export function ReadinessReportDoc(props: ReadinessReportDocProps) {
     </Document>
   )
 }
-
-export { DISCLOSURE_FOOTNOTE }
