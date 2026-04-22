@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 import { ESLint } from 'eslint'
 
 /**
@@ -13,16 +13,21 @@ import { ESLint } from 'eslint'
  * `npm run lint` job in CI.
  */
 
-async function lintFixture(source: string, filename = 'fixture.ts') {
-  const eslint = new ESLint({
+let eslint: ESLint
+
+// Loading ESLint's config + plugin graph takes ~3s and only happens on
+// the first `lintText` call. Doing it in beforeAll (with a warm-up
+// call) keeps every test body well under vitest's default timeout.
+beforeAll(async () => {
+  eslint = new ESLint({
     overrideConfigFile: new URL('../../../eslint.config.mjs', import.meta.url).pathname,
   })
+  await eslint.lintText('export const warmup = 1\n', { filePath: 'warmup.ts' })
+}, 30_000)
+
+async function messagesFor(source: string, filename = 'fixture.ts') {
   const results = await eslint.lintText(source, { filePath: filename })
   return results[0]?.messages ?? []
-}
-
-function messagesFor(source: string) {
-  return lintFixture(source)
 }
 
 describe('ADR 001 — cross-context public surface lint rule', () => {
