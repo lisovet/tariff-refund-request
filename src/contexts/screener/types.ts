@@ -24,13 +24,20 @@ export type DutyBand =
   | 'band_over_5m'
 
 export type GoodsCategory =
-  | 'electronics'
-  | 'apparel'
-  | 'home_goods'
-  | 'industrial'
-  | 'auto_parts'
-  | 'food_beverage'
+  | 'apparel_fashion'
+  | 'jewelry_watches'
+  | 'consumer_electronics'
+  | 'furniture_home'
+  | 'footwear'
+  | 'toys_games'
+  | 'machinery_parts'
+  | 'steel_metals'
   | 'other'
+
+export interface GoodsCategorySelection {
+  readonly categories: readonly GoodsCategory[]
+  readonly otherText?: string
+}
 
 export interface EmailCapture {
   readonly company: string
@@ -44,7 +51,7 @@ export interface ScreenerAnswers {
   q4?: ClearancePath
   q5?: ShipmentBand
   q6?: DutyBand
-  q7?: readonly GoodsCategory[]
+  q7?: GoodsCategorySelection
   q8?: YesNoUnknown // entries liquidated
   q9?: YesNoUnknown // ACE account
   q10?: EmailCapture

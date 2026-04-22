@@ -32,8 +32,12 @@ function isAnswered(answers: ScreenerAnswers, id: Question['id']): boolean {
   if (Array.isArray(value)) return value.length > 0
   if (typeof value === 'string') return value.length > 0
   if (typeof value === 'object') {
-    // Email-capture object: company + email both required.
     const o = value as unknown as Record<string, unknown>
+    // q7 goods-category selection: non-empty categories array.
+    if (Array.isArray(o.categories)) {
+      return o.categories.length > 0
+    }
+    // Email-capture object: company + email both required.
     return (
       typeof o.company === 'string' &&
       o.company.length > 0 &&

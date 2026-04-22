@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { Question } from '@contexts/screener'
+import { COUNTRIES, filterCountries } from '@contexts/screener'
 import { Button } from '@/app/_components/ui'
 
 /**
@@ -23,13 +24,15 @@ interface Props {
 }
 
 const CATEGORIES = [
-  { id: 'electronics', label: 'Electronics' },
-  { id: 'apparel', label: 'Apparel' },
-  { id: 'home_goods', label: 'Home goods' },
-  { id: 'industrial', label: 'Industrial / equipment' },
-  { id: 'auto_parts', label: 'Auto parts' },
-  { id: 'food_beverage', label: 'Food / beverage' },
-  { id: 'other', label: 'Other' },
+  { id: 'apparel_fashion', label: 'Apparel & fashion' },
+  { id: 'jewelry_watches', label: 'Jewelry & watches' },
+  { id: 'consumer_electronics', label: 'Consumer electronics' },
+  { id: 'furniture_home', label: 'Furniture & home goods' },
+  { id: 'footwear', label: 'Footwear' },
+  { id: 'toys_games', label: 'Toys & games' },
+  { id: 'machinery_parts', label: 'Machinery & parts' },
+  { id: 'steel_metals', label: 'Steel & metals' },
+  { id: 'other', label: 'Other (please specify)' },
 ] as const
 
 const CLEARANCE_PATHS = [
@@ -153,29 +156,115 @@ function CountryInput({
 }: {
   readonly onSubmit: (value: AnyAnswer) => void
 }) {
-  const [country, setCountry] = useState('')
+  const [query, setQuery] = useState('')
+  const [selected, setSelected] = useState<string | null>(null)
+  const [open, setOpen] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const listboxId = 'country-listbox'
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const matches = useMemo(() => filterCountries(query), [query])
+  const canSubmit = (selected ?? query.trim()).length > 0
+
+  function choose(name: string): void {
+    setSelected(name)
+    setQuery(name)
+    setOpen(false)
+    setActiveIndex(0)
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>): void {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setOpen(true)
+      setActiveIndex((i) => Math.min(i + 1, matches.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setActiveIndex((i) => Math.max(i - 1, 0))
+    } else if (e.key === 'Enter' && open && matches[activeIndex]) {
+      e.preventDefault()
+      choose(matches[activeIndex].name)
+    } else if (e.key === 'Escape') {
+      setOpen(false)
+    }
+  }
+
   return (
     <form
       className="flex flex-col gap-4"
       onSubmit={(e) => {
         e.preventDefault()
-        if (country.trim().length > 0) onSubmit(country.trim())
+        const value = selected ?? query.trim()
+        if (value.length > 0) onSubmit(value)
       }}
     >
       <label className="flex flex-col gap-2">
         <span className="font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
-          Country (ISO code or name)
+          Country
         </span>
-        <input
-          type="text"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          className="w-full max-w-md rounded-card border border-rule bg-paper-2 px-4 py-3 text-ink focus:border-ink focus:outline-none"
-          aria-label="Country"
-        />
+        <div className="relative w-full max-w-md">
+          <input
+            ref={inputRef}
+            type="text"
+            role="combobox"
+            aria-expanded={open}
+            aria-controls={listboxId}
+            aria-autocomplete="list"
+            aria-activedescendant={
+              open && matches[activeIndex]
+                ? `country-option-${matches[activeIndex].iso}`
+                : undefined
+            }
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value)
+              setSelected(null)
+              setOpen(true)
+              setActiveIndex(0)
+            }}
+            onFocus={() => setOpen(true)}
+            onBlur={() => {
+              // Delay so a click on an option fires before close.
+              setTimeout(() => setOpen(false), 120)
+            }}
+            onKeyDown={handleKeyDown}
+            className="w-full rounded-card border border-rule bg-paper-2 px-4 py-3 text-ink focus:border-ink focus:outline-none"
+            aria-label="Country"
+            autoComplete="off"
+            placeholder="Start typing…"
+          />
+          {open && matches.length > 0 && (
+            <ul
+              id={listboxId}
+              role="listbox"
+              className="absolute left-0 right-0 top-full z-10 mt-1 max-h-60 overflow-auto rounded-card border border-rule bg-paper shadow-sm"
+            >
+              {matches.map((c, i) => (
+                <li
+                  key={c.iso}
+                  id={`country-option-${c.iso}`}
+                  role="option"
+                  aria-selected={i === activeIndex}
+                  className={`cursor-pointer px-4 py-2 text-ink ${
+                    i === activeIndex ? 'bg-paper-2' : ''
+                  }`}
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    choose(c.name)
+                  }}
+                  onMouseEnter={() => setActiveIndex(i)}
+                >
+                  {c.name}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </label>
       <div className="flex gap-4">
-        <Button type="submit">Continue</Button>
+        <Button type="submit" disabled={!canSubmit}>
+          Continue
+        </Button>
         <Button variant="underline" onClick={() => onSubmit('unknown')}>
           I don&apos;t know
         </Button>
@@ -184,17 +273,36 @@ function CountryInput({
   )
 }
 
+// Keep an import reference so tree-shaking doesn't drop the seed data
+// when consumed only via `filterCountries`.
+export const _COUNTRIES_SEEN = COUNTRIES.length
+
+const OTHER_TEXT_MAX = 120
+
 function MultiCategoryInput({
   onSubmit,
 }: {
   readonly onSubmit: (value: AnyAnswer) => void
 }) {
   const [picked, setPicked] = useState<string[]>([])
+  const [otherText, setOtherText] = useState('')
+  const otherChecked = picked.includes('other')
+
   const toggle = (id: string) => {
     setPicked((prev) =>
       prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
     )
   }
+
+  const handleContinue = () => {
+    const trimmed = otherText.trim().slice(0, OTHER_TEXT_MAX)
+    const selection = {
+      categories: picked,
+      ...(otherChecked && trimmed.length > 0 ? { otherText: trimmed } : {}),
+    }
+    onSubmit(selection)
+  }
+
   return (
     <div className="flex flex-col gap-3">
       {CATEGORIES.map((c) => (
@@ -212,11 +320,24 @@ function MultiCategoryInput({
           <span>{c.label}</span>
         </label>
       ))}
+      {otherChecked && (
+        <label className="flex flex-col gap-2 px-1">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
+            What else? (optional)
+          </span>
+          <input
+            type="text"
+            value={otherText}
+            onChange={(e) => setOtherText(e.target.value.slice(0, OTHER_TEXT_MAX))}
+            maxLength={OTHER_TEXT_MAX}
+            placeholder="e.g. medical devices"
+            className="w-full max-w-md rounded-card border border-rule bg-paper-2 px-4 py-3 text-ink focus:border-ink focus:outline-none"
+            aria-label="Other category"
+          />
+        </label>
+      )}
       <div className="mt-2">
-        <Button
-          disabled={picked.length === 0}
-          onClick={() => onSubmit(picked)}
-        >
+        <Button disabled={picked.length === 0} onClick={handleContinue}>
           Continue
         </Button>
       </div>

@@ -1,11 +1,13 @@
 import { Button, Eyebrow, Hairline } from '@/app/_components/ui'
 import type {
   Confidence,
+  DisqualificationReason,
   Prerequisites,
   RecommendedNextStep,
   ScreenerResult,
 } from '@contexts/screener'
 import { NotifyMeForm } from './NotifyMeForm'
+import { StartOverButton } from './StartOverButton'
 
 /**
  * Editorial results dossier per PRD 01 + docs/DESIGN-LANGUAGE.md.
@@ -86,10 +88,21 @@ function QualifiedDossier({
         <p className="mt-6 max-w-xl text-base text-ink/85">
           {nextStepRationale(result.recommendedNextStep)}
         </p>
-        <div className="mt-8">
-          <Button as="a" href="/how-it-works" variant="underline" size="lg">
-            See how each stage works
+        <div className="mt-8 flex flex-wrap items-baseline gap-6">
+          <Button
+            as="a"
+            href={nextStepHref(result.recommendedNextStep)}
+            variant="underline"
+            size="lg"
+          >
+            See your options
           </Button>
+          <a
+            href="/how-it-works"
+            className="text-sm text-accent/80 underline underline-offset-[6px] decoration-accent/30 hover:decoration-accent decoration-1"
+          >
+            How each stage works
+          </a>
         </div>
       </section>
 
@@ -121,9 +134,8 @@ function DisqualifiedDossier({
         of Record on a new lane, or your records turn up old IEEPA-window
         entries — we&apos;d like to let you know.
       </p>
-      <p className="mt-4 text-sm text-ink/60">
-        Reason:{' '}
-        <span className="font-mono">{result.disqualificationReason}</span>
+      <p className="mt-4 text-sm text-ink/70">
+        {disqualificationCopy(result.disqualificationReason)}
       </p>
 
       <section className="mt-10">
@@ -140,16 +152,15 @@ function DisqualifiedDossier({
 
       <Hairline className="my-12" />
 
-      <p className="text-sm text-ink/70">
-        You can{' '}
+      <div className="flex flex-wrap items-baseline gap-6">
+        <StartOverButton />
         <a
           href="/how-it-works"
-          className="text-accent underline underline-offset-[6px] decoration-accent/40 hover:decoration-accent decoration-1"
+          className="text-sm text-accent underline underline-offset-[6px] decoration-accent/40 hover:decoration-accent decoration-1"
         >
-          read how the service works
-        </a>{' '}
-        if you&apos;re evaluating it for someone else.
-      </p>
+          Read how the service works
+        </a>
+      </div>
     </article>
   )
 }
@@ -228,8 +239,38 @@ function nextStepRationale(step: RecommendedNextStep): string {
   return NEXT_STEP_RATIONALE[step]
 }
 
+const NEXT_STEP_HREF: Record<RecommendedNextStep, string> = {
+  recovery_kit: '/pricing#recovery',
+  recovery_service: '/pricing#recovery',
+  cape_prep: '/pricing#prep',
+  concierge: '/pricing#concierge',
+  none: '/pricing',
+}
+
+function nextStepHref(step: RecommendedNextStep): string {
+  return NEXT_STEP_HREF[step]
+}
+
+const DISQUALIFICATION_COPY: Record<DisqualificationReason, string> = {
+  no_imports_in_window:
+    'Your imports fell outside the IEEPA refund window (Feb 4, 2025 – Feb 23, 2026).',
+  not_ior:
+    'Refunds can only be claimed by the Importer of Record on the entry.',
+  unknown: "We weren't able to confirm eligibility from your answers.",
+}
+
+function disqualificationCopy(reason: DisqualificationReason | undefined): string {
+  if (!reason) return DISQUALIFICATION_COPY.unknown
+  return DISQUALIFICATION_COPY[reason]
+}
+
 // Re-export for use by tests against the verdict / label maps if needed.
-export { verdictFor as _verdictFor, NEXT_STEP_LABEL as _NEXT_STEP_LABEL }
+export {
+  verdictFor as _verdictFor,
+  NEXT_STEP_LABEL as _NEXT_STEP_LABEL,
+  NEXT_STEP_HREF as _NEXT_STEP_HREF,
+  DISQUALIFICATION_COPY as _DISQUALIFICATION_COPY,
+}
 
 // Confidence type re-exported so consumers don't have to chase it
 // through the screener context just to type a wrapper.

@@ -26,6 +26,7 @@ export type {
   ShipmentBand,
   DutyBand,
   GoodsCategory,
+  GoodsCategorySelection,
   EmailCapture,
 } from './types'
 
@@ -38,6 +39,8 @@ export type {
 } from './repo'
 
 export { QUESTIONS, QUESTION_BY_ID } from './questions'
+export { COUNTRIES, filterCountries } from './countries'
+export type { Country } from './countries'
 export { nextQuestion, isComplete } from './branching'
 export { estimateRefund, ESTIMATOR_VERSION } from './estimator'
 export { computeResult, RESULT_VERSION } from './qualification'

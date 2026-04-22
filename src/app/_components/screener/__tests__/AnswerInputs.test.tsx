@@ -73,6 +73,57 @@ describe('<AnswerInput> — country', () => {
     expect(submit).toHaveBeenCalledWith('CN')
   })
 
+  it('filters the combobox listbox by case-insensitive substring on country name', () => {
+    render(
+      <AnswerInput
+        question={QUESTION_BY_ID.q2}
+        onSubmit={vi.fn()}
+        onBack={noopBack}
+        canGoBack={false}
+      />,
+    )
+    const input = screen.getByRole('combobox', { name: /country/i })
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: 'vie' } })
+    const options = screen.getAllByRole('option')
+    expect(options.length).toBe(1)
+    expect(options[0]?.textContent).toMatch(/Vietnam/)
+  })
+
+  it('selects a country from the listbox on mousedown and emits its name', () => {
+    const submit = vi.fn()
+    render(
+      <AnswerInput
+        question={QUESTION_BY_ID.q2}
+        onSubmit={submit}
+        onBack={noopBack}
+        canGoBack={false}
+      />,
+    )
+    const input = screen.getByRole('combobox', { name: /country/i })
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: 'vie' } })
+    fireEvent.mouseDown(screen.getByRole('option', { name: /Vietnam/ }))
+    fireEvent.click(screen.getByRole('button', { name: /continue/i }))
+    expect(submit).toHaveBeenCalledWith('Vietnam')
+  })
+
+  it('does not display raw ISO codes in the listbox options', () => {
+    render(
+      <AnswerInput
+        question={QUESTION_BY_ID.q2}
+        onSubmit={vi.fn()}
+        onBack={noopBack}
+        canGoBack={false}
+      />,
+    )
+    const input = screen.getByRole('combobox', { name: /country/i })
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: 'vie' } })
+    const option = screen.getByRole('option', { name: /Vietnam/ })
+    expect(option.textContent).not.toMatch(/\bVN\b/)
+  })
+
   it('emits "unknown" when the I-do-not-know shortcut is clicked', () => {
     const submit = vi.fn()
     render(
@@ -103,7 +154,7 @@ describe('<AnswerInput> — duty_band', () => {
 })
 
 describe('<AnswerInput> — multi_category', () => {
-  it('emits an array of selected categories on submit', () => {
+  it('emits a GoodsCategorySelection on submit', () => {
     const submit = vi.fn()
     render(
       <AnswerInput
@@ -116,7 +167,44 @@ describe('<AnswerInput> — multi_category', () => {
     fireEvent.click(screen.getByRole('checkbox', { name: /electronics/i }))
     fireEvent.click(screen.getByRole('checkbox', { name: /apparel/i }))
     fireEvent.click(screen.getByRole('button', { name: /continue/i }))
-    expect(submit).toHaveBeenCalledWith(['electronics', 'apparel'])
+    expect(submit).toHaveBeenCalledWith({
+      categories: ['consumer_electronics', 'apparel_fashion'],
+    })
+  })
+
+  it('reveals a free-text input when "Other" is selected and includes it on submit', () => {
+    const submit = vi.fn()
+    render(
+      <AnswerInput
+        question={QUESTION_BY_ID.q7}
+        onSubmit={submit}
+        onBack={noopBack}
+        canGoBack={false}
+      />,
+    )
+    fireEvent.click(screen.getByRole('checkbox', { name: /other/i }))
+    const freeText = screen.getByLabelText(/other category/i)
+    fireEvent.change(freeText, { target: { value: 'industrial tools' } })
+    fireEvent.click(screen.getByRole('button', { name: /continue/i }))
+    expect(submit).toHaveBeenCalledWith({
+      categories: ['other'],
+      otherText: 'industrial tools',
+    })
+  })
+
+  it('does not block Continue when Other is selected with no free text', () => {
+    const submit = vi.fn()
+    render(
+      <AnswerInput
+        question={QUESTION_BY_ID.q7}
+        onSubmit={submit}
+        onBack={noopBack}
+        canGoBack={false}
+      />,
+    )
+    fireEvent.click(screen.getByRole('checkbox', { name: /other/i }))
+    fireEvent.click(screen.getByRole('button', { name: /continue/i }))
+    expect(submit).toHaveBeenCalledWith({ categories: ['other'] })
   })
 
   it('disables continue until at least one category is picked', () => {
