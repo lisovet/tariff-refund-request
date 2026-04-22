@@ -3,6 +3,7 @@ import {
   Footnote,
   FootnoteContent,
   Hairline,
+  NOT_A_CUSTOMS_BROKER_CLAUSE,
 } from '@/app/_components/ui'
 
 /**
@@ -21,7 +22,7 @@ export const metadata = {
 }
 
 const NON_GOALS: readonly string[] = [
-  'Not a customs broker (unless your engagement letter explicitly says otherwise).',
+  NOT_A_CUSTOMS_BROKER_CLAUSE,
   'Not a law firm. Nothing here is legal advice.',
   'We do not auto-submit to CBP. You (or your authorized broker) control the filing.',
   'Not a financing product. We do not advance refunds.',

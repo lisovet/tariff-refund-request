@@ -1,4 +1,4 @@
-import { Eyebrow, Hairline } from '@/app/_components/ui'
+import { Eyebrow, Hairline, NOT_A_CUSTOMS_BROKER_CLAUSE } from '@/app/_components/ui'
 
 /**
  * "What we are not" — the anti-positioning section per PRD 05.
@@ -6,11 +6,13 @@ import { Eyebrow, Hairline } from '@/app/_components/ui'
  * before they ask.
  *
  * Per .claude/rules/never-auto-submit.md + disclosure-language-required.md:
- * the no-auto-submit promise must appear here as real text.
+ * the no-auto-submit promise must appear here as real text. The
+ * customs-broker carve-out pulls from the shared constant so /trust,
+ * the engagement letters, and this list never drift apart.
  */
 
 const NON_GOALS: readonly string[] = [
-  'A customs broker (unless explicitly noted in your engagement letter).',
+  NOT_A_CUSTOMS_BROKER_CLAUSE,
   'A law firm. Nothing here is legal advice.',
   'An auto-submit-to-CBP service. You (or your broker) control the filing.',
   'A financing product. We do not advance refunds.',

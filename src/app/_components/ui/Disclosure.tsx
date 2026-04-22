@@ -9,8 +9,11 @@
  * import the same source without pulling React into their bundle.
  */
 
+import { NOT_LEGAL_ADVICE_DISCLOSURE } from '@/shared/disclosure/constants'
+
 export {
   CANONICAL_TRUST_PROMISE,
+  NOT_A_CUSTOMS_BROKER_CLAUSE,
   NOT_LEGAL_ADVICE_DISCLOSURE,
   SUBMISSION_CONTROL_CLAUSE,
   REFUND_TIMING_CLAUSE,
@@ -29,6 +32,12 @@ interface TrustFootnoteProps {
 /**
  * Compact disclosure block. Used inline by the marketing SiteFooter
  * and as a standalone footer on /app + /ops via `asFooter`.
+ *
+ * The sentence after the "Not legal advice" eyebrow strips the
+ * leading marker (the eyebrow serves that role visually) and renders
+ * the rest of the constant. Keeping the prose source-of-truth in the
+ * shared constant means the footer can never drift from the PDF or
+ * email footers.
  */
 export function TrustFootnote({ asFooter = false }: TrustFootnoteProps) {
   const body = (
@@ -37,10 +46,7 @@ export function TrustFootnote({ asFooter = false }: TrustFootnoteProps) {
         Not legal advice
       </span>
       {' — '}
-      This site provides software and document-prep services. It is not
-      legal advice, not a customs brokerage (unless your engagement
-      letter explicitly says otherwise), and does not guarantee any
-      outcome with U.S. Customs and Border Protection.{' '}
+      {NOT_LEGAL_ADVICE_DISCLOSURE.replace(/^Not legal advice\.\s*/, '')}{' '}
       <a
         href="/trust"
         className="text-accent underline underline-offset-[6px] decoration-accent/40 hover:decoration-accent decoration-1"

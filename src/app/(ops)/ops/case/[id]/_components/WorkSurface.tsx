@@ -46,7 +46,7 @@ function renderBody(caseId: string, state: CaseState) {
         <div data-testid="surface-entry-list">
           <SurfaceCard
             heading="Entry list ready"
-            body="Review the recovered entries before kicking off CAPE prep. Per-entry provenance lands in the right panel's Audit tab; editing lands with the entry-grid task."
+            body="Review the recovered entries before kicking off CAPE prep. Per-entry provenance is visible in the right panel's Audit tab."
           />
         </div>
       )
@@ -55,7 +55,7 @@ function renderBody(caseId: string, state: CaseState) {
         <div data-testid="surface-cape-prep">
           <SurfaceCard
             heading="CAPE prep in progress"
-            body="Run the validator, draft sign-off notes, and assemble the Readiness Report. The CAPE-prep workspace lands with its own task — this placeholder surfaces what stage the case is in."
+            body="Run the validator, draft sign-off notes, and assemble the Readiness Report."
           />
         </div>
       )
@@ -64,7 +64,7 @@ function renderBody(caseId: string, state: CaseState) {
         <div data-testid="surface-batch-qa">
           <SurfaceCard
             heading="Validator sign-off"
-            body="Run the QA checklist, confirm zero blocking issues, enter a reviewer note, and sign off. The dedicated sign-off surface lands with its own task."
+            body="Review the QA checklist, resolve every blocking issue, enter a reviewer note, and sign off."
           />
         </div>
       )

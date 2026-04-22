@@ -7,6 +7,7 @@ export { Button } from './Button'
 export { Card } from './Card'
 export {
   CANONICAL_TRUST_PROMISE,
+  NOT_A_CUSTOMS_BROKER_CLAUSE,
   NOT_LEGAL_ADVICE_DISCLOSURE,
   TrustFootnote,
 } from './Disclosure'

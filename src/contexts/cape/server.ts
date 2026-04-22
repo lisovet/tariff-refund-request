@@ -21,7 +21,6 @@ export {
 export { renderReadinessReport } from './report-pdf/render'
 export {
   ReadinessReportDoc,
-  DISCLOSURE_FOOTNOTE,
   type ReadinessReportBody,
   type ReadinessReportDocProps,
 } from './report-pdf/ReadinessReportDoc'

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import {
-  DISCLOSURE_FOOTNOTE,
   ReadinessReportDoc,
   type ReadinessReportBody,
 } from '../ReadinessReportDoc'
@@ -73,14 +72,6 @@ describe('ReadinessReportDoc — component tree', () => {
   })
 })
 
-describe('DISCLOSURE_FOOTNOTE', () => {
-  it('carries the canonical "Not legal advice" disclosure verbatim', () => {
-    expect(DISCLOSURE_FOOTNOTE).toMatch(/Not legal advice/)
-    expect(DISCLOSURE_FOOTNOTE).toMatch(/human-reviewed/)
-    expect(DISCLOSURE_FOOTNOTE).toMatch(/prepare files/)
-  })
-})
-
 describe('FONT_FAMILIES', () => {
   it('declares the three design-language roles', () => {
     expect(FONT_FAMILIES).toEqual({
@@ -128,17 +119,15 @@ describe('renderReadinessReport — buffer output', () => {
     expect(buf.slice(0, 5).toString('ascii')).toBe('%PDF-')
   }, 15_000)
 
-  it('full-body render still carries the disclosure footnote wording', async () => {
+  it('full-body render carries the submission-control clause verbatim', () => {
     // The disclosure block is composed from smaller pure components
-    // (DisclosureFooter etc.). The shared `DISCLOSURE_FOOTNOTE`
-    // constant stays a reliable sentinel — it embeds
-    // SUBMISSION_CONTROL_CLAUSE, which MUST appear in the report.
+    // (DisclosureFooter etc.); the submission-control clause is the
+    // load-bearing sentinel that MUST appear in the rendered tree.
     const tree = ReadinessReportDoc({
       ...FIXTURE_PROPS,
       body: FIXTURE_BODY,
     })
     const joined = collectTextStrings(tree as AnyNode).join(' ')
-    expect(DISCLOSURE_FOOTNOTE).toMatch(/We prepare files; you control submission\./)
     expect(joined).toMatch(/We prepare files; you control submission\./)
   })
 })

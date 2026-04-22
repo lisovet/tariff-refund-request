@@ -1,4 +1,7 @@
-import { NOT_LEGAL_ADVICE_DISCLOSURE } from '@shared/disclosure/constants'
+import {
+  NOT_A_CUSTOMS_BROKER_CLAUSE,
+  NOT_LEGAL_ADVICE_DISCLOSURE,
+} from '@shared/disclosure/constants'
 
 /**
  * Bundler-compatible body of the `recovery-prep-v1` clickwrap.
@@ -26,6 +29,8 @@ A software product and a document-prep service. We help you recover entry-number
 ## 2. Not legal advice
 
 > ${NOT_LEGAL_ADVICE_DISCLOSURE}
+
+> ${NOT_A_CUSTOMS_BROKER_CLAUSE}
 
 ## 3. Human review
 
