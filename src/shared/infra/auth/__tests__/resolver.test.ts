@@ -32,11 +32,12 @@ describe('resolveActorFromSession', () => {
     expect(actor.id).toBe('user_123')
   })
 
-  it('returns a StaffActor when org_role matches a known staff role', () => {
-    // Clerk emits the "org:" prefix — real prod sessions look like this.
+  it('returns a StaffActor when orgRole matches a known staff role (v1 token shape)', () => {
+    // v1 Clerk tokens surface orgRole with the "org:" prefix.
     const actor = resolveActorFromSession({
       ...baseSession,
-      sessionClaims: { org_role: 'org:analyst', org_name: 'Tariff Refund Staff' },
+      orgRole: 'org:analyst',
+      sessionClaims: { org_name: 'Tariff Refund Staff' },
       fullName: 'A. Analyst',
     })
     expect(isStaff(actor)).toBe(true)
@@ -45,21 +46,22 @@ describe('resolveActorFromSession', () => {
     expect(actor.name).toBe('A. Analyst')
   })
 
-  it('accepts a bare org_role without the "org:" prefix (defense in depth)', () => {
+  it('returns a StaffActor when orgRole is bare (v2 token shape)', () => {
+    // v2 Clerk tokens drop the "org:" prefix and surface bare role keys.
     const actor = resolveActorFromSession({
       ...baseSession,
-      sessionClaims: { org_role: 'analyst' },
+      orgRole: 'admin',
     })
     expect(isStaff(actor)).toBe(true)
     if (!isStaff(actor)) throw new Error('type guard failed')
-    expect(actor.role).toBe('analyst')
+    expect(actor.role).toBe('admin')
   })
 
-  it('falls back to CustomerActor when org_role is set but unrecognized', () => {
+  it('falls back to CustomerActor when orgRole is set but unrecognized', () => {
     // Defensive: Clerk org could have any role; we only honor known ones.
     const actor = resolveActorFromSession({
       ...baseSession,
-      sessionClaims: { org_role: 'org:spectator' },
+      orgRole: 'org:spectator',
     })
     expect(isCustomer(actor)).toBe(true)
   })
@@ -67,7 +69,7 @@ describe('resolveActorFromSession', () => {
   it('falls back to "Unknown" name when fullName is missing', () => {
     const actor = resolveActorFromSession({
       ...baseSession,
-      sessionClaims: { org_role: 'org:admin' },
+      orgRole: 'org:admin',
       fullName: null,
     })
     if (!isStaff(actor)) throw new Error('type guard failed')
