@@ -64,3 +64,6 @@ export type {
   ReleaseCaseResult,
 } from './assignment'
 export { claimCase, reassignCase, releaseCase } from './assignment'
+
+export type { StateCopy } from './state-copy'
+export { STATE_COPY } from './state-copy'
