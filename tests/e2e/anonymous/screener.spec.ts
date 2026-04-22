@@ -16,7 +16,7 @@ test.describe('/screener', () => {
     await page.goto('/screener')
     await page.getByRole('button', { name: 'No' }).click()
     await expect(
-      page.getByRole('heading', { name: /Probably not a fit/i }),
+      page.getByRole('heading', { name: /Not a fit/i }),
     ).toBeVisible()
     await expect(
       page.getByText(/imports fell outside the IEEPA refund window/i),
