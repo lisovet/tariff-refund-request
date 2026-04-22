@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Button, Eyebrow, Hairline } from '@/app/_components/ui'
-import { isCustomer, isStaff } from '@shared/infra/auth/actor'
+import { isAnonymous, isCustomer } from '@shared/infra/auth/actor'
 import { resolveCurrentActor } from '@shared/infra/auth/resolver'
 import { getIdentityRepo } from '@contexts/identity'
 import { getCaseRepo } from '@contexts/ops/server'
@@ -90,20 +90,21 @@ const STATE_COPY: Record<CaseRecord['state'], { label: string; description: stri
 export default async function CustomerHome() {
   const actor = await resolveCurrentActor()
 
-  if (isStaff(actor)) {
-    redirect('/ops')
-  }
-
-  if (!isCustomer(actor)) {
+  if (isAnonymous(actor)) {
     redirect('/sign-in')
   }
 
-  const customer = await getIdentityRepo().findCustomerByClerkUserId(actor.clerkUserId)
+  const customer = isCustomer(actor)
+    ? await getIdentityRepo().findCustomerByClerkUserId(actor.clerkUserId)
+    : null
   const cases = customer
     ? await getCaseRepo().listCasesByCustomer(customer.id)
     : []
 
-  const displayName = customer?.fullName?.split(' ')[0] ?? actor.email.split('@')[0]
+  const fallbackName = isCustomer(actor)
+    ? actor.email.split('@')[0]
+    : actor.name.split(' ')[0]
+  const displayName = customer?.fullName?.split(' ')[0] ?? fallbackName
 
   return (
     <main className="mx-auto max-w-4xl px-6 pb-24 pt-20 sm:px-10 sm:pt-28">

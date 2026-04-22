@@ -22,7 +22,7 @@ export default function AppLayout({
 }) {
   return (
     <ClerkProvider>
-      <EnsureActiveOrg redirectTo="/ops" />
+      <EnsureActiveOrg />
       <div className="flex min-h-[100dvh] flex-col bg-paper">
         <div className="flex-1">{children}</div>
         <TrustFootnote asFooter />
