@@ -91,7 +91,7 @@ describe('UploadZone — pre-validation (no network call)', () => {
 
     const row = screen.getByTestId('upload-row')
     expect(within(row).getByTestId('upload-status').textContent).toBe('Failed')
-    expect(within(row).getByText(/content_type_unsupported/)).toBeInTheDocument()
+    expect(within(row).getByText(/Unsupported file type/)).toBeInTheDocument()
     expect(client.fetchFn).not.toHaveBeenCalled()
   })
 
@@ -104,7 +104,7 @@ describe('UploadZone — pre-validation (no network call)', () => {
     })
     fireEvent.change(input, { target: { files: [big] } })
     const row = screen.getByTestId('upload-row')
-    expect(within(row).getByText(/byte_size_too_large/)).toBeInTheDocument()
+    expect(within(row).getByText(/File exceeds \d+ MB/)).toBeInTheDocument()
     expect(client.fetchFn).not.toHaveBeenCalled()
   })
 })

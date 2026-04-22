@@ -261,7 +261,7 @@ export function UploadZone({
                 </p>
                 <p className="font-mono text-xs text-ink/55">
                   {formatBytes(entry.file.size)}
-                  {entry.error ? ` · ${entry.error}` : ''}
+                  {entry.error ? ` · ${formatUploadError(entry.error)}` : ''}
                 </p>
                 {entry.status === 'uploading' && (
                   <div
@@ -303,6 +303,25 @@ function preValidate(file: File): string | undefined {
   if (file.size <= 0) return 'byte_size_invalid'
   if (file.size > MAX_UPLOAD_BYTES) return 'byte_size_too_large'
   return undefined
+}
+
+/**
+ * Map known pre-validation error codes to English. Server- or
+ * network-originated errors already arrive as free-text (HTTP
+ * messages, caught exception strings) — those fall through unchanged
+ * rather than being hidden behind a generic "Upload failed."
+ */
+function formatUploadError(code: string): string {
+  switch (code) {
+    case 'content_type_unsupported':
+      return 'Unsupported file type. Use PDF, XLSX, XLS, CSV, or EML.'
+    case 'byte_size_invalid':
+      return 'File is empty.'
+    case 'byte_size_too_large':
+      return `File exceeds ${Math.round(MAX_UPLOAD_BYTES / 1024 / 1024)} MB.`
+    default:
+      return code
+  }
 }
 
 function formatBytes(bytes: number): string {
