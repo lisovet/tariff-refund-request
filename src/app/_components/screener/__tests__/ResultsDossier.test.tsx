@@ -41,11 +41,10 @@ describe('<ResultsDossier> — qualified', () => {
     expect(hero.className).toMatch(/text-(4xl|5xl|6xl|7xl)/)
   })
 
-  it('renders the confidence label in the accent face uppercased', () => {
+  it('does not surface a confidence label on the refund hero', () => {
     render(<ResultsDossier result={qualified} />)
-    const label = screen.getByText(/Confidence: HIGH/)
-    expect(label.className).toMatch(/text-accent/)
-    expect(label.className).toMatch(/uppercase/)
+    expect(screen.queryByText(/^Confidence$/i)).toBeNull()
+    expect(screen.queryByText(/Confidence: /i)).toBeNull()
   })
 
   it('renders a one-sentence editorial qualification verdict', () => {
@@ -55,14 +54,33 @@ describe('<ResultsDossier> — qualified', () => {
     expect(heading.textContent).toMatch(/\.$/)
   })
 
-  it('renders the prerequisites block with met / missing status', () => {
+  it('renders each prerequisite row', () => {
     render(<ResultsDossier result={qualified} />)
-    // Each prerequisite row.
-    expect(screen.getByText(/Importer of record/i)).toBeTruthy()
-    expect(screen.getByText(/ACE access/i)).toBeTruthy()
-    expect(screen.getByText(/Liquidation status/i)).toBeTruthy()
-    // ACH on file should show as "missing" since prerequisites.ach=false.
-    expect(screen.getByText(/ACH on file/i)).toBeTruthy()
+    expect(screen.getByText('Importer of record')).toBeTruthy()
+    expect(screen.getByText('ACE access')).toBeTruthy()
+    expect(screen.getByText('Liquidation status known')).toBeTruthy()
+    // Exact-text row label (not the explanatory missing-copy).
+    expect(screen.getByText('ACH on file')).toBeTruthy()
+  })
+
+  it('marks missing prerequisites in blocking red with an × glyph and an explanation', () => {
+    render(<ResultsDossier result={qualified} />)
+    // ach is false in the fixture.
+    const missingLabel = screen.getByText('ACH on file')
+    expect(missingLabel.className).toMatch(/text-blocking/)
+    // The missing-copy sub-label is present.
+    expect(
+      screen.getByText(/ACH on file is how CBP returns the money/i),
+    ).toBeTruthy()
+    const missingStatus = screen.getAllByLabelText('Missing')[0]
+    expect(missingStatus?.className).toMatch(/text-blocking/)
+    expect(missingStatus?.textContent).toMatch(/×/)
+  })
+
+  it('renders a N / 4 ready summary reflecting the prerequisites count', () => {
+    render(<ResultsDossier result={qualified} />)
+    // Fixture has ior + ace + liquidationKnown met, ach missing → 3 / 4.
+    expect(screen.getByText(/3 \/ 4 ready/i)).toBeTruthy()
   })
 
   it('deep-links the primary CTA to the pricing anchor for recommendedNextStep', () => {
@@ -85,6 +103,21 @@ describe('<ResultsDossier> — qualified', () => {
     expect(
       screen.getByRole('link', { name: /See your options/i }).getAttribute('href'),
     ).toBe('/pricing#concierge')
+  })
+
+  it('renders the next-step product name in display face and its bullet list', () => {
+    render(<ResultsDossier result={qualified} />)
+    const name = screen.getByRole('heading', { level: 2 })
+    expect(name.textContent).toMatch(/Recovery Service/)
+    expect(name.className).toMatch(/font-display/)
+    // Three "what you get" bullets for recovery_service.
+    expect(
+      screen.getByText(/Analyst extracts entries from your uploads/i),
+    ).toBeTruthy()
+    expect(screen.getByText(/Source \+ confidence on every row/i)).toBeTruthy()
+    expect(
+      screen.getByText(/You get a single canonical entry list back/i),
+    ).toBeTruthy()
   })
 
   it('keeps "How each stage works" as a quieter secondary link', () => {

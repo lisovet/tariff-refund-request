@@ -118,6 +118,8 @@ export interface Question {
     | 'q9'
     | 'q10'
   readonly prompt: string
+  /** Optional editorial subtitle rendered under the headline. */
+  readonly subtitle?: string
   readonly kind:
     | 'yes_no'
     | 'yes_no_unknown'

@@ -65,49 +65,25 @@ function QualifiedDossier({
             ${result.refundEstimate.low.toLocaleString()} —{' '}
             ${result.refundEstimate.high.toLocaleString()}
           </p>
-          <p className="mt-3 font-mono text-xs uppercase tracking-[0.2em] text-accent">
-            Confidence: {result.refundEstimate.confidence.toUpperCase()}
-          </p>
         </section>
       )}
 
       <Hairline className="my-12" />
 
       <section>
-        <Eyebrow>Filing readiness</Eyebrow>
+        <div className="flex items-baseline justify-between gap-4">
+          <Eyebrow>Filing readiness</Eyebrow>
+          <ReadinessSummary prerequisites={result.prerequisites} />
+        </div>
         <PrerequisitesList prerequisites={result.prerequisites} />
       </section>
 
       <Hairline className="my-12" />
 
-      <section>
-        <Eyebrow>Recommended next step</Eyebrow>
-        <p className="mt-3 font-mono text-sm text-accent">
-          {nextStepLabel(result.recommendedNextStep)}
-        </p>
-        <p className="mt-6 max-w-xl text-base text-ink/85">
-          {nextStepRationale(result.recommendedNextStep)}
-        </p>
-        <div className="mt-8 flex flex-wrap items-baseline gap-6">
-          <Button
-            as="a"
-            href={nextStepHref(result.recommendedNextStep)}
-            variant="underline"
-            size="lg"
-          >
-            See your options
-          </Button>
-          <a
-            href="/how-it-works"
-            className="text-sm text-accent/80 underline underline-offset-[6px] decoration-accent/30 hover:decoration-accent decoration-1"
-          >
-            How each stage works
-          </a>
-        </div>
-      </section>
+      <NextStepCard step={result.recommendedNextStep} />
 
       {emailSent && (
-        <p className="mt-12 font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
+        <p className="mt-12 text-center font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
           We also sent these results to your inbox.
         </p>
       )}
@@ -170,12 +146,53 @@ function DisqualifiedDossier({
 const PREREQUISITE_ROWS: ReadonlyArray<{
   readonly key: keyof Prerequisites
   readonly label: string
+  readonly missingCopy: string
 }> = [
-  { key: 'ior', label: 'Importer of record' },
-  { key: 'ace', label: 'ACE access' },
-  { key: 'ach', label: 'ACH on file' },
-  { key: 'liquidationKnown', label: 'Liquidation status known' },
+  {
+    key: 'ior',
+    label: 'Importer of record',
+    missingCopy:
+      "You aren't the Importer of Record — only the IOR can file this refund.",
+  },
+  {
+    key: 'ace',
+    label: 'ACE access',
+    missingCopy:
+      "You'll need an ACE portal account before CBP accepts the correction.",
+  },
+  {
+    key: 'ach',
+    label: 'ACH on file',
+    missingCopy:
+      'ACH on file is how CBP returns the money. Set this up first.',
+  },
+  {
+    key: 'liquidationKnown',
+    label: 'Liquidation status known',
+    missingCopy:
+      "Liquidation status determines your filing window. We'll help you confirm it.",
+  },
 ]
+
+function ReadinessSummary({
+  prerequisites,
+}: {
+  readonly prerequisites: Prerequisites
+}) {
+  const total = PREREQUISITE_ROWS.length
+  const ready = PREREQUISITE_ROWS.filter((r) => prerequisites[r.key]).length
+  const allReady = ready === total
+  return (
+    <p
+      className={`font-mono text-xs uppercase tracking-[0.2em] ${
+        allReady ? 'text-positive' : 'text-blocking'
+      }`}
+      aria-label={`${ready} of ${total} items ready`}
+    >
+      {ready} / {total} ready
+    </p>
+  )
+}
 
 function PrerequisitesList({
   prerequisites,
@@ -183,24 +200,120 @@ function PrerequisitesList({
   readonly prerequisites: Prerequisites
 }) {
   return (
-    <ul className="mt-4 divide-y divide-rule border-y border-rule">
-      {PREREQUISITE_ROWS.map((row) => (
-        <li
-          key={row.key}
-          className="flex items-baseline justify-between gap-4 py-3 text-base text-ink"
-        >
-          <span>{row.label}</span>
-          <span
-            className={`font-mono text-xs uppercase tracking-[0.2em] ${
-              prerequisites[row.key] ? 'text-positive' : 'text-warning'
+    <ul className="mt-6 divide-y divide-rule border-y border-rule">
+      {PREREQUISITE_ROWS.map((row) => {
+        const met = prerequisites[row.key]
+        return (
+          <li
+            key={row.key}
+            className={`flex items-start justify-between gap-6 py-5 ${
+              met ? '' : 'border-l-4 border-l-blocking pl-4'
             }`}
-            aria-label={prerequisites[row.key] ? 'Met' : 'Missing'}
           >
-            {prerequisites[row.key] ? 'Met' : 'Missing'}
-          </span>
-        </li>
-      ))}
+            <div className="flex-1">
+              <p
+                className={`text-base ${
+                  met ? 'text-ink' : 'font-medium text-blocking'
+                }`}
+              >
+                {row.label}
+              </p>
+              {!met && (
+                <p className="mt-1 text-sm text-ink/70">{row.missingCopy}</p>
+              )}
+            </div>
+            <span
+              className={`flex shrink-0 items-center gap-2 font-mono uppercase tracking-[0.2em] ${
+                met
+                  ? 'text-xs text-positive'
+                  : 'text-sm font-medium text-blocking'
+              }`}
+              aria-label={met ? 'Met' : 'Missing'}
+            >
+              <span aria-hidden="true" className={met ? 'text-sm' : 'text-lg leading-none'}>
+                {met ? '✓' : '×'}
+              </span>
+              {met ? 'Met' : 'Missing'}
+            </span>
+          </li>
+        )
+      })}
     </ul>
+  )
+}
+
+// --- next-step card -------------------------------------------------------
+
+function NextStepCard({ step }: { readonly step: RecommendedNextStep }) {
+  const bullets = NEXT_STEP_BULLETS[step]
+  if (step === 'none') {
+    return (
+      <section>
+        <Eyebrow>Recommended next step</Eyebrow>
+        <p className="mt-6 max-w-xl text-base text-ink/85">
+          We&apos;ll route you to the right starting point on the pricing page.
+        </p>
+        <div className="mt-8 flex flex-wrap items-baseline gap-6">
+          <Button as="a" href={nextStepHref(step)} variant="solid" size="lg">
+            See your options
+          </Button>
+          <a
+            href="/how-it-works"
+            className="text-sm text-accent/80 underline underline-offset-[6px] decoration-accent/30 hover:decoration-accent decoration-1"
+          >
+            How each stage works
+          </a>
+        </div>
+      </section>
+    )
+  }
+  return (
+    <section className="rounded-card border border-rule bg-paper-2/40 p-8 sm:p-12">
+      <Eyebrow>Recommended next step</Eyebrow>
+      <h2 className="mt-3 font-display text-3xl tracking-display text-ink sm:text-4xl">
+        {NEXT_STEP_NAME[step]}
+      </h2>
+      <p className="mt-3 font-mono text-xl text-accent">
+        {NEXT_STEP_PRICE[step]}
+      </p>
+      <p className="mt-6 max-w-xl text-lg text-ink/85">
+        {NEXT_STEP_RATIONALE[step]}
+      </p>
+      {bullets.length > 0 && (
+        <>
+          <p className="mt-10 font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
+            What you get
+          </p>
+          <ul className="mt-3 divide-y divide-rule border-y border-rule">
+            {bullets.map((b) => (
+              <li
+                key={b}
+                className="flex items-start gap-4 py-4 text-base text-ink/85"
+              >
+                <span
+                  aria-hidden="true"
+                  className="mt-0.5 font-mono text-sm text-accent"
+                >
+                  ▸
+                </span>
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      <div className="mt-10 flex flex-wrap items-baseline gap-6">
+        <Button as="a" href={nextStepHref(step)} variant="solid" size="lg">
+          See your options
+        </Button>
+        <a
+          href="/how-it-works"
+          className="text-sm text-accent/80 underline underline-offset-[6px] decoration-accent/30 hover:decoration-accent decoration-1"
+        >
+          How each stage works
+        </a>
+      </div>
+    </section>
   )
 }
 
@@ -219,6 +332,22 @@ const NEXT_STEP_LABEL: Record<RecommendedNextStep, string> = {
   none: '—',
 }
 
+const NEXT_STEP_NAME: Record<RecommendedNextStep, string> = {
+  recovery_kit: 'Recovery Kit',
+  recovery_service: 'Recovery Service',
+  cape_prep: 'CAPE Filing Prep',
+  concierge: 'Concierge',
+  none: '—',
+}
+
+const NEXT_STEP_PRICE: Record<RecommendedNextStep, string> = {
+  recovery_kit: '$99 – $299',
+  recovery_service: '$299 – $499',
+  cape_prep: '$199 – $999',
+  concierge: '$999+ · 8–12% success fee',
+  none: '',
+}
+
 const NEXT_STEP_RATIONALE: Record<RecommendedNextStep, string> = {
   recovery_kit:
     'Self-guided outreach kit + secure upload portal. Fastest path when your duty exposure is on the smaller side.',
@@ -231,12 +360,28 @@ const NEXT_STEP_RATIONALE: Record<RecommendedNextStep, string> = {
   none: '',
 }
 
-function nextStepLabel(step: RecommendedNextStep): string {
-  return NEXT_STEP_LABEL[step]
-}
-
-function nextStepRationale(step: RecommendedNextStep): string {
-  return NEXT_STEP_RATIONALE[step]
+const NEXT_STEP_BULLETS: Record<RecommendedNextStep, readonly string[]> = {
+  recovery_kit: [
+    'Broker / carrier / ACE outreach templates',
+    'Secure upload portal for returned documents',
+    'Readiness checklist tailored to your clearance path',
+  ],
+  recovery_service: [
+    'Analyst extracts entries from your uploads',
+    'Source + confidence on every row',
+    'You get a single canonical entry list back',
+  ],
+  cape_prep: [
+    'CBP-compliant CSV, batch-validated',
+    'Human-reviewed Readiness Report',
+    'Phase segmentation + prerequisite gap plan',
+  ],
+  concierge: [
+    'Analyst coordinates with your broker end-to-end',
+    'ACE / ACH gap remediation',
+    'Success-fee pricing: we only win when you do',
+  ],
+  none: [],
 }
 
 const NEXT_STEP_HREF: Record<RecommendedNextStep, string> = {

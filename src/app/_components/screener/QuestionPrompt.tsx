@@ -29,6 +29,11 @@ export function QuestionPrompt({ question, index, total }: Props) {
       <h1 className="font-display text-3xl tracking-display text-ink sm:text-5xl">
         {question.prompt}
       </h1>
+      {question.subtitle && (
+        <p className="mt-4 font-mono text-sm uppercase tracking-[0.2em] text-accent">
+          {question.subtitle}
+        </p>
+      )}
     </header>
   )
 }

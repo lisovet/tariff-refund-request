@@ -9,7 +9,8 @@ export const QUESTIONS: readonly Question[] = [
   {
     id: 'q1',
     prompt:
-      'Did you import goods into the U.S. between February 4, 2025 and February 23, 2026 (the IEEPA-covered period)?',
+      'Did you import goods into the U.S. during the IEEPA-covered period?',
+    subtitle: 'February 4, 2025 — February 23, 2026',
     kind: 'yes_no',
   },
   {
