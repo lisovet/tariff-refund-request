@@ -20,7 +20,8 @@ export function QueueTable({ rows }: QueueTableProps) {
       <div className="px-6 py-12 text-center text-sm text-ink/60 sm:px-10">
         <p className="font-mono uppercase tracking-[0.2em]">Queue empty</p>
         <p className="mt-1">
-          Either nothing matches the current filter or no cases are in flight.
+          No cases match the current filter. Clear filters or pick a
+          different saved view.
         </p>
       </div>
     )

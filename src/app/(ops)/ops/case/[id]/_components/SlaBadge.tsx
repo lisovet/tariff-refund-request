@@ -6,7 +6,7 @@ import { computeSlaStatus, formatRemainingHumanized } from '@contexts/ops'
  *
  * Pulls the band from `computeSlaStatus` so the design-language
  * status palette (positive / warning / blocking / ink) stays the
- * single color authority. Terminal states render a "— no SLA"
+ * single color authority. Terminal states render a "— not applicable"
  * placeholder so the slot is always there.
  */
 
@@ -37,7 +37,7 @@ export function SlaBadge({ state, ageMs }: SlaBadgeProps) {
         </span>
         <span className="mt-1 font-mono text-sm tabular-nums">—</span>
         <span className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.12em]">
-          no SLA
+          not applicable
         </span>
       </div>
     )
