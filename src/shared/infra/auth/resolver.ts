@@ -23,6 +23,10 @@ export interface ClerkSessionShape {
   readonly userId: string | null
   readonly email: string | null
   readonly fullName?: string | null
+  // Top-level orgRole from auth() — stable across v1 and v2 Clerk
+  // session tokens. sessionClaims stays around for any custom claims
+  // we read directly, but role resolution reads from here.
+  readonly orgRole?: string | null
   readonly sessionClaims: {
     readonly org_role?: string | null
     readonly org_name?: string | null
@@ -32,7 +36,7 @@ export interface ClerkSessionShape {
 export function resolveActorFromSession(session: ClerkSessionShape): Actor {
   if (!session.userId) return AnonymousActor
 
-  const orgRole = normalizeOrgRole(session.sessionClaims.org_role)
+  const orgRole = normalizeOrgRole(session.orgRole)
   if (orgRole && isStaffRole(orgRole)) {
     return {
       kind: 'staff',
@@ -68,6 +72,7 @@ export async function resolveCurrentActor(): Promise<Actor> {
     userId: session.userId,
     email,
     fullName,
+    orgRole: session.orgRole ?? null,
     sessionClaims: (session.sessionClaims ?? {}) as ClerkSessionShape['sessionClaims'],
   })
 }

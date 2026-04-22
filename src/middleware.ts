@@ -28,7 +28,11 @@ export default clerkMiddleware(async (auth, req) => {
     return session.redirectToSignIn({ returnBackUrl: req.url })
   }
   if (isOpsRoute(req)) {
-    const role = normalizeOrgRole(session.sessionClaims?.org_role)
+    // Read from auth().orgRole rather than sessionClaims.org_role so we
+    // work across both v1 and v2 Clerk session tokens (v2 nests org
+    // claims under `o.rol` and omits the `org:` prefix). normalizeOrgRole
+    // still strips the prefix that v1 tokens carry.
+    const role = normalizeOrgRole(session.orgRole)
     if (!isStaffRole(role)) {
       // Authed but not staff — bounce to /app (their customer surface).
       const url = new URL('/app', req.url)
