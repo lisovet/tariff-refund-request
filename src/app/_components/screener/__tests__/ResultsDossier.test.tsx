@@ -131,7 +131,7 @@ describe('<ResultsDossier> — disqualified', () => {
   it('renders a respectful headline with human-readable disqualification copy', () => {
     render(<ResultsDossier result={disqualified} />)
     const heading = screen.getByRole('heading', { level: 1 })
-    expect(heading.textContent).toMatch(/Probably not a fit/i)
+    expect(heading.textContent).toMatch(/Not a fit/i)
     expect(screen.getByText(/IEEPA refund window/i)).toBeTruthy()
   })
 

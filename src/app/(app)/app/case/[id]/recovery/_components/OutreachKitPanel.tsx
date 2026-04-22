@@ -79,9 +79,9 @@ export function OutreachKitPanel({
       )}
 
       <p className="mt-10 max-w-prose text-sm text-ink/65">
-        Edit the wording before you send if you want — these are starting
-        points, not legal requirements. The placeholders are filled with
-        what we know about your case; replace anything that&rsquo;s wrong.
+        Edit the wording before you send — these are starting points,
+        not legal requirements. Placeholders are filled from your case;
+        update anything that doesn&rsquo;t match your records.
       </p>
 
       <p className="mt-2 font-mono text-xs uppercase tracking-[0.16em] text-ink/45">
