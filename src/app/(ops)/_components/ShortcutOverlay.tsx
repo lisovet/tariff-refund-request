@@ -63,11 +63,6 @@ export const OPS_SHORTCUTS: readonly ShortcutRow[] = [
     description: 'Mark the current case stalled.',
     scope: 'Case workspace',
   },
-  {
-    keys: ['/'],
-    description: 'Focus the search / filter input.',
-    scope: 'Queue',
-  },
 ]
 
 export function ShortcutOverlay() {

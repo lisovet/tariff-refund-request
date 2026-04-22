@@ -100,7 +100,9 @@ export function CaseHeaderPanel({ caseRecord, plan }: CaseHeaderPanelProps) {
             <button
               type="button"
               data-testid="action-claim"
-              className="w-full border border-rule px-3 py-2 text-left font-mono text-xs uppercase tracking-[0.16em] hover:bg-paper-2"
+              disabled
+              aria-disabled="true"
+              className="w-full border border-rule px-3 py-2 text-left font-mono text-xs uppercase tracking-[0.16em] hover:bg-paper-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
             >
               Claim case <kbd className="ml-2 text-ink/55">c</kbd>
             </button>
@@ -109,15 +111,14 @@ export function CaseHeaderPanel({ caseRecord, plan }: CaseHeaderPanelProps) {
             <button
               type="button"
               data-testid="action-stall"
-              className="w-full border border-rule px-3 py-2 text-left font-mono text-xs uppercase tracking-[0.16em] hover:bg-paper-2"
+              disabled
+              aria-disabled="true"
+              className="w-full border border-rule px-3 py-2 text-left font-mono text-xs uppercase tracking-[0.16em] hover:bg-paper-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
             >
               Mark stalled <kbd className="ml-2 text-ink/55">x</kbd>
             </button>
           </li>
         </ul>
-        <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.16em] text-ink/45">
-          State-machine actions are stubs at v1; transition wiring lands with the validator UI.
-        </p>
       </div>
     </aside>
   )
