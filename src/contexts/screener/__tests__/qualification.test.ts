@@ -9,7 +9,7 @@ const happyPath: ScreenerAnswers = {
   q4: 'broker',
   q5: '50_500',
   q6: 'band_50k_500k',
-  q7: ['electronics'],
+  q7: { categories: ['consumer_electronics'] },
   q8: 'yes',
   q9: 'yes',
   q10: { company: 'Acme', email: 'a@b.co' },

@@ -59,3 +59,6 @@ drizzle/meta/_journal.json.bak
 # generated sample artifacts (kept local — regenerate via scripts)
 tmp/
 .claude/scheduled_tasks.lock
+
+# clerk configuration (can include secrets)
+/.clerk/

@@ -128,8 +128,9 @@ export default function PricingPage() {
       {STAGES.map((stage, index) => (
         <section
           key={stage.id}
+          id={stage.id}
           aria-labelledby={`stage-${stage.id}-heading`}
-          className="bg-paper"
+          className="scroll-mt-24 bg-paper"
         >
           <div className="mx-auto max-w-4xl px-6 py-24 sm:px-10 sm:py-32">
             <Eyebrow>Stage {stage.num}</Eyebrow>
@@ -177,10 +178,11 @@ export default function PricingPage() {
       <Hairline label="III · Concierge" />
 
       <section
+        id="concierge"
         aria-labelledby="concierge-heading"
         role="region"
         aria-label="Concierge"
-        className="bg-paper-2"
+        className="scroll-mt-24 bg-paper-2"
       >
         <div className="mx-auto max-w-4xl px-6 py-24 sm:px-10 sm:py-32">
           <Eyebrow>Stage 03 — bespoke</Eyebrow>
