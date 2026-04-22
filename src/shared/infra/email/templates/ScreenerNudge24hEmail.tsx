@@ -22,7 +22,7 @@ export function ScreenerNudge24hEmail({
 }: Props) {
   const greeting = firstName ? `Hi ${firstName},` : 'Hi,'
   return (
-    <EmailLayout preview="A quick note about your screener results.">
+    <EmailLayout preview="Your next step: recover your entry numbers.">
       <Section>
         <Heading
           as="h1"

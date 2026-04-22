@@ -19,7 +19,7 @@ export function RecoveryPurchasedEmail({ firstName, caseUrl }: Props) {
         <H1>Your Recovery workspace is open.</H1>
         <P>{greetingFor(firstName)}</P>
         <P>
-          Thanks for picking up Recovery. Your workspace is the
+          Your Recovery purchase is confirmed. The workspace is the
           single place we&apos;ll do this together: a personalized
           outreach kit, a checklist of what we need from your records,
           and a secure upload portal.
