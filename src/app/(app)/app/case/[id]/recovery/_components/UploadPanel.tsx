@@ -20,8 +20,8 @@ export function UploadPanel({ caseId }: UploadPanelProps): ReactElement {
     >
       <UploadZone caseId={caseId} />
       <p className="mt-6 max-w-prose text-sm text-ink/65">
-        Each upload becomes a recovery source linked to your case. We&rsquo;ll
-        verify it before it shows up in your entry list.
+        Each upload becomes a recovery source linked to your case. A
+        validator reviews it before the entries appear in your list.
       </p>
     </section>
   )

@@ -116,9 +116,9 @@ export default function PricingPage() {
           a monitored claim — and is priced on its own.
         </p>
         <p className="mt-6 max-w-2xl text-base text-ink/65">
-          Bands span SMB and mid-market. You land in mid-market if
-          your case has more than 100 entries or more than
-          <span className="font-mono"> $50,000 </span>
+          Bands span SMB and mid-market. Your case is priced as
+          mid-market if it has 100+ entries or
+          <span className="font-mono"> $50,000+ </span>
           in IEEPA duty paid.
         </p>
       </header>

@@ -16,7 +16,7 @@ import {
 const PATH_LABEL: Readonly<Record<RecoveryPath, string>> = {
   broker: 'Broker recovery',
   carrier: 'Carrier recovery',
-  'ace-self-export': 'ACE self-export',
+  'ace-self-export': 'ACE portal recovery',
   mixed: 'Mixed recovery',
 }
 
@@ -62,9 +62,9 @@ export function RecoveryStatusPanel({
           {PATH_LABEL[plan.path]}
         </p>
         <p className="mt-3 text-sm text-ink/85">
-          We&rsquo;ll email you when your entries are validated. First touch
-          within{' '}
-          <span className="font-mono">{plan.sla.firstTouchHours}h</span>; full
+          Upload your documents to get started. We&rsquo;ll email you when
+          your entries are validated — first response within{' '}
+          <span className="font-mono">{plan.sla.firstTouchHours}h</span>, full
           turnaround within{' '}
           <span className="font-mono">{plan.sla.completionHours}h</span> after
           documents land.

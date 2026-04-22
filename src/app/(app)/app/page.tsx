@@ -59,10 +59,9 @@ function EmptyState() {
   return (
     <section>
       <p className="max-w-2xl text-lg text-ink/80">
-        You don&apos;t have a case yet. Run the eligibility screener —
-        ten questions, three minutes — and you&apos;ll get a refund
-        estimate plus a recommended next step. If it looks like a fit,
-        you can open a case from there.
+        Run the eligibility screener — ten questions, three minutes.
+        You&apos;ll get a refund estimate and a clear next step if you
+        qualify.
       </p>
       <div className="mt-10">
         <Button as="a" href="/screener" variant="solid" size="lg">

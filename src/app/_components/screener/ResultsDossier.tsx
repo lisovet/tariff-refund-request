@@ -65,6 +65,10 @@ function QualifiedDossier({
             ${result.refundEstimate.low.toLocaleString()} —{' '}
             ${result.refundEstimate.high.toLocaleString()}
           </p>
+          <p className="mt-4 text-sm text-ink/60">
+            Estimates are based on the information you provided. Actual
+            refunds depend on CBP review.
+          </p>
         </section>
       )}
 
@@ -102,13 +106,14 @@ function DisqualifiedDossier({
     <article>
       <Eyebrow>Your screener results</Eyebrow>
       <h1 className="mt-3 font-display text-4xl tracking-display text-ink sm:text-5xl">
-        Probably not a fit right now.
+        Not a fit right now.
       </h1>
       <p className="mt-8 text-lg text-ink/85">
-        Based on your answers we don&apos;t see an obvious IEEPA refund
-        here. If your situation changes — say, you become the Importer
-        of Record on a new lane, or your records turn up old IEEPA-window
-        entries — we&apos;d like to let you know.
+        Based on your answers, you don&apos;t appear to qualify for an
+        IEEPA refund right now. If your situation changes — say, you
+        become the Importer of Record on a new lane, or your records
+        turn up old IEEPA-window entries — we&apos;d like to let you
+        know.
       </p>
       <p className="mt-4 text-sm text-ink/70">
         {disqualificationCopy(result.disqualificationReason)}
@@ -321,7 +326,7 @@ function NextStepCard({ step }: { readonly step: RecommendedNextStep }) {
 
 function verdictFor(result: ScreenerResult): string {
   if (result.qualification === 'qualified') return 'Likely a fit.'
-  return 'Probably worth a closer look.'
+  return 'Likely worth a closer look.'
 }
 
 const NEXT_STEP_LABEL: Record<RecommendedNextStep, string> = {

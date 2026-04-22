@@ -80,7 +80,8 @@ export function DocumentViewerPanel({
           data-testid="ops-doc-viewer-empty"
         >
           <p className="font-mono text-xs uppercase tracking-[0.18em] text-ink/55">
-            No documents on this case yet.
+            No uploads yet — check the audit timeline for the customer&rsquo;s
+            last activity.
           </p>
         </div>
       )}

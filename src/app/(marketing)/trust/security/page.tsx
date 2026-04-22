@@ -29,12 +29,12 @@ const STAFF_ROLE_DESCRIPTIONS: readonly { readonly role: string; readonly scope:
   {
     role: 'Analyst',
     scope:
-      'Work inside a case workspace — run validator, edit entry records, draft Readiness Report notes. Cannot finalize submission_ready.',
+      'Work inside a case workspace — run validator, edit entry records, draft Readiness Report notes. Cannot approve a batch for submission.',
   },
   {
     role: 'Validator',
     scope:
-      'Only role permitted to sign off a batch as submission_ready. Every sign-off records the validator name + timestamp on the artifact.',
+      'Only role permitted to approve a batch for submission. Every sign-off records the validator name + timestamp on the artifact.',
   },
   {
     role: 'Admin',

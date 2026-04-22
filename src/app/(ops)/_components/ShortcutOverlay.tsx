@@ -55,7 +55,7 @@ export const OPS_SHORTCUTS: readonly ShortcutRow[] = [
   },
   {
     keys: ['c'],
-    description: 'Claim the current case.',
+    description: 'Claim case.',
     scope: 'Case workspace',
   },
   {

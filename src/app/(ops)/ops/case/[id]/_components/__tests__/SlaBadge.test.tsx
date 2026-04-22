@@ -29,6 +29,6 @@ describe('SlaBadge', () => {
     render(<SlaBadge state="closed" ageMs={100 * H} />)
     expect(screen.getByTestId('sla-badge').getAttribute('data-band')).toBe('none')
     expect(screen.getByText('—')).toBeTruthy()
-    expect(screen.getByText(/no SLA/i)).toBeTruthy()
+    expect(screen.getByText(/not applicable/i)).toBeTruthy()
   })
 })
