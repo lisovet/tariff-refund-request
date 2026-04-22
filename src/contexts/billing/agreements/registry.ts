@@ -1,5 +1,6 @@
 import {
   CANONICAL_TRUST_PROMISE,
+  NOT_A_CUSTOMS_BROKER_CLAUSE,
   NOT_LEGAL_ADVICE_DISCLOSURE,
 } from '@shared/disclosure/constants'
 import { CONCIERGE_V1_BODY } from './concierge-v1.body'
@@ -159,7 +160,11 @@ export function renderAgreement(
   })
 }
 
-export { CANONICAL_TRUST_PROMISE, NOT_LEGAL_ADVICE_DISCLOSURE }
+export {
+  CANONICAL_TRUST_PROMISE,
+  NOT_A_CUSTOMS_BROKER_CLAUSE,
+  NOT_LEGAL_ADVICE_DISCLOSURE,
+}
 
 function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')

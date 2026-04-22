@@ -24,7 +24,7 @@ We will help prepare one or more CAPE submission files on your behalf and coordi
 
 We prepare files; you control submission. We do not operate as your licensed customs broker unless a separate, specifically-identified engagement explicitly names us in that capacity. Nothing in this letter makes us your legal counsel. This product is not legal advice. Refund timing depends on CBP review and is outside our control.
 
-> Not legal advice. This site provides software and document-prep services. It is not legal advice, not a customs brokerage (unless your engagement letter explicitly says otherwise), and does not guarantee any outcome with U.S. Customs and Border Protection.
+> Not legal advice. This site provides software and document-prep services. It is not legal advice and does not guarantee any outcome with U.S. Customs and Border Protection.
 
 ## 3. Our trust posture (binding)
 

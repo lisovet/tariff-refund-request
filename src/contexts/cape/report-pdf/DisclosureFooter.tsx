@@ -15,7 +15,7 @@ import {
  *   - "Not legal advice" eyebrow
  *   - SUBMISSION_CONTROL_CLAUSE ("We prepare files; you control submission.")
  *   - CANONICAL_TRUST_PROMISE (the four-clause trust posture)
- *   - NOT_LEGAL_ADVICE_DISCLOSURE (the "not a customs brokerage" clause)
+ *   - NOT_LEGAL_ADVICE_DISCLOSURE (the short footer disclosure)
  *
  * All four strings are real text (no images). Customers AND their
  * reviewers can extract + audit them from the PDF.

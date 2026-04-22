@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   CANONICAL_TRUST_PROMISE,
+  NOT_A_CUSTOMS_BROKER_CLAUSE,
   NOT_LEGAL_ADVICE_DISCLOSURE,
   SUBMISSION_CONTROL_CLAUSE,
   REFUND_TIMING_CLAUSE,
@@ -34,9 +35,22 @@ describe('NOT_LEGAL_ADVICE_DISCLOSURE', () => {
     )
   })
 
-  it('explicitly disavows customs-broker services unless engagement letter says otherwise', () => {
-    expect(NOT_LEGAL_ADVICE_DISCLOSURE).toMatch(/customs brokerage/)
-    expect(NOT_LEGAL_ADVICE_DISCLOSURE).toMatch(/engagement letter/)
+  it('names CBP so readers see the outcome we cannot guarantee', () => {
+    expect(NOT_LEGAL_ADVICE_DISCLOSURE).toMatch(
+      /U\.S\. Customs and Border Protection/,
+    )
+  })
+
+  it('does not carry the customs-broker carve-out (that lives in its own clause)', () => {
+    expect(NOT_LEGAL_ADVICE_DISCLOSURE).not.toMatch(/customs broker/i)
+    expect(NOT_LEGAL_ADVICE_DISCLOSURE).not.toMatch(/engagement letter/i)
+  })
+})
+
+describe('NOT_A_CUSTOMS_BROKER_CLAUSE', () => {
+  it('states the customs-broker scope and the engagement-letter carve-out', () => {
+    expect(NOT_A_CUSTOMS_BROKER_CLAUSE).toMatch(/customs broker/i)
+    expect(NOT_A_CUSTOMS_BROKER_CLAUSE).toMatch(/engagement letter/i)
   })
 })
 

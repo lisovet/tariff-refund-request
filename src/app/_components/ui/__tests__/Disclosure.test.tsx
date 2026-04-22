@@ -23,7 +23,9 @@ describe('canonical trust constants', () => {
 
   it('NOT_LEGAL_ADVICE_DISCLOSURE includes the canonical phrase', () => {
     expect(NOT_LEGAL_ADVICE_DISCLOSURE).toMatch(/Not legal advice/)
-    expect(NOT_LEGAL_ADVICE_DISCLOSURE).toMatch(/customs brokerage/)
+    expect(NOT_LEGAL_ADVICE_DISCLOSURE).toMatch(
+      /U\.S\. Customs and Border Protection/,
+    )
   })
 })
 

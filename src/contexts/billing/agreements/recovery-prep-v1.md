@@ -16,7 +16,9 @@ A software product and a document-prep service. We help you recover entry-number
 
 ## 2. Not legal advice
 
-> Not legal advice. This site provides software and document-prep services. It is not legal advice, not a customs brokerage (unless your engagement letter explicitly says otherwise), and does not guarantee any outcome with U.S. Customs and Border Protection.
+> Not legal advice. This site provides software and document-prep services. It is not legal advice and does not guarantee any outcome with U.S. Customs and Border Protection.
+
+> Not a customs broker, unless your engagement letter explicitly names us in that capacity.
 
 ## 3. Human review
 
