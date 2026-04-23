@@ -1,106 +1,25 @@
 import { Button, Eyebrow, Hairline } from '@/app/_components/ui'
-import {
-  SUCCESS_FEE_HARD_CAP,
-  SUCCESS_FEE_RATES,
-  priceFor,
-  type Sku,
-} from '@contexts/billing'
-import { dollars } from '../_components/formatDollars'
+import { TIERS, TIER_ORDER, type Tier } from '@contexts/billing'
 
 /**
- * /pricing — stage-by-stage ladder per PRD 05 + PRD 06.
+ * /pricing — two-tier commercial model (April 2026 repricing).
  *
- * The page mirrors `pricing.ts` verbatim — every figure is read from
- * `PRICE_LADDER` / `SUCCESS_FEE_RATES` / `SUCCESS_FEE_HARD_CAP`. No
- * hand-typed numbers; the ladder is the single source of truth and a
- * snapshot test keeps that property honest.
+ * The page mirrors the two-tier card structure rendered on the
+ * qualified results page. Visitors on the marketing surface see
+ * the same Audit / Full Prep comparison, but the CTA drops them
+ * into the free screener so they see a tailored refund estimate
+ * before they pay.
  *
- * Editorial conventions per the design language: tabular figures,
- * mono numerics, hairline-divided rows, no popular badge, free tier
- * rendered with the same weight as paid tiers, success-fee disclosure
- * prominent on the Concierge section.
+ * Design-language rules (docs/DESIGN-LANGUAGE.md): hairline cards,
+ * sharp corners, Berkeley Mono for money, GT Sectra for tier names,
+ * no pill badges, no shadows, no pastel fills.
  */
 
 export const metadata = {
   title: 'Pricing',
   description:
-    'Paid in stages. Free screener, then recovery and filing prep only when you reach them. Concierge is optional — base fee plus a success fee tied to the realized refund.',
+    'Two tiers. Audit for $99 — eligibility verdict and an action plan you run yourself. Full Prep for $999 + success fee — we build a validated, submission-ready CAPE file.',
 }
-
-interface StageRow {
-  readonly sku: Sku | 'free'
-  readonly label: string
-  readonly priceLabel: string
-  readonly note?: string
-}
-
-interface Stage {
-  readonly id: string
-  readonly num: '00' | '01' | '02'
-  readonly title: string
-  readonly tagline: string
-  readonly rows: readonly StageRow[]
-}
-
-const STAGES: readonly Stage[] = [
-  {
-    id: 'screener',
-    num: '00',
-    title: 'See if it’s worth your time',
-    tagline:
-      'Ten questions. Three minutes. A real refund estimate at the end — no account required, no paywall.',
-    rows: [
-      {
-        sku: 'free',
-        label: 'Eligibility screener',
-        priceLabel: 'Free',
-        note: 'Always free. Returns a qualified estimate and a clear next step.',
-      },
-    ],
-  },
-  {
-    id: 'recovery',
-    num: '01',
-    title: 'Rebuild your entry list',
-    tagline:
-      'Every entry you made during the IEEPA window, with its source document. Run it yourself with our outreach kit, or hand us the documents and an analyst extracts them.',
-    rows: [
-      {
-        sku: 'recovery_kit',
-        label: 'Recovery Kit (DIY)',
-        priceLabel: `${dollars(priceFor('recovery_kit', 'smb').usdCents)} – ${dollars(priceFor('recovery_kit', 'mid_market').usdCents)}`,
-        note: 'Outreach templates for your broker / carrier / ACE export, plus the secure upload portal.',
-      },
-      {
-        sku: 'recovery_service',
-        label: 'Recovery Service (we extract)',
-        priceLabel: `${dollars(priceFor('recovery_service', 'smb').usdCents)} – ${dollars(priceFor('recovery_service', 'mid_market').usdCents)}`,
-        note: 'Analyst extracts and verifies entries directly from the documents you upload.',
-      },
-    ],
-  },
-  {
-    id: 'prep',
-    num: '02',
-    title: 'Turn it into a submission-ready package',
-    tagline:
-      'A CBP-compliant CSV and a signed Readiness Report your broker can file unchanged. Reviewed by a named validator before it reaches you.',
-    rows: [
-      {
-        sku: 'cape_prep_standard',
-        label: 'CAPE Prep — Standard',
-        priceLabel: `${dollars(priceFor('cape_prep_standard', 'smb').usdCents)} – ${dollars(priceFor('cape_prep_standard', 'mid_market').usdCents)}`,
-        note: 'Format checks, dedupe, batch grouping, Readiness Report draft.',
-      },
-      {
-        sku: 'cape_prep_premium',
-        label: 'CAPE Prep — Premium',
-        priceLabel: `${dollars(priceFor('cape_prep_premium', 'smb').usdCents)} – ${dollars(priceFor('cape_prep_premium', 'mid_market').usdCents)}`,
-        note: 'Phase segmentation, prerequisite-gap remediation plan, validator review.',
-      },
-    ],
-  },
-] as const
 
 export default function PricingPage() {
   return (
@@ -108,163 +27,73 @@ export default function PricingPage() {
       <header className="mx-auto max-w-4xl px-6 pb-16 pt-32 sm:px-10 sm:pb-24 sm:pt-40">
         <Eyebrow>Pricing</Eyebrow>
         <h1 className="mt-3 font-display text-5xl tracking-display text-ink sm:text-7xl">
-          Paid in stages.
+          Two tiers. No seat licenses.
         </h1>
         <p className="mt-10 max-w-2xl text-lg text-ink/80">
-          You can stop at any stage. Each one delivers a concrete
-          artifact — a recovered entry list, a submission-ready file,
-          a monitored claim — and is priced on its own.
+          Start with a $99 Audit if you want the verdict and an action
+          plan. Skip to Full Prep when you want us to build the
+          submission-ready file for you.
         </p>
         <p className="mt-6 max-w-2xl text-base text-ink/65">
-          Bands span SMB and mid-market. Your case is priced as
-          mid-market if it has 100+ entries or
-          <span className="font-mono"> $50,000+ </span>
-          in IEEPA duty paid.
+          The screener itself is free. You only pay once we have
+          something concrete to give you in return.
         </p>
       </header>
 
       <Hairline />
 
-      {STAGES.map((stage, index) => (
-        <section
-          key={stage.id}
-          id={stage.id}
-          aria-labelledby={`stage-${stage.id}-heading`}
-          className="scroll-mt-24 bg-paper"
-        >
-          <div className="mx-auto max-w-4xl px-6 py-24 sm:px-10 sm:py-32">
-            <Eyebrow>Stage {stage.num}</Eyebrow>
-            <h2
-              id={`stage-${stage.id}-heading`}
-              className="mt-3 font-display text-4xl tracking-display text-ink sm:text-5xl"
-            >
-              {stage.title}
-            </h2>
-            <p className="mt-8 max-w-2xl text-xl text-ink/85">
-              {stage.tagline}
-            </p>
-
-            <div className="mt-16 divide-y divide-rule border-y border-rule">
-              {stage.rows.map((row) => (
-                <div
-                  key={`${stage.id}__${row.sku}`}
-                  data-sku={row.sku}
-                  className="grid gap-6 py-8 sm:grid-cols-[1fr_auto] sm:items-baseline sm:gap-12"
-                >
-                  <div>
-                    <h3 className="font-display text-2xl text-ink">
-                      {row.label}
-                    </h3>
-                    {row.note && (
-                      <p className="mt-3 text-base text-ink/75">{row.note}</p>
-                    )}
-                  </div>
-                  <div
-                    data-price-mono
-                    className="font-mono text-lg text-accent sm:text-right"
-                  >
-                    {row.priceLabel}
-                  </div>
-                </div>
-              ))}
-            </div>
+      <section className="bg-paper">
+        <div className="mx-auto max-w-5xl px-6 py-24 sm:px-10 sm:py-32">
+          <div className="grid gap-6 sm:grid-cols-2">
+            {TIER_ORDER.map((id) => (
+              <PricingTierCard key={id} tier={TIERS[id]} />
+            ))}
           </div>
-          {index < STAGES.length - 1 && (
-            <Hairline label={`II · Stage ${STAGES[index + 1]?.num}`} />
-          )}
-        </section>
-      ))}
-
-      <Hairline label="III · Concierge" />
-
-      <section
-        id="concierge"
-        aria-labelledby="concierge-heading"
-        role="region"
-        aria-label="Concierge"
-        className="scroll-mt-24 bg-paper-2"
-      >
-        <div className="mx-auto max-w-4xl px-6 py-24 sm:px-10 sm:py-32">
-          <Eyebrow>Stage 03 — bespoke</Eyebrow>
-          <h2
-            id="concierge-heading"
-            className="mt-3 font-display text-4xl tracking-display text-ink sm:text-5xl"
-          >
-            Concierge
-          </h2>
-          <p className="mt-8 max-w-2xl text-xl text-ink/85">
-            Hand off the filing. We coordinate with your broker,
-            resolve ACE / ACH prerequisite gaps, and monitor through
-            CBP response. Success fee only when the refund posts.
+          <p className="mt-6 text-xs text-ink/60">
+            Paid Audit first? The $99 credits toward Full Prep when you
+            upgrade.
           </p>
-
-          <div
-            data-sku="concierge_base"
-            className="mt-16 grid gap-6 border-y border-rule py-8 sm:grid-cols-[1fr_auto] sm:items-baseline sm:gap-12"
-          >
-            <div>
-              <h3 className="font-display text-2xl text-ink">
-                Concierge — engagement
-              </h3>
-              <p className="mt-3 text-base text-ink/75">
-                Engagement letter, signed before any payment is captured.
-                Coordination through filing and CBP response.
-              </p>
-            </div>
-            <div data-price-mono className="font-mono text-lg text-accent sm:text-right">
-              {dollars(priceFor('concierge_base', 'smb').usdCents)} – {dollars(priceFor('concierge_base', 'mid_market').usdCents)}
-            </div>
-          </div>
-
-          <div className="mt-12 max-w-2xl space-y-6 text-base text-ink/85">
-            <p>
-              <span className="font-mono uppercase tracking-[0.16em] text-accent">
-                Plus a success fee
-              </span>{' '}
-              calculated against the <em>realized refund</em>, not the
-              pre-filing estimate. Bands are{' '}
-              <span className="font-mono">{Math.round(SUCCESS_FEE_RATES.smb.min * 100)}–{Math.round(SUCCESS_FEE_RATES.smb.max * 100)}%</span>{' '}
-              for SMB and{' '}
-              <span className="font-mono">{Math.round(SUCCESS_FEE_RATES.mid_market.min * 100)}–{Math.round(SUCCESS_FEE_RATES.mid_market.max * 100)}%</span>{' '}
-              for mid-market, capped at{' '}
-              <span className="font-mono">{dollars(SUCCESS_FEE_HARD_CAP.usdCents)}</span>{' '}
-              per case.
-            </p>
-            <p>
-              We bill the success fee only after the refund posts. If
-              the refund never posts, you owe nothing on the success
-              fee — only the engagement.
-            </p>
-          </div>
         </div>
       </section>
 
-      <Hairline />
+      <Hairline label="II · Success fee" />
 
-      <section className="bg-paper">
+      <section
+        id="success-fee"
+        role="region"
+        aria-label="Success fee"
+        className="scroll-mt-24 bg-paper-2"
+      >
         <div className="mx-auto max-w-4xl px-6 py-24 sm:px-10 sm:py-32">
-          <Eyebrow>Monitoring</Eyebrow>
-          <h2 className="mt-3 font-display text-3xl tracking-display text-ink sm:text-4xl">
-            Stay informed after you file.
-          </h2>
-          <div
-            data-sku="monitoring"
-            className="mt-12 grid gap-6 border-y border-rule py-8 sm:grid-cols-[1fr_auto] sm:items-baseline sm:gap-12"
+          <Eyebrow>Success fee</Eyebrow>
+          <h2
+            id="success-fee-heading"
+            className="mt-3 font-display text-4xl tracking-display text-ink sm:text-5xl"
           >
-            <div>
-              <h3 className="font-display text-2xl text-ink">
-                Ongoing monitoring (subscription)
-              </h3>
-              <p className="mt-3 text-base text-ink/75">
-                Weekly CBP-status pulls, anomaly alerts, and a single
-                dashboard if you have multiple entities. Cancel any time.
-                Annual prepay gets two months free.
-              </p>
-            </div>
-            <div data-price-mono className="font-mono text-lg text-accent sm:text-right">
-              {dollars(priceFor('monitoring', 'smb').usdCents)} – {dollars(priceFor('monitoring', 'mid_market').usdCents)}
-              <span className="ml-1 text-ink/55">/ mo</span>
-            </div>
+            10 % of your estimated refund, capped at $25,000.
+          </h2>
+          <p className="mt-8 max-w-2xl text-lg text-ink/85">
+            The success fee is added to Full Prep only, and it&rsquo;s
+            computed against the <em>estimated</em> refund at checkout —
+            not the amount CBP eventually posts. You owe nothing more if
+            the refund lands higher than we estimated.
+          </p>
+
+          <SuccessFeeTable />
+
+          <div className="mt-12 grid gap-8 sm:grid-cols-3">
+            <Callout
+              eyebrow="Why upfront beats contingency"
+              body="Charging a percentage of what CBP eventually pays means 60–90 days of float and open-ended liability if the refund is contested. Charging 10 % of the estimate at checkout lets us get paid on the work, not on CBP's timeline."
+            />
+            <Callout
+              eyebrow="The $25,000 cap"
+              body="At large refund sizes 10 % stops feeling like a service fee. The cap keeps large-importer economics sane without gutting mid-size deals where the percentage is modest."
+            />
+            <Callout
+              eyebrow="Audit credit"
+              body="If you paid $99 for the Audit first, we credit it toward the $999 Full Prep flat fee at checkout. No double-charging for the same eligibility work."
+            />
           </div>
         </div>
       </section>
@@ -277,8 +106,9 @@ export default function PricingPage() {
             Start with the screener.
           </h2>
           <p className="mt-6 text-lg text-ink/80">
-            The screener is free. You only hit a paywall once we have
-            something concrete to give you in return.
+            Free, three minutes, ten questions. You&rsquo;ll see both
+            tiers again at the end with a refund estimate so the math is
+            concrete.
           </p>
           <div className="mt-10 inline-block">
             <Button as="a" href="/screener" variant="underline" size="lg">
@@ -288,5 +118,184 @@ export default function PricingPage() {
         </div>
       </section>
     </main>
+  )
+}
+
+function PricingTierCard({ tier }: { readonly tier: Tier }) {
+  const priceMain = `$${(tier.flatUsdCents / 100).toLocaleString()}`
+  const priceSub =
+    tier.successFeePct !== undefined ? '+ success fee' : 'one time'
+  return (
+    <section
+      data-tier={tier.id}
+      className="flex h-full flex-col rounded-card border border-rule bg-paper p-8 sm:p-10"
+    >
+      <Eyebrow>{tier.eyebrow}</Eyebrow>
+      <h2 className="mt-3 font-display text-3xl tracking-display text-ink sm:text-4xl">
+        {tier.name}
+      </h2>
+      <p className="mt-4 font-mono text-ink" data-price-mono>
+        <span className="text-3xl">{priceMain}</span>{' '}
+        <span className="text-sm text-ink/60">{priceSub}</span>
+      </p>
+      {tier.successFeePct !== undefined && (
+        <p className="mt-1 font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
+          {Math.round(tier.successFeePct * 100)}% of estimated refund · cap $
+          {((tier.successFeeCapUsdCents ?? 0) / 100).toLocaleString()}
+        </p>
+      )}
+      <p className="mt-6 text-base text-ink/85">{tier.pitch}</p>
+
+      <div className="mt-8 border-t border-rule pt-6">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink/60">
+          What&rsquo;s included
+        </p>
+        <ul className="mt-4 divide-y divide-rule border-y border-rule">
+          {tier.included.map((item) => (
+            <li
+              key={item}
+              className="flex items-start gap-4 py-3 text-sm text-ink/85"
+            >
+              <span
+                aria-hidden="true"
+                className="mt-0.5 font-mono text-sm text-positive"
+              >
+                ✓
+              </span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {tier.notIncluded && tier.notIncluded.length > 0 && (
+        <div className="mt-6">
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink/60">
+            Not included
+          </p>
+          <ul className="mt-3 space-y-2">
+            {tier.notIncluded.map((item) => (
+              <li
+                key={item}
+                className="flex items-start gap-4 text-sm text-ink/55"
+              >
+                <span
+                  aria-hidden="true"
+                  className="mt-0.5 font-mono text-sm text-ink/40"
+                >
+                  ×
+                </span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div className="mt-10 flex-1" />
+
+      <Button as="a" href="/screener" variant="solid" size="lg">
+        Check eligibility
+      </Button>
+    </section>
+  )
+}
+
+interface FeeRow {
+  readonly refund: number
+  readonly flat: number
+  readonly successFee: number
+  readonly capped?: boolean
+}
+
+const FEE_ROWS: readonly FeeRow[] = [
+  { refund: 5_000, flat: 999, successFee: 500 },
+  { refund: 15_000, flat: 999, successFee: 1_500 },
+  { refund: 30_000, flat: 999, successFee: 3_000 },
+  { refund: 50_000, flat: 999, successFee: 5_000 },
+  { refund: 100_000, flat: 999, successFee: 10_000 },
+  { refund: 250_000, flat: 999, successFee: 25_000, capped: true },
+  { refund: 500_000, flat: 999, successFee: 25_000, capped: true },
+]
+
+function fmt(usd: number): string {
+  return `$${usd.toLocaleString('en-US')}`
+}
+
+function SuccessFeeTable() {
+  return (
+    <div className="mt-12 overflow-x-auto">
+      <table
+        aria-label="Success fee by estimated refund"
+        className="w-full border-collapse text-left text-sm"
+      >
+        <thead>
+          <tr className="border-y border-rule">
+            <th className="py-3 pr-6 font-mono text-[10px] uppercase tracking-[0.2em] text-ink/60">
+              Estimated refund
+            </th>
+            <th className="py-3 pr-6 font-mono text-[10px] uppercase tracking-[0.2em] text-ink/60">
+              Flat fee
+            </th>
+            <th className="py-3 pr-6 font-mono text-[10px] uppercase tracking-[0.2em] text-ink/60">
+              Success fee
+            </th>
+            <th className="py-3 pr-6 font-mono text-[10px] uppercase tracking-[0.2em] text-ink/60">
+              Total
+            </th>
+            <th className="py-3 font-mono text-[10px] uppercase tracking-[0.2em] text-ink/60">
+              You keep
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-rule">
+          {FEE_ROWS.map((r) => {
+            const total = r.flat + r.successFee
+            const keep = r.refund - r.successFee
+            return (
+              <tr key={r.refund}>
+                <td className="py-4 pr-6 font-mono tabular-nums text-ink">
+                  {fmt(r.refund)}
+                </td>
+                <td className="py-4 pr-6 font-mono tabular-nums text-ink/85">
+                  {fmt(r.flat)}
+                </td>
+                <td className="py-4 pr-6 font-mono tabular-nums text-ink/85">
+                  {fmt(r.successFee)}
+                  {r.capped && (
+                    <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
+                      cap
+                    </span>
+                  )}
+                </td>
+                <td className="py-4 pr-6 font-mono tabular-nums text-ink/85">
+                  {fmt(total)}
+                </td>
+                <td className="py-4 font-mono tabular-nums text-positive">
+                  {fmt(keep)}
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+function Callout({
+  eyebrow,
+  body,
+}: {
+  readonly eyebrow: string
+  readonly body: string
+}) {
+  return (
+    <div className="border-l border-rule pl-6">
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
+        {eyebrow}
+      </p>
+      <p className="mt-3 text-sm text-ink/80">{body}</p>
+    </div>
   )
 }
