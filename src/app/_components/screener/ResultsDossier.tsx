@@ -1,4 +1,5 @@
-import { Button, Eyebrow, Hairline } from '@/app/_components/ui'
+import { Eyebrow, Hairline } from '@/app/_components/ui'
+import type { TierId } from '@contexts/billing'
 import type {
   Confidence,
   DisqualificationReason,
@@ -8,6 +9,7 @@ import type {
 } from '@contexts/screener'
 import { NotifyMeForm } from './NotifyMeForm'
 import { StartOverButton } from './StartOverButton'
+import { TierSelection } from './TierSelection'
 
 /**
  * Editorial results dossier per PRD 01 + docs/DESIGN-LANGUAGE.md.
@@ -15,10 +17,11 @@ import { StartOverButton } from './StartOverButton'
  * inline at /screener after q10 and at /screener/results?token= when
  * resumed from the magic-link email.
  *
- * Photographable: a founder should want to screenshot it. Hero metric
- * in Berkeley Mono at display size; confidence as a small caps accent
- * label; prerequisites as a typeset checklist; one CTA, sized for
- * confidence not aggression.
+ * The qualified surface is the funnel's highest-converting page:
+ * verdict + refund hero + filing readiness + two-tier selection with
+ * in-page Pay buttons that land on /screener/confirmation. There is
+ * no longer any link back to /pricing from here — we broke the
+ * circular loop by inlining the commercial decision.
  */
 
 interface Props {
@@ -51,6 +54,7 @@ function QualifiedDossier({
   readonly result: ScreenerResult
   readonly emailSent: boolean
 }) {
+  const recommendedTier = TIER_FOR_STEP[result.recommendedNextStep]
   return (
     <article>
       <Eyebrow>Your screener results</Eyebrow>
@@ -84,7 +88,16 @@ function QualifiedDossier({
 
       <Hairline className="my-12" />
 
-      <NextStepCard step={result.recommendedNextStep} />
+      <TierSelection recommendedTier={recommendedTier} />
+
+      <div className="mt-10">
+        <a
+          href="/how-it-works"
+          className="text-sm text-accent/80 underline underline-offset-[6px] decoration-accent/30 hover:decoration-accent decoration-1"
+        >
+          How this works
+        </a>
+      </div>
 
       {emailSent && (
         <p className="mt-12 text-center font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
@@ -247,81 +260,6 @@ function PrerequisitesList({
   )
 }
 
-// --- next-step card -------------------------------------------------------
-
-function NextStepCard({ step }: { readonly step: RecommendedNextStep }) {
-  const bullets = NEXT_STEP_BULLETS[step]
-  if (step === 'none') {
-    return (
-      <section>
-        <Eyebrow>Recommended next step</Eyebrow>
-        <p className="mt-6 max-w-xl text-base text-ink/85">
-          We&apos;ll route you to the right starting point on the pricing page.
-        </p>
-        <div className="mt-8 flex flex-wrap items-baseline gap-6">
-          <Button as="a" href={nextStepHref(step)} variant="solid" size="lg">
-            See your options
-          </Button>
-          <a
-            href="/how-it-works"
-            className="text-sm text-accent/80 underline underline-offset-[6px] decoration-accent/30 hover:decoration-accent decoration-1"
-          >
-            How each stage works
-          </a>
-        </div>
-      </section>
-    )
-  }
-  return (
-    <section className="rounded-card border border-rule bg-paper-2/40 p-8 sm:p-12">
-      <Eyebrow>Recommended next step</Eyebrow>
-      <h2 className="mt-3 font-display text-3xl tracking-display text-ink sm:text-4xl">
-        {NEXT_STEP_NAME[step]}
-      </h2>
-      <p className="mt-3 font-mono text-xl text-accent">
-        {NEXT_STEP_PRICE[step]}
-      </p>
-      <p className="mt-6 max-w-xl text-lg text-ink/85">
-        {NEXT_STEP_RATIONALE[step]}
-      </p>
-      {bullets.length > 0 && (
-        <>
-          <p className="mt-10 font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
-            What you get
-          </p>
-          <ul className="mt-3 divide-y divide-rule border-y border-rule">
-            {bullets.map((b) => (
-              <li
-                key={b}
-                className="flex items-start gap-4 py-4 text-base text-ink/85"
-              >
-                <span
-                  aria-hidden="true"
-                  className="mt-0.5 font-mono text-sm text-accent"
-                >
-                  ▸
-                </span>
-                <span>{b}</span>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-      <div className="mt-10 flex flex-wrap items-baseline gap-6">
-        <Button as="a" href={nextStepHref(step)} variant="solid" size="lg">
-          See your options
-        </Button>
-        <a
-          href="/how-it-works"
-          className="text-sm text-accent/80 underline underline-offset-[6px] decoration-accent/30 hover:decoration-accent decoration-1"
-        >
-          How each stage works
-        </a>
-      </div>
-    </section>
-  )
-}
-
 // --- copy helpers ---------------------------------------------------------
 
 function verdictFor(result: ScreenerResult): string {
@@ -329,76 +267,19 @@ function verdictFor(result: ScreenerResult): string {
   return 'Likely worth a closer look.'
 }
 
-const NEXT_STEP_LABEL: Record<RecommendedNextStep, string> = {
-  recovery_kit: 'Recovery Kit · $99–299',
-  recovery_service: 'Recovery Service · $299–499',
-  cape_prep: 'CAPE Filing Prep · $199–999',
-  concierge: 'Concierge · $999+ + 8–12% success fee',
-  none: '—',
-}
-
-const NEXT_STEP_NAME: Record<RecommendedNextStep, string> = {
-  recovery_kit: 'Recovery Kit',
-  recovery_service: 'Recovery Service',
-  cape_prep: 'CAPE Filing Prep',
-  concierge: 'Concierge',
-  none: '—',
-}
-
-const NEXT_STEP_PRICE: Record<RecommendedNextStep, string> = {
-  recovery_kit: '$99 – $299',
-  recovery_service: '$299 – $499',
-  cape_prep: '$199 – $999',
-  concierge: '$999+ · 8–12% success fee',
-  none: '',
-}
-
-const NEXT_STEP_RATIONALE: Record<RecommendedNextStep, string> = {
-  recovery_kit:
-    'Self-guided outreach kit + secure upload portal. Fastest path when your duty exposure is on the smaller side.',
-  recovery_service:
-    'Adds an analyst who extracts and verifies entries directly from your uploaded documents — the right call when records are fragmented.',
-  cape_prep:
-    'Once your entries are validated, generate a CBP-compliant CSV plus a human-reviewed Readiness Report.',
-  concierge:
-    'High-touch coordination of filing actor, ACE/ACH gaps, and CBP follow-up. Recommended at scale or with mixed clearance paths.',
-  none: '',
-}
-
-const NEXT_STEP_BULLETS: Record<RecommendedNextStep, readonly string[]> = {
-  recovery_kit: [
-    'Broker / carrier / ACE outreach templates',
-    'Secure upload portal for returned documents',
-    'Readiness checklist tailored to your clearance path',
-  ],
-  recovery_service: [
-    'Analyst extracts entries from your uploads',
-    'Source + confidence on every row',
-    'You get a single canonical entry list back',
-  ],
-  cape_prep: [
-    'CBP-compliant CSV, batch-validated',
-    'Human-reviewed Readiness Report',
-    'Phase segmentation + prerequisite gap plan',
-  ],
-  concierge: [
-    'Analyst coordinates with your broker end-to-end',
-    'ACE / ACH gap remediation',
-    'Success-fee pricing: we only win when you do',
-  ],
-  none: [],
-}
-
-const NEXT_STEP_HREF: Record<RecommendedNextStep, string> = {
-  recovery_kit: '/pricing#recovery',
-  recovery_service: '/pricing#recovery',
-  cape_prep: '/pricing#prep',
-  concierge: '/pricing#concierge',
-  none: '/pricing',
-}
-
-function nextStepHref(step: RecommendedNextStep): string {
-  return NEXT_STEP_HREF[step]
+/**
+ * UI-layer mapping from the legacy 5-value `RecommendedNextStep`
+ * union to the commercial two-tier model. Kept at the UI layer so
+ * the screener branching logic + `qualification.ts` unit tests stay
+ * untouched; follow-up PR can collapse the union once Stripe wiring
+ * settles.
+ */
+const TIER_FOR_STEP: Record<RecommendedNextStep, TierId> = {
+  recovery_kit: 'audit',
+  recovery_service: 'full_prep',
+  cape_prep: 'full_prep',
+  concierge: 'full_prep',
+  none: 'audit',
 }
 
 const DISQUALIFICATION_COPY: Record<DisqualificationReason, string> = {
@@ -414,11 +295,10 @@ function disqualificationCopy(reason: DisqualificationReason | undefined): strin
   return DISQUALIFICATION_COPY[reason]
 }
 
-// Re-export for use by tests against the verdict / label maps if needed.
+// Re-export for tests.
 export {
   verdictFor as _verdictFor,
-  NEXT_STEP_LABEL as _NEXT_STEP_LABEL,
-  NEXT_STEP_HREF as _NEXT_STEP_HREF,
+  TIER_FOR_STEP as _TIER_FOR_STEP,
   DISQUALIFICATION_COPY as _DISQUALIFICATION_COPY,
 }
 
