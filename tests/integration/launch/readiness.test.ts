@@ -115,11 +115,11 @@ describe('Launch readiness — Inngest workflows registered', () => {
       if (typeof fn.id === 'string') return fn.id
       return fn._def?.id ?? 'unknown'
     })
-    // Twelve workflows make up the v1 registry.
-    expect(workflows.length).toBe(12)
+    // Thirteen workflows make up the v1 registry (post buy-flow wire).
+    expect(workflows.length).toBe(13)
     // Spot-check the five funnel workflows (task #85) + the
-    // artifact pipeline (#70) + the concierge checkout
-    // (#73) landed.
+    // artifact pipeline (#70) + the concierge checkout (#73) +
+    // the post-payment case-creation (buy-flow) landed.
     const bag = ids.join(' ')
     for (const kind of [
       'artifact-generation',
@@ -128,6 +128,7 @@ describe('Launch readiness — Inngest workflows registered', () => {
       'screener-nudge',
       'audit-log-mirror',
       'stalled-cadence',
+      'ops-case-on-payment',
       'funnel-screener-completed',
       'funnel-payment-completed',
       'funnel-concierge-signed',

@@ -17,4 +17,24 @@ test.describe('protected route gating', () => {
     expect(page.url()).toContain('/sign-in')
     expect(response?.status()).toBeLessThan(500)
   })
+
+  test('returnBackUrl echoes the public origin, never the internal node host', async ({
+    page,
+    baseURL,
+  }) => {
+    // Regression: Clerk redirect_url was being built from req.url, which
+    // on Railway resolves to localhost:8080. The middleware now reads
+    // NEXT_PUBLIC_APP_URL; assert the result lines up with the test
+    // baseURL, not the internal process host.
+    await page.goto('/app')
+    const finalUrl = page.url()
+    // Sign-in URL should contain a redirect_url query param; its value
+    // should point at the same origin the browser was pointed at.
+    const match = finalUrl.match(/[?&]redirect_url=([^&]+)/)
+    expect(match, `no redirect_url in ${finalUrl}`).toBeTruthy()
+    const decoded = decodeURIComponent(match![1] ?? '')
+    const expectedOrigin = new URL(baseURL ?? 'http://localhost:3000').origin
+    expect(decoded).toContain(expectedOrigin)
+    expect(decoded).not.toMatch(/localhost:8080/)
+  })
 })

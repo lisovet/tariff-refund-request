@@ -19,6 +19,7 @@ const checkoutCompleted = (id = 'evt_001') =>
         metadata: {
           screenerSessionId: 'sess_x',
           sku: 'recovery_kit',
+          tier: 'smb',
         },
       },
     },
@@ -42,6 +43,7 @@ describe('handleStripeEvent — idempotency', () => {
     expect(publish).toHaveBeenCalledWith({
       sessionId: 'sess_x',
       sku: 'recovery_kit',
+      tier: 'smb',
       stripeChargeId: 'pi_test_001',
       amountUsdCents: 9900,
       email: 'a@b.co',

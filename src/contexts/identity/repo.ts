@@ -48,6 +48,10 @@ export interface IdentityRepo {
   /** Primary-key lookup. Used by the data-rights (export + deletion)
    *  services per PRD 10. */
   findCustomerById(customerId: string): Promise<CustomerRecord | null>
+  /** Email lookup used by the post-payment workflow to resolve the
+   *  buyer's `customerId` when creating their case. Email must match
+   *  the value captured by the Clerk `user.created` webhook. */
+  findCustomerByEmail(email: string): Promise<CustomerRecord | null>
   findStaffUserByClerkUserId(clerkUserId: string): Promise<StaffUserRecord | null>
   // Listing methods primarily for tests / admin diagnostics.
   listCustomers(): Promise<readonly CustomerRecord[]>
