@@ -8,6 +8,9 @@
  * @contexts/billing/server.
  */
 
+export type { Tier, TierId } from './tiers'
+export { TIERS, TIER_ORDER, isTierId } from './tiers'
+
 export type {
   BillingRepo,
   MarkEventInput,
