@@ -124,7 +124,7 @@ export default function PricingPage() {
 function PricingTierCard({ tier }: { readonly tier: Tier }) {
   const priceMain = `$${(tier.flatUsdCents / 100).toLocaleString()}`
   const priceSub =
-    tier.successFeePct !== undefined ? '+ success fee' : 'one time'
+    tier.successFeePct !== undefined ? 'due now' : 'one time'
   return (
     <section
       data-tier={tier.id}
@@ -139,10 +139,17 @@ function PricingTierCard({ tier }: { readonly tier: Tier }) {
         <span className="text-sm text-ink/60">{priceSub}</span>
       </p>
       {tier.successFeePct !== undefined && (
-        <p className="mt-1 font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
-          {Math.round(tier.successFeePct * 100)}% of estimated refund · cap $
-          {((tier.successFeeCapUsdCents ?? 0) / 100).toLocaleString()}
-        </p>
+        <>
+          <p className="mt-1 font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
+            {Math.round(tier.successFeePct * 100)}% of estimated refund · cap $
+            {((tier.successFeeCapUsdCents ?? 0) / 100).toLocaleString()}
+          </p>
+          <p className="mt-2 text-xs text-ink/60">
+            You pay $
+            {(tier.flatUsdCents / 100).toLocaleString()} now. The success fee
+            is billed only after your file is delivered.
+          </p>
+        </>
       )}
       <p className="mt-6 text-base text-ink/85">{tier.pitch}</p>
 

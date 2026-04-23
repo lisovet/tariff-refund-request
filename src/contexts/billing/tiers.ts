@@ -29,9 +29,9 @@ export interface Tier {
   readonly included: readonly string[]
   /** What's NOT included (the upgrade wedge). Optional. */
   readonly notIncluded?: readonly string[]
-  /** Short CTA label, e.g. "Pay — $99". */
+  /** Short CTA label, e.g. "Select Tier 1". */
   readonly ctaLabelShort: string
-  /** Accessible CTA label, e.g. "Pay — $99 · start Audit". */
+  /** Accessible CTA label, e.g. "Select Tier 1 · start Audit". */
   readonly ctaLabelAccessible: string
 }
 
@@ -58,8 +58,8 @@ export const TIERS: Readonly<Record<TierId, Tier>> = {
       'Pre-submission confidence report',
       'VA-assisted file prep',
     ],
-    ctaLabelShort: 'Pay — $99',
-    ctaLabelAccessible: 'Pay — $99 · start Audit',
+    ctaLabelShort: 'Select Tier 1',
+    ctaLabelAccessible: 'Select Tier 1 · start Audit',
   },
   full_prep: {
     id: 'full_prep',
@@ -80,8 +80,8 @@ export const TIERS: Readonly<Record<TierId, Tier>> = {
       'Phase 2 follow-up — we hold your entries and re-engage when the window opens',
       '5-day turnaround SLA — from documents received to file delivered',
     ],
-    ctaLabelShort: 'Pay — $999 + fee',
-    ctaLabelAccessible: 'Pay — $999 plus success fee · start Full Prep',
+    ctaLabelShort: 'Select Tier 2',
+    ctaLabelAccessible: 'Select Tier 2 · start Full Prep',
   },
 } as const
 

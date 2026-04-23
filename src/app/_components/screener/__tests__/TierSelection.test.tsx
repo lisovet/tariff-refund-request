@@ -48,4 +48,19 @@ describe('<TierSelection>', () => {
     expect(screen.getByText(/10% of estimated refund/i)).toBeTruthy()
     expect(screen.getByText(/cap \$25,000/i)).toBeTruthy()
   })
+
+  it('CTAs read "Select Tier 1" / "Select Tier 2" (not Pay)', () => {
+    render(<TierSelection recommendedTier="audit" />)
+    expect(screen.getByRole('button', { name: /Select Tier 1/i })).toBeTruthy()
+    expect(screen.getByRole('button', { name: /Select Tier 2/i })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: /^Pay/i })).toBeNull()
+  })
+
+  it('Full Prep clarifies $999 due now + fee billed after delivery', () => {
+    render(<TierSelection recommendedTier="audit" />)
+    expect(screen.getByText(/due now/i)).toBeTruthy()
+    expect(
+      screen.getByText(/billed only after your file is delivered/i),
+    ).toBeTruthy()
+  })
 })

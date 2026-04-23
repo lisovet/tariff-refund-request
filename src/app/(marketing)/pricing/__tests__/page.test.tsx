@@ -68,17 +68,20 @@ describe('/pricing — tier prices', () => {
     expect(within(audit).queryByText(/success fee/i)).toBeNull()
   })
 
-  it('Full Prep is $999 + success fee with the 10% / $25,000 cap line', () => {
+  it('Full Prep shows $999 due now + success fee billed after delivery', () => {
     renderPricing()
     const fp = document.querySelector(
       '[data-tier="full_prep"]',
     ) as HTMLElement
     expect(within(fp).getByText('$999')).toBeInTheDocument()
-    expect(within(fp).getByText(/\+ success fee/i)).toBeInTheDocument()
+    expect(within(fp).getByText(/due now/i)).toBeInTheDocument()
     expect(
       within(fp).getByText(/10% of estimated refund/i),
     ).toBeInTheDocument()
     expect(within(fp).getByText(/cap \$25,000/i)).toBeInTheDocument()
+    expect(
+      within(fp).getByText(/billed only after your file is delivered/i),
+    ).toBeInTheDocument()
   })
 
   it('renders prices in monospace numerics (Berkeley Mono fallback)', () => {
