@@ -27,9 +27,6 @@ const PUBLIC_PAGES: readonly string[] = [
   '/',
   '/how-it-works',
   '/pricing',
-  '/recovery',
-  '/cape-prep',
-  '/concierge',
   '/for-agencies',
   '/blog',
 ]

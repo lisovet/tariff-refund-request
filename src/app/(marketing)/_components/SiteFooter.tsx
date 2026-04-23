@@ -16,9 +16,6 @@ const SECTIONS: ReadonlyArray<{
     links: [
       { label: 'How it works', href: '/how-it-works' },
       { label: 'Pricing', href: '/pricing' },
-      { label: 'Recovery', href: '/recovery' },
-      { label: 'Filing prep', href: '/cape-prep' },
-      { label: 'Concierge', href: '/concierge' },
       { label: 'Check eligibility', href: '/screener' },
     ],
   },

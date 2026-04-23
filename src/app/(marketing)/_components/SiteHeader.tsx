@@ -5,18 +5,16 @@ import { Button } from '@/app/_components/ui'
  * Marketing masthead — editorial magazine style per
  * docs/DESIGN-LANGUAGE.md. Three columns on desktop:
  *
- *   [ TARIFF · REFUND ]        [ nav ]        [ CTA ]
+ *   [ TARIFF · REFUND ]        [ nav ]        [ Sign in · CTA ]
  *
  * - Wordmark in mono, small caps with a middle-dot separator so
  *   it reads like a publication masthead, not a product logo.
  *   Clicks home from any marketing page.
  * - Primary nav is three links (How it works / Pricing / Trust) —
  *   the minimum set per PRD 05. Everything else lives in the footer.
- * - Right side is the single accent CTA ("Check eligibility"). Per
- *   the design-language rule: exactly one accent CTA above the fold.
- *   Sign-in is intentionally omitted at launch — every customer is
- *   onboarded by an account manager, and there is no self-serve
- *   portal to sign into yet. Re-introduce when the customer app ships.
+ * - Right side carries a quiet Sign-in link + the single accent
+ *   CTA ("Check eligibility"). Per the design-language rule:
+ *   exactly one accent CTA above the fold.
  * - Hairline bottom border. No shadow. No backdrop-blur. No sticky
  *   positioning — these pages scroll like print.
  */
@@ -58,6 +56,12 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-5">
+          <Link
+            href="/sign-in"
+            className="hidden font-mono text-xs uppercase tracking-[0.2em] text-ink/70 hover:text-ink sm:inline"
+          >
+            Sign in
+          </Link>
           <Button as="a" href="/screener" variant="solid">
             Check eligibility
           </Button>

@@ -4,9 +4,10 @@ import { EMAIL_COLORS, EMAIL_FONTS, EmailLayout } from './_layout'
 /**
  * 24h post-screener nudge per PRD 05.
  *
- * Editorial register: a soft nudge, not a sales push. Frames recovery
- * as the first concrete step. One link back to the results dossier;
- * one link to /how-it-works for evaluators.
+ * Editorial register: a soft nudge, not a sales push. Frames the
+ * Audit as the low-commitment first step in the two-tier model. One
+ * link back to the results dossier; one link to /how-it-works for
+ * evaluators still deciding between Audit and Full Prep.
  */
 
 interface Props {
@@ -22,7 +23,7 @@ export function ScreenerNudge24hEmail({
 }: Props) {
   const greeting = firstName ? `Hi ${firstName},` : 'Hi,'
   return (
-    <EmailLayout preview="Your next step: recover your entry numbers.">
+    <EmailLayout preview="Your next step: a $99 Audit with a clear verdict and a checklist.">
       <Section>
         <Heading
           as="h1"
@@ -35,7 +36,7 @@ export function ScreenerNudge24hEmail({
             color: EMAIL_COLORS.ink,
           }}
         >
-          The shortest path to a refund is finding your entry numbers.
+          The shortest path to a refund starts with a clear verdict.
         </Heading>
 
         <Text
@@ -57,10 +58,13 @@ export function ScreenerNudge24hEmail({
             color: EMAIL_COLORS.ink,
           }}
         >
-          Most importers can&apos;t file because they don&apos;t have a
-          clean entry list. That&apos;s the work the Recovery step does
-          first — broker outreach templates, an upload portal, optional
-          analyst help. It costs less than the round trip to a CPA.
+          Most importers stall because they aren&apos;t sure which of
+          their entries qualify, or what to ask their broker for. The
+          $99 Audit gives you an eligibility verdict, a defensible
+          refund estimate, and a step-by-step checklist with the
+          templates you need — so you can run the rest yourself, or
+          hand it to us for Full Prep. If you upgrade, the $99 credits
+          toward Full Prep.
         </Text>
 
         <Section style={{ margin: '32px 0' }}>

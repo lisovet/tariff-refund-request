@@ -23,9 +23,11 @@ describe('SiteHeader', () => {
     )
   })
 
-  it('does not render a sign-in link (white-glove launch — no portal yet)', () => {
+  it('renders the sign-in link', () => {
     render(<SiteHeader />)
-    expect(screen.queryByRole('link', { name: /sign in/i })).toBeNull()
+    expect(
+      screen.getByRole('link', { name: /sign in/i }).getAttribute('href'),
+    ).toBe('/sign-in')
   })
 
   it('renders the primary CTA — Check eligibility', () => {
