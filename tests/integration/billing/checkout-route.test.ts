@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type * as BillingModule from '@contexts/billing'
 
 /**
  * Integration test for POST /api/checkout. Stubs the checkout client
@@ -21,7 +22,7 @@ vi.mock('@contexts/billing/server', () => ({
 }))
 
 vi.mock('@contexts/billing', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@contexts/billing')>()
+  const actual = await importOriginal<typeof BillingModule>()
   return {
     ...actual,
     createCheckoutForSku: mocks.createCheckoutForSku,

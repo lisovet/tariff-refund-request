@@ -8,7 +8,7 @@ import {
 } from '../payment-aggregate'
 import { createInMemoryPaymentRepo } from '../in-memory-payment-repo'
 
-const $50k = 50_000_00
+const $25k = 25_000_00
 
 describe('PAYMENT_KINDS', () => {
   it('includes the v1 kinds', () => {
@@ -20,7 +20,8 @@ describe('PAYMENT_KINDS', () => {
 
 describe('computeSuccessFeeInvoiceCents — pure clamping logic', () => {
   it('returns the raw fee when nothing is invoiced or refunded yet', () => {
-    // SMB band 10–12%; 11% on $10k refund = $1100 = 110_000 cents.
+    // Band is locked at 10% post-repricing. 10% on $10k refund =
+    // $1000 = 100_000 cents. A requested 0.11 is clamped to 0.10.
     expect(
       computeSuccessFeeInvoiceCents({
         realizedRefundCents: 10_000_00,
@@ -29,17 +30,17 @@ describe('computeSuccessFeeInvoiceCents — pure clamping logic', () => {
         alreadyInvoicedSuccessFeeCents: 0,
         alreadyRefundedToCustomerCents: 0,
       }),
-    ).toBe(110_000)
+    ).toBe(100_000)
   })
 
   it('subtracts already-invoiced amounts so retried paid events do not double-bill', () => {
-    // Same case, second invocation. First call already billed $1100.
+    // Same case, second invocation. First call already billed $1000.
     expect(
       computeSuccessFeeInvoiceCents({
         realizedRefundCents: 10_000_00,
         tier: 'smb',
-        rate: 0.11,
-        alreadyInvoicedSuccessFeeCents: 110_000,
+        rate: 0.11, // clamped to 0.10
+        alreadyInvoicedSuccessFeeCents: 100_000,
         alreadyRefundedToCustomerCents: 0,
       }),
     ).toBe(0)
@@ -59,17 +60,17 @@ describe('computeSuccessFeeInvoiceCents — pure clamping logic', () => {
     ).toBe(50_000) // $500 delta
   })
 
-  it('caps at the per-case ladder maximum (PRD 06: $50k)', () => {
-    // $1M refund at 12% would be $120k raw; clamps to $50k.
+  it('caps at the customer-promise ceiling ($25k post-repricing)', () => {
+    // $1M refund at 10% would be $100k raw; clamps to $25k.
     expect(
       computeSuccessFeeInvoiceCents({
         realizedRefundCents: 1_000_000_00,
         tier: 'smb',
-        rate: 0.12,
+        rate: 0.12, // clamped to 0.10
         alreadyInvoicedSuccessFeeCents: 0,
         alreadyRefundedToCustomerCents: 0,
       }),
-    ).toBe($50k)
+    ).toBe($25k)
   })
 
   it('clamps to the remaining refund when we already issued Stripe refunds back to the customer', () => {
@@ -125,16 +126,16 @@ describe('computeSuccessFeeInvoiceCents — pure clamping logic', () => {
     ).toBe(0)
   })
 
-  it('uses the mid-market band correctly (8–10%)', () => {
+  it('mid-market band is also locked at 10% post-repricing', () => {
     expect(
       computeSuccessFeeInvoiceCents({
         realizedRefundCents: 10_000_00,
         tier: 'mid_market',
-        // No rate → defaults to band min (8%).
+        // No rate → defaults to band min (10%).
         alreadyInvoicedSuccessFeeCents: 0,
         alreadyRefundedToCustomerCents: 0,
       }),
-    ).toBe(80_000)
+    ).toBe(100_000)
   })
 })
 
@@ -236,7 +237,8 @@ describe('generateSuccessFeeInvoice — composition', () => {
 
     expect(result.outcome).toBe('created')
     if (result.outcome !== 'created') throw new Error('unreachable')
-    expect(result.payment.amountUsdCents).toBe(110_000)
+    // 10% of $10k = $1000 (rate 0.11 is clamped to 0.10 post-repricing).
+    expect(result.payment.amountUsdCents).toBe(100_000)
     expect(result.payment.kind).toBe('success_fee_invoice')
 
     expect(publish).toHaveBeenCalledTimes(1)
@@ -340,7 +342,7 @@ describe('generateSuccessFeeInvoice — composition', () => {
     expect(publish).toHaveBeenCalledWith(
       expect.objectContaining({
         caseId: 'cas_xyz',
-        amountUsdCents: 40_000, // 8% of $5k
+        amountUsdCents: 50_000, // 10% of $5k (rate locked post-repricing)
         tier: 'mid_market',
       }),
     )

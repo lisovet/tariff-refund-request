@@ -56,18 +56,34 @@ export const PRICE_LADDER: Readonly<Record<Sku, Readonly<Record<PricingTier, Mon
   },
 } as const
 
+/**
+ * Success fee rates per tier (April 2026 two-tier repricing).
+ *
+ * The customer promise on /pricing and /how-it-works is a flat 10%
+ * of the estimated refund, capped at $25,000. Both bands are
+ * intentionally degenerate `{min: 0.10, max: 0.10}` so the clamp in
+ * `computeSuccessFeeCents` collapses to exactly 10% regardless of
+ * what `rate` a caller requests — the customer sees one number and
+ * internal code can't drift above or below it.
+ *
+ * Band shape is preserved (rather than collapsing to a scalar) so
+ * the surrounding clamp/rounding logic and tests don't have to
+ * change when / if ops wants to widen the band for a specific tier
+ * again.
+ */
 export const SUCCESS_FEE_RATES: Readonly<Record<PricingTier, FractionRange>> = {
-  smb: { min: 0.10, max: 0.12 },
-  mid_market: { min: 0.08, max: 0.10 },
+  smb: { min: 0.10, max: 0.10 },
+  mid_market: { min: 0.10, max: 0.10 },
 } as const
 
 /**
- * Per PRD 06: caps the success fee so we never bill more than the
- * refund makes reasonable. A blanket dollar cap is the simplest
- * defensible policy — if a future case warrants more, it's a
- * deliberate ladder change, not a quiet drift.
+ * Per the April 2026 tier catalog: caps the success fee at $25,000.
+ * This is the number printed on /pricing, /how-it-works, and every
+ * tier card. A cap higher than this (the previous $50k) would
+ * silently violate the customer promise, so it's centralized here
+ * and enforced by `computeSuccessFeeCents`.
  */
-export const SUCCESS_FEE_HARD_CAP: MoneyCents = { usdCents: 50_000_00 }
+export const SUCCESS_FEE_HARD_CAP: MoneyCents = { usdCents: 25_000_00 }
 
 const MID_MARKET_ENTRY_THRESHOLD = 100
 const MID_MARKET_DUTY_THRESHOLD_CENTS = 50_000_00 // $50,000
