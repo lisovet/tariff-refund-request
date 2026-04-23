@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
+import { getAppOrigin } from '@shared/infra/auth/get-app-origin'
 import { isProtectedRoute } from '@shared/infra/auth/route-gating'
 import { isStaffRole, normalizeOrgRole } from '@shared/infra/auth/roles'
 
@@ -25,7 +26,11 @@ export default clerkMiddleware(async (auth, req) => {
   if (!isProtected(req)) return NextResponse.next()
   const session = await auth()
   if (!session.userId) {
-    return session.redirectToSignIn({ returnBackUrl: req.url })
+    // Build the return URL from the canonical public origin, not
+    // `req.url` — behind Railway's proxy the latter is the internal
+    // Node hostname. See get-app-origin.ts for the full story.
+    const backUrl = `${getAppOrigin()}${req.nextUrl.pathname}${req.nextUrl.search}`
+    return session.redirectToSignIn({ returnBackUrl: backUrl })
   }
   if (isOpsRoute(req)) {
     // Read from auth().orgRole rather than sessionClaims.org_role so we
