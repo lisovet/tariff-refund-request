@@ -1,88 +1,131 @@
 import { Button, Eyebrow, Hairline } from '@/app/_components/ui'
+import { TIERS } from '@contexts/billing'
+import {
+  REFUND_TIMING_CLAUSE,
+  SUBMISSION_CONTROL_CLAUSE,
+} from '@/shared/disclosure/constants'
 
 /**
- * /how-it-works — long-form editorial explainer per PRD 05. Three
- * stages, each as its own typeset movement with hairline rules
- * between sections (mirrors the homepage rhythm but goes deeper:
- * each stage has "What we do" and "What you do" sub-headings).
+ * /how-it-works — long-form editorial explainer for the two-tier
+ * commercial model. Four sections: the free screener (section 00),
+ * Audit (01), Full Prep (02), and "After delivery" (03) which
+ * carries the canonical trust disclosures.
  *
- * Pricing copy here is editorial; canonical source is
- * src/contexts/billing/pricing.ts (lands in task #34) and is
- * snapshotted into /pricing in task #16.
+ * Copy that has a single source of truth — tier pitches and tier
+ * numbers — is imported from `@contexts/billing` (TIERS) and
+ * `@/shared/disclosure/constants`. Prose ("What we do / What you
+ * do") is editorial, written for this page, intentionally not the
+ * same bullets as the TIERS.included list (those are for pricing
+ * cards).
  */
 
 export const metadata = {
   title: 'How it works',
   description:
-    'Three stages. Rebuild your entry list, prepare a submission-ready file, optionally hand off the filing. Stop when you have what you need.',
+    "Two tiers. Start with the free screener, then pick Audit ($99) or Full Prep ($999 + success fee). We prepare the file; you control submission.",
 }
 
-interface Stage {
-  readonly num: '01' | '02' | '03'
-  readonly title: 'Recovery' | 'Filing prep' | 'Concierge'
+interface Section {
+  readonly num: '00' | '01' | '02' | '03'
+  readonly title: string
   readonly priceLabel: string
   readonly tagline: string
   readonly weDo: readonly string[]
   readonly youDo: readonly string[]
-  readonly artifact: string
+  /** Muted paragraph shown only on Audit — the upgrade wedge. */
+  readonly doesNotInclude?: string
+  /** Hairline-bordered aside shown only on Full Prep. */
+  readonly turnaround?: string
+  /** Sectra artifact callout — shown on sections 00 / 01 / 02. */
+  readonly artifact?: string
+  /**
+   * When present, the section has no "we do / you do" columns and
+   * renders prose + disclosures instead. Used by section 03.
+   */
+  readonly afterDeliveryProse?: {
+    readonly body: string
+    readonly disclosures: readonly string[]
+  }
 }
 
-const STAGES: readonly Stage[] = [
+const SECTIONS: readonly Section[] = [
   {
-    num: '01',
-    title: 'Recovery',
-    priceLabel: 'from $99',
+    num: '00',
+    title: 'The screener',
+    priceLabel: 'Free · 10 questions · 3 minutes',
     tagline:
-      'Rebuild the entry list. Every broker, every carrier, every ACE account your shipments touched — reconciled into one provenance-checked record.',
+      'Ten questions about what you import and when. We tell you whether you qualify for Phase 1, Phase 2, or both, and a refund-range estimate grounded in your own numbers.',
     weDo: [
-      'Build a personalized outreach kit for your specific path — broker, carrier, or ACE self-export.',
-      'Walk you through a secure upload portal that accepts 7501s, broker spreadsheets, carrier invoices, and ACE CSVs.',
-      'On the Service tier, an analyst extracts and verifies entries directly from your uploaded documents.',
-      'Track every entry to its source document so the provenance is auditable.',
+      'Run your answers through the CBP Phase 1 / Phase 2 eligibility rules so you see a verdict, not a pitch.',
+      'Estimate the refund range from your stated duty volume and import dates.',
+      'Recommend Audit or Full Prep based on the paperwork burden your specific case implies.',
     ],
     youDo: [
-      'Use the outreach kit to ask your broker (or carrier) for the records you do not already have.',
-      'Upload whatever you can find — even partial documents help.',
-      'Approve the recovered entry list before we move on.',
+      "Answer ten questions honestly. We don't store any personally identifiable account info before you decide to continue.",
+      'Pick a tier, or close the tab — nothing is charged yet.',
     ],
-    artifact: 'A validated entry list with source-document provenance.',
+    artifact:
+      'A Phase 1 / Phase 2 verdict, a refund estimate, and a tier recommendation.',
+  },
+  {
+    num: '01',
+    title: 'Audit',
+    priceLabel: '$99 · one-time',
+    tagline: TIERS.audit.pitch,
+    weDo: [
+      "Issue a Phase 1 / Phase 2 eligibility verdict with a confidence level, so you know which window you're working against.",
+      "Run a country-and-category analysis: which of your imports qualify, which don't, and why.",
+      'Tighten the refund-range estimate using the country / category analysis, so the number you see is defensible.',
+      'Hand you a personalized checklist of exactly what to gather and in what order.',
+      'Include a pre-written broker outreach email template, an ACE portal setup guide with ACH enrollment walkthrough, and the CAPE CSV spec so you know the exact format your file needs to hit.',
+    ],
+    youDo: [
+      'Request documents from your broker or carrier using our template.',
+      'Enroll in ACE and set up ACH banking using our guide.',
+      'Build the CAPE CSV to the spec we give you.',
+      'Upload to ACE under your own account.',
+    ],
+    doesNotInclude:
+      "We don't review your documents, extract entry numbers from them, build or validate the CSV, or produce a pre-submission confidence report. If that's the help you want, Full Prep is the tier for you.",
+    artifact:
+      'An Audit packet — verdict, estimated refund range, personalized checklist, broker template, ACE guide, and CAPE CSV spec.',
   },
   {
     num: '02',
-    title: 'Filing prep',
-    priceLabel: 'from $199',
-    tagline:
-      'Turn the entry list into a submission-ready package. CBP-compliant CSV. Signed Readiness Report. Your broker files it unchanged.',
+    title: 'Full Prep',
+    priceLabel:
+      '$999 due now · 10 % of estimated refund, capped at $25,000 — billed after file delivery',
+    tagline: TIERS.full_prep.pitch,
     weDo: [
-      'Run the entry list through the CAPE validator: format checks, dedupe, phase segmentation, batch grouping.',
-      'Generate a CBP-compliant CSV.',
-      'Draft a Readiness Report — entries, prerequisite checks, blocking issues if any, recommended remediations.',
-      'A validator (real human) signs off on the report before it reaches you.',
+      'Manage document collection end-to-end — we follow up with your broker or carrier directly until we have what we need.',
+      'A validator reviews every document and extracts every entry number. Each entry carries a source + confidence record back to the document it came from.',
+      'Build your full CAPE CSV — formatted, validated, split if the batch size requires it, and ready to upload.',
+      'Separate Phase 1 from Phase 2: your Phase 1 file is ready now; we hold your Phase 2 entries and re-engage when that window opens.',
+      "Deliver a pre-submission confidence report: a plain-English summary of what's in the file, any flags that could cause a CBP hold, and the expected timeline.",
+      'Give you an ACE upload walkthrough so nothing goes wrong at submission.',
     ],
     youDo: [
-      'Review the Readiness Report and download the CSV.',
-      'Submit yourself, hand off to your existing broker, or upgrade to Concierge.',
+      'Sign the engagement letter (e-sign, before any success fee is captured).',
+      'Get us the documents we ask for — the exact list, based on your clearance path. Nothing speculative.',
+      'Upload to ACE yourself, or hand the validated file to your broker.',
+      'Confirm receipt when CBP posts the refund.',
     ],
-    artifact: 'CSV + Readiness Report PDF, both human-reviewed.',
+    turnaround: 'Five business days from documents received to file delivered.',
+    artifact:
+      'A validated, submission-ready CAPE file + pre-submission confidence report, signed off by a named human validator.',
   },
   {
     num: '03',
-    title: 'Concierge',
-    priceLabel: 'from $999 + success fee',
+    title: 'After delivery',
+    priceLabel: 'What CBP does',
     tagline:
-      'Hand off the filing. We coordinate with your broker, resolve ACE / ACH gaps, and monitor through CBP response. Success fee only if the refund posts.',
-    weDo: [
-      'Coordinate the actual filing with you or your broker.',
-      'Handle ACE / ACH prerequisite gaps with a clear remediation plan.',
-      'Monitor CBP status weekly until the refund posts.',
-      'Invoice the success fee against the realized refund — never against the estimate.',
-    ],
-    youDo: [
-      'Sign the engagement letter (e-sign, before any payment is captured).',
-      'Approve the final batch and the filing actor (you, your broker, or our partner network).',
-      'Confirm receipt when the refund posts.',
-    ],
-    artifact: 'A filed claim, monitored to refund.',
+      'Once the file is delivered, submission is yours. You upload to ACE (or your broker does). CBP reviews on its own schedule — typically weeks to months — and posts the refund directly to your ACH account.',
+    weDo: [],
+    youDo: [],
+    afterDeliveryProse: {
+      body: "We stay reachable after delivery for questions about the file we built, but we never submit on your behalf and we don't chase CBP. That posture is deliberate — not a limitation.",
+      disclosures: [SUBMISSION_CONTROL_CLAUSE, REFUND_TIMING_CLAUSE],
+    },
   },
 ]
 
@@ -92,72 +135,149 @@ export default function HowItWorksPage() {
       <header className="mx-auto max-w-4xl px-6 pb-16 pt-32 sm:px-10 sm:pb-24 sm:pt-40">
         <Eyebrow>How it works</Eyebrow>
         <h1 className="mt-3 font-display text-5xl tracking-display text-ink sm:text-7xl">
-          Three stages. Stop when you have what you need.
+          Two tiers. Pick what you have time for.
         </h1>
         <p className="mt-10 max-w-2xl text-lg text-ink/80">
-          Each stage delivers a concrete artifact — a recovered
-          entry list, a submission-ready file, a monitored claim —
-          and is priced on its own. The last stage is optional.
+          Everyone starts with the same free eligibility screener.
+          Then you decide: do the work yourself with our Audit packet,
+          or hand it to us and get a submission-ready file back in
+          five business days.
         </p>
       </header>
 
       <Hairline />
 
-      {STAGES.map((stage, index) => (
-        <section key={stage.num} className="bg-paper">
+      {SECTIONS.map((section, index) => (
+        <section key={section.num} className="bg-paper">
           <div className="mx-auto max-w-4xl px-6 py-24 sm:px-10 sm:py-32">
-            <Eyebrow>Stage {stage.num}</Eyebrow>
+            <Eyebrow>Section {section.num}</Eyebrow>
             <h2 className="mt-3 font-display text-4xl tracking-display text-ink sm:text-5xl">
-              {stage.num} — {stage.title}
+              {section.num} — {section.title}
             </h2>
             <p className="mt-4 font-mono text-sm text-accent">
-              {stage.priceLabel}
+              {section.priceLabel}
             </p>
             <p className="mt-8 max-w-2xl text-xl text-ink/85">
-              {stage.tagline}
+              {section.tagline}
             </p>
 
-            <div className="mt-16 grid gap-12 sm:grid-cols-2">
-              <div>
-                <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
-                  What we do
-                </h3>
-                <ul className="mt-4 space-y-3 text-base text-ink/85">
-                  {stage.weDo.map((line) => (
-                    <li key={line} className="flex items-baseline gap-3">
-                      <span aria-hidden="true" className="font-mono text-accent">
-                        →
-                      </span>
-                      <span>{line}</span>
+            {section.afterDeliveryProse ? (
+              <div className="mt-12 max-w-2xl">
+                <p className="text-base text-ink/80">
+                  {section.afterDeliveryProse.body}
+                </p>
+                <ul className="mt-8 space-y-3 border-l border-rule pl-6">
+                  {section.afterDeliveryProse.disclosures.map((line) => (
+                    <li
+                      key={line}
+                      className="font-mono text-xs uppercase tracking-[0.2em] text-ink/70"
+                    >
+                      {line}
                     </li>
                   ))}
                 </ul>
               </div>
+            ) : (
+              <>
+                <div className="mt-16 grid gap-12 sm:grid-cols-2">
+                  <div>
+                    <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
+                      What we do
+                    </h3>
+                    <ul className="mt-4 space-y-3 text-base text-ink/85">
+                      {section.weDo.map((line) => (
+                        <li key={line} className="flex items-baseline gap-3">
+                          <span
+                            aria-hidden="true"
+                            className="font-mono text-accent"
+                          >
+                            →
+                          </span>
+                          <span>{line}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-              <div>
-                <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
-                  What you do
-                </h3>
-                <ul className="mt-4 space-y-3 text-base text-ink/85">
-                  {stage.youDo.map((line) => (
-                    <li key={line} className="flex items-baseline gap-3">
-                      <span aria-hidden="true" className="font-mono text-accent">
-                        →
-                      </span>
-                      <span>{line}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+                  <div>
+                    <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-ink/60">
+                      What you do
+                    </h3>
+                    <ul className="mt-4 space-y-3 text-base text-ink/85">
+                      {section.youDo.map((line) => (
+                        <li key={line} className="flex items-baseline gap-3">
+                          <span
+                            aria-hidden="true"
+                            className="font-mono text-accent"
+                          >
+                            →
+                          </span>
+                          <span>{line}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
 
-            <p className="mt-12 border-l border-rule pl-6 font-display text-2xl text-ink">
-              {stage.artifact}
-            </p>
+                {section.doesNotInclude && (
+                  <p className="mt-10 max-w-2xl text-sm text-ink/55">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink/60">
+                      What this tier doesn&rsquo;t do
+                    </span>
+                    <br />
+                    {section.doesNotInclude}
+                  </p>
+                )}
+
+                {section.turnaround && (
+                  <aside
+                    aria-label="Full Prep turnaround"
+                    className="mt-10 border-l-2 border-accent pl-6"
+                  >
+                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
+                      Turnaround
+                    </p>
+                    <p className="mt-2 text-base text-ink/85">
+                      {section.turnaround}
+                    </p>
+                  </aside>
+                )}
+
+                {section.artifact && (
+                  <p className="mt-12 border-l border-rule pl-6 font-display text-2xl text-ink">
+                    {section.artifact}
+                  </p>
+                )}
+              </>
+            )}
           </div>
-          {index < STAGES.length - 1 && <Hairline label={`II · Stage ${index + 2}`} />}
+          {index < SECTIONS.length - 1 && (
+            <Hairline label={`Section ${SECTIONS[index + 1]!.num}`} />
+          )}
         </section>
       ))}
+
+      <Hairline />
+
+      <section className="bg-paper">
+        <div className="mx-auto max-w-4xl px-6 py-20 sm:px-10 sm:py-24">
+          <aside
+            aria-label="Audit credit toward Full Prep"
+            className="flex items-baseline gap-6 border-l-2 border-accent pl-6"
+          >
+            <span className="font-mono text-3xl text-accent sm:text-4xl">
+              $99
+            </span>
+            <p className="text-lg text-ink/85 sm:text-xl">
+              <span className="font-medium text-ink">
+                Paid for the Audit first?
+              </span>{' '}
+              We credit the full $99 toward Full Prep when you upgrade —
+              no double-charging for the same eligibility work.
+            </p>
+          </aside>
+        </div>
+      </section>
 
       <section className="bg-paper-2">
         <Hairline />
