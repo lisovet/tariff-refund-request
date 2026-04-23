@@ -92,19 +92,15 @@ export default function PricingPage() {
 
           <SuccessFeeTable />
 
-          <div className="mt-12 grid gap-8 sm:grid-cols-3">
-            <Callout
-              eyebrow="Why upfront beats contingency"
-              body="Charging a percentage of what CBP eventually pays means 60–90 days of float and open-ended liability if the refund is contested. Charging 10 % of the estimate at checkout lets us get paid on the work, not on CBP's timeline."
-            />
-            <Callout
-              eyebrow="The $25,000 cap"
-              body="At large refund sizes 10 % stops feeling like a service fee. The cap keeps large-importer economics sane without gutting mid-size deals where the percentage is modest."
-            />
-            <Callout
-              eyebrow="Audit credit"
-              body="If you paid $99 for the Audit first, we credit it toward the $999 Full Prep & Concierge Service flat fee at checkout. No double-charging for the same eligibility work."
-            />
+          <div className="mx-auto mt-16 max-w-3xl text-center sm:mt-20">
+            <p className="font-mono text-xs uppercase tracking-[0.24em] text-accent sm:text-sm">
+              Audit credit
+            </p>
+            <p className="mt-6 font-display text-2xl leading-snug text-ink sm:text-3xl">
+              If you paid $99 for the Audit first, we credit it toward the
+              $999 Full Prep & Concierge Service flat fee at checkout. No
+              double-charging for the same eligibility work.
+            </p>
           </div>
         </div>
       </section>
@@ -301,19 +297,3 @@ function SuccessFeeTable() {
   )
 }
 
-function Callout({
-  eyebrow,
-  body,
-}: {
-  readonly eyebrow: string
-  readonly body: string
-}) {
-  return (
-    <div className="border-l border-rule pl-6">
-      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
-        {eyebrow}
-      </p>
-      <p className="mt-3 text-sm text-ink/80">{body}</p>
-    </div>
-  )
-}
