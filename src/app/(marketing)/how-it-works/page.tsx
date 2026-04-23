@@ -22,7 +22,7 @@ import {
 export const metadata = {
   title: 'How it works',
   description:
-    "Two tiers. Start with the free screener, then pick Audit ($99) or Full Prep ($999 + success fee). We prepare the file; you control submission.",
+    "Two tiers. Start with the free screener, then pick Audit ($99) or Full Prep & Concierge Service ($999 + success fee). We prepare the file; you control submission.",
 }
 
 interface Section {
@@ -58,7 +58,7 @@ const SECTIONS: readonly Section[] = [
     weDo: [
       'Run your answers through the CBP Phase 1 / Phase 2 eligibility rules so you see a verdict, not a pitch.',
       'Estimate the refund range from your stated duty volume and import dates.',
-      'Recommend Audit or Full Prep based on the paperwork burden your specific case implies.',
+      'Recommend Audit or Full Prep & Concierge Service based on the paperwork burden your specific case implies.',
     ],
     youDo: [
       "Answer ten questions honestly. We don't store any personally identifiable account info before you decide to continue.",
@@ -86,13 +86,13 @@ const SECTIONS: readonly Section[] = [
       'Upload to ACE under your own account.',
     ],
     doesNotInclude:
-      "We don't review your documents, extract entry numbers from them, build or validate the CSV, or produce a pre-submission confidence report. If that's the help you want, Full Prep is the tier for you.",
+      "We don't review your documents, extract entry numbers from them, build or validate the CSV, or produce a pre-submission confidence report. If that's the help you want, Full Prep & Concierge Service is the tier for you.",
     artifact:
       'An Audit packet — verdict, estimated refund range, personalized checklist, broker template, ACE guide, and CAPE CSV spec.',
   },
   {
     num: '02',
-    title: 'Full Prep',
+    title: 'Full Prep & Concierge Service',
     priceLabel:
       '$999 due now · 10 % of estimated refund, capped at $25,000 — billed after file delivery',
     tagline: TIERS.full_prep.pitch,
@@ -231,7 +231,7 @@ export default function HowItWorksPage() {
 
                 {section.turnaround && (
                   <aside
-                    aria-label="Full Prep turnaround"
+                    aria-label="Full Prep & Concierge Service turnaround"
                     className="mt-10 border-l-2 border-accent pl-6"
                   >
                     <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
@@ -262,7 +262,7 @@ export default function HowItWorksPage() {
       <section className="bg-paper">
         <div className="mx-auto max-w-4xl px-6 py-20 sm:px-10 sm:py-24">
           <aside
-            aria-label="Audit credit toward Full Prep"
+            aria-label="Audit credit toward Full Prep & Concierge Service"
             className="flex items-baseline gap-6 border-l-2 border-accent pl-6"
           >
             <span className="font-mono text-3xl text-accent sm:text-4xl">
@@ -272,7 +272,7 @@ export default function HowItWorksPage() {
               <span className="font-medium text-ink">
                 Paid for the Audit first?
               </span>{' '}
-              We credit the full $99 toward Full Prep when you upgrade —
+              We credit the full $99 toward Full Prep & Concierge Service when you upgrade —
               no double-charging for the same eligibility work.
             </p>
           </aside>

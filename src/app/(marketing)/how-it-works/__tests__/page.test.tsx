@@ -24,7 +24,7 @@ describe('/how-it-works', () => {
     const titles = h2s.map((h) => h.textContent)
     expect(titles).toContain('00 — The screener')
     expect(titles).toContain('01 — Audit')
-    expect(titles).toContain('02 — Full Prep')
+    expect(titles).toContain('02 — Full Prep & Concierge Service')
     expect(titles).toContain('03 — After delivery')
   })
 
@@ -60,13 +60,13 @@ describe('/how-it-works', () => {
     // Exactly one occurrence (on Audit). Full Prep has no analogous block.
     expect(labels).toHaveLength(1)
     expect(
-      screen.getByText(/If that.s the help you want, Full Prep is the tier for you/i),
+      screen.getByText(/If that.s the help you want, Full Prep & Concierge Service is the tier for you/i),
     ).toBeTruthy()
   })
 
   it('Full Prep section shows the 5 business-day turnaround aside', () => {
     render(<HowItWorksPage />)
-    const aside = screen.getByLabelText(/Full Prep turnaround/i)
+    const aside = screen.getByLabelText(/Full Prep .* turnaround/i)
     expect(aside.textContent).toMatch(/Five business days/i)
   })
 

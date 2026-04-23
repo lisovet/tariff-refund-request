@@ -7,7 +7,7 @@ describe('<HomeMovements>', () => {
   it('renders the two tiers in funnel order', () => {
     render(<HomeMovements />)
     const headings = screen.getAllByRole('heading', { level: 3 })
-    expect(headings.map((h) => h.textContent)).toEqual(['Audit', 'Full Prep'])
+    expect(headings.map((h) => h.textContent)).toEqual(['Audit', 'Full Prep & Concierge Service'])
   })
 
   it('renders prices in the mono face (Berkeley Mono fallback chain)', () => {

@@ -29,13 +29,13 @@ export const STATE_COPY: Record<CaseState, StateCopy> = {
   new_lead: {
     customerLabel: 'Getting started',
     customerDescription:
-      "We've received your screener — next step is to pick a tier (Audit or Full Prep) so we know what you're asking us to do.",
+      "We've received your screener — next step is to pick a tier (Audit or Full Prep & Concierge Service) so we know what you're asking us to do.",
     opsLabel: 'New lead',
   },
   qualified: {
     customerLabel: 'Eligible',
     customerDescription:
-      'Your answers qualify. Pick Audit ($99) or Full Prep ($999 + success fee) to open the case.',
+      'Your answers qualify. Pick Audit ($99) or Full Prep & Concierge Service ($999 + success fee) to open the case.',
     opsLabel: 'Qualified',
   },
   disqualified: {
@@ -57,13 +57,13 @@ export const STATE_COPY: Record<CaseState, StateCopy> = {
     opsLabel: 'Awaiting docs',
   },
   entry_recovery_in_progress: {
-    customerLabel: 'Full Prep in progress',
+    customerLabel: 'Full Prep & Concierge Service in progress',
     customerDescription:
       "We're reconciling your entries across broker, carrier, and ACE sources.",
     opsLabel: 'Recovery in progress',
   },
   entry_list_ready: {
-    customerLabel: 'Full Prep in progress',
+    customerLabel: 'Full Prep & Concierge Service in progress',
     customerDescription:
       "Your entry list is rebuilt. We're moving straight into CAPE file prep — no extra purchase needed.",
     opsLabel: 'Entry list ready',
@@ -78,7 +78,7 @@ export const STATE_COPY: Record<CaseState, StateCopy> = {
     opsLabel: 'Awaiting prep purchase',
   },
   cape_prep_in_progress: {
-    customerLabel: 'Full Prep in progress',
+    customerLabel: 'Full Prep & Concierge Service in progress',
     customerDescription:
       "We're running your entries through the CAPE validator and drafting your pre-submission confidence report.",
     opsLabel: 'CAPE prep in progress',

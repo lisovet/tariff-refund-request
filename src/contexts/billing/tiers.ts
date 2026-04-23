@@ -63,7 +63,7 @@ export const TIERS: Readonly<Record<TierId, Tier>> = {
   },
   full_prep: {
     id: 'full_prep',
-    name: 'Full Prep',
+    name: 'Full Prep & Concierge Service',
     eyebrow: 'Tier 02 · Done for you',
     flatUsdCents: 99_900,
     successFeePct: 0.1,
@@ -81,7 +81,7 @@ export const TIERS: Readonly<Record<TierId, Tier>> = {
       '5-day turnaround SLA — from documents received to file delivered',
     ],
     ctaLabelShort: 'Select Tier 2',
-    ctaLabelAccessible: 'Select Tier 2 · start Full Prep',
+    ctaLabelAccessible: 'Select Tier 2 · start Full Prep & Concierge Service',
   },
 } as const
 

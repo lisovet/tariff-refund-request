@@ -18,7 +18,7 @@ import { TIERS, TIER_ORDER, type Tier } from '@contexts/billing'
 export const metadata = {
   title: 'Pricing',
   description:
-    'Two tiers. Audit for $99 — eligibility verdict and an action plan you run yourself. Full Prep for $999 + success fee — we build a validated, submission-ready CAPE file.',
+    'Two tiers. Audit for $99 — eligibility verdict and an action plan you run yourself. Full Prep & Concierge Service for $999 + success fee — we build a validated, submission-ready CAPE file.',
 }
 
 export default function PricingPage() {
@@ -31,7 +31,7 @@ export default function PricingPage() {
         </h1>
         <p className="mt-10 max-w-2xl text-lg text-ink/80">
           Start with a $99 Audit if you want the verdict and an action
-          plan. Skip to Full Prep when you want us to build the
+          plan. Skip to Full Prep & Concierge Service when you want us to build the
           submission-ready file for you.
         </p>
         <p className="mt-6 max-w-2xl text-base text-ink/65">
@@ -50,7 +50,7 @@ export default function PricingPage() {
             ))}
           </div>
           <aside
-            aria-label="Audit credit toward Full Prep"
+            aria-label="Audit credit toward Full Prep & Concierge Service"
             className="mt-10 flex items-baseline gap-6 border-l-2 border-accent pl-6 sm:mt-12"
           >
             <span className="font-mono text-3xl text-accent sm:text-4xl">
@@ -60,7 +60,7 @@ export default function PricingPage() {
               <span className="font-medium text-ink">
                 Paid for the Audit first?
               </span>{' '}
-              We credit the full $99 toward Full Prep when you upgrade — no
+              We credit the full $99 toward Full Prep & Concierge Service when you upgrade — no
               double-charging for the same eligibility work.
             </p>
           </aside>
@@ -84,7 +84,7 @@ export default function PricingPage() {
             10 % of your estimated refund, capped at $25,000.
           </h2>
           <p className="mt-8 max-w-2xl text-lg text-ink/85">
-            The success fee is added to Full Prep only, and it&rsquo;s
+            The success fee is added to Full Prep & Concierge Service only, and it&rsquo;s
             computed against the <em>estimated</em> refund at checkout —
             not the amount CBP eventually posts. You owe nothing more if
             the refund lands higher than we estimated.
@@ -103,7 +103,7 @@ export default function PricingPage() {
             />
             <Callout
               eyebrow="Audit credit"
-              body="If you paid $99 for the Audit first, we credit it toward the $999 Full Prep flat fee at checkout. No double-charging for the same eligibility work."
+              body="If you paid $99 for the Audit first, we credit it toward the $999 Full Prep & Concierge Service flat fee at checkout. No double-charging for the same eligibility work."
             />
           </div>
         </div>

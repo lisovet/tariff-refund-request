@@ -39,7 +39,7 @@ export function TierSelection({ recommendedTier }: Props) {
         ))}
       </div>
       <aside
-        aria-label="Audit credit toward Full Prep"
+        aria-label="Audit credit toward Full Prep & Concierge Service"
         className="mt-8 flex items-baseline gap-5 border-l-2 border-accent pl-6"
       >
         <span className="font-mono text-2xl text-accent sm:text-3xl">$99</span>
@@ -47,7 +47,7 @@ export function TierSelection({ recommendedTier }: Props) {
           <span className="font-medium text-ink">
             Paid for the Audit first?
           </span>{' '}
-          We credit the full $99 toward Full Prep when you upgrade — no
+          We credit the full $99 toward Full Prep & Concierge Service when you upgrade — no
           double-charging for the same eligibility work.
         </p>
       </aside>

@@ -63,8 +63,8 @@ export function ScreenerNudge24hEmail({
           $99 Audit gives you an eligibility verdict, a defensible
           refund estimate, and a step-by-step checklist with the
           templates you need — so you can run the rest yourself, or
-          hand it to us for Full Prep. If you upgrade, the $99 credits
-          toward Full Prep.
+          hand it to us for Full Prep & Concierge Service. If you upgrade, the $99 credits
+          toward Full Prep & Concierge Service.
         </Text>
 
         <Section style={{ margin: '32px 0' }}>
