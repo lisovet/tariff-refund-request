@@ -17,6 +17,9 @@ import type { BillingRepo } from './repo'
 export interface PaymentCompletedPayload {
   readonly sessionId: string
   readonly sku: string
+  /** Pricing tier captured in the Stripe checkout metadata. Kept as a
+   *  loose string at the boundary — downstream consumers validate. */
+  readonly tier: string
   readonly stripeChargeId: string
   readonly amountUsdCents: number
   readonly email: string
@@ -75,6 +78,7 @@ async function onCheckoutCompleted(
     )
   }
   const sku = metadata.sku ?? 'unknown'
+  const tier = metadata.tier ?? 'unknown'
   const email = session.customer_email ?? ''
   const amount = session.amount_total ?? 0
   const stripeChargeId =
@@ -85,6 +89,7 @@ async function onCheckoutCompleted(
   await deps.publishPaymentCompleted({
     sessionId: screenerSessionId,
     sku,
+    tier,
     stripeChargeId,
     amountUsdCents: amount,
     email,
