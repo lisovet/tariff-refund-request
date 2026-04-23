@@ -98,39 +98,24 @@ function computeQualification(
 
 function recommendNextStep(
   qualification: Qualification,
-  clearancePath: ClearancePath | undefined,
+  _clearancePath: ClearancePath | undefined,
   dutyBand: DutyBand | undefined,
   recoveryPath: RecoveryPath | null,
 ): RecommendedNextStep {
   if (qualification === 'disqualified') return 'none'
 
-  // Big duty + complex (mixed) recovery path → concierge.
-  if (
-    (dutyBand === 'band_over_5m' || dutyBand === 'band_500k_5m') &&
-    recoveryPath === 'mixed'
-  ) {
-    return 'concierge'
-  }
+  // Full Prep is the right fit whenever the paperwork burden is
+  // large enough that a self-serve checklist starts to feel
+  // unreasonable: mid-to-large duty bands, OR a mixed clearance
+  // path (documents scattered across multiple sources). Everyone
+  // else gets the self-serve Audit tier; they can upgrade to Full
+  // Prep later with the $99 credit.
+  const largeDuty =
+    dutyBand === 'band_50k_500k' ||
+    dutyBand === 'band_500k_5m' ||
+    dutyBand === 'band_over_5m'
+  if (largeDuty) return 'full_prep'
+  if (recoveryPath === 'mixed') return 'full_prep'
 
-  // Mid-band + recoverable path → recovery_service (analyst-assisted).
-  if (
-    dutyBand === 'band_50k_500k' &&
-    (clearancePath === 'broker' ||
-      clearancePath === 'carrier' ||
-      clearancePath === 'ace_self_filed')
-  ) {
-    return 'recovery_service'
-  }
-
-  // Small duty → recovery_kit (self-serve).
-  if (dutyBand === 'band_under_5k' || dutyBand === 'band_5k_50k') {
-    return 'recovery_kit'
-  }
-
-  // Larger duties default to service unless concierge fired above.
-  if (dutyBand === 'band_500k_5m' || dutyBand === 'band_over_5m') {
-    return 'recovery_service'
-  }
-
-  return 'recovery_kit'
+  return 'audit'
 }

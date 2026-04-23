@@ -14,7 +14,7 @@ const baseResult: ScreenerResult = {
   confidence: 'moderate',
   recoveryPath: 'broker',
   prerequisites: { ace: false, ach: false, ior: true, liquidationKnown: false },
-  recommendedNextStep: 'recovery_service',
+  recommendedNextStep: 'full_prep',
   version: 'screener-v1+estimator-v1',
 }
 

@@ -48,7 +48,7 @@ const QUAL_RESULT: ScreenerResult = {
   confidence: 'high',
   recoveryPath: 'broker',
   prerequisites: { ace: true, ach: true, ior: true, liquidationKnown: true },
-  recommendedNextStep: 'recovery_service',
+  recommendedNextStep: 'full_prep',
   version: 'screener-v1+estimator-v1',
 }
 

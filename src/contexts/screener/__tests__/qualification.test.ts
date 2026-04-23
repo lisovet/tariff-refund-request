@@ -36,12 +36,7 @@ describe('computeResult — qualification', () => {
     expect(r.qualification).toBe('qualified')
     expect(r.refundEstimate).not.toBeNull()
     expect(r.recoveryPath).toBe('broker')
-    expect(r.recommendedNextStep).toBeOneOf([
-      'recovery_kit',
-      'recovery_service',
-      'cape_prep',
-      'concierge',
-    ])
+    expect(r.recommendedNextStep).toBeOneOf(['audit', 'full_prep'])
   })
 
   it('falls back to "likely_qualified" when key data is missing but no DQ trigger fired', () => {
@@ -99,22 +94,34 @@ describe('computeResult — prerequisites', () => {
 })
 
 describe('computeResult — recommendedNextStep', () => {
-  it('points small-duty qualified leads at recovery_kit', () => {
+  it('points small-duty qualified leads at the Audit tier (self-serve)', () => {
     const r = computeResult({ ...happyPath, q6: 'band_5k_50k' })
-    expect(r.recommendedNextStep).toBe('recovery_kit')
+    expect(r.recommendedNextStep).toBe('audit')
   })
 
-  it('points mid-band qualified leads at recovery_service', () => {
+  it('points mid-band qualified leads at Full Prep', () => {
     const r = computeResult({ ...happyPath, q6: 'band_50k_500k' })
-    expect(r.recommendedNextStep).toBe('recovery_service')
+    expect(r.recommendedNextStep).toBe('full_prep')
   })
 
-  it('points large-duty qualified leads with mixed paths at concierge', () => {
+  it('points large-duty qualified leads with mixed paths at Full Prep', () => {
     const r = computeResult({
       ...happyPath,
       q4: 'mixed',
       q6: 'band_over_5m',
     })
-    expect(r.recommendedNextStep).toBe('concierge')
+    expect(r.recommendedNextStep).toBe('full_prep')
+  })
+
+  it('escalates a small-duty lead to Full Prep when the clearance path is mixed', () => {
+    // Small duty band but documents scattered across broker + carrier
+    // + self-filed — the self-serve checklist is unreasonable for
+    // that paperwork burden, so we recommend Full Prep.
+    const r = computeResult({
+      ...happyPath,
+      q4: 'mixed',
+      q6: 'band_5k_50k',
+    })
+    expect(r.recommendedNextStep).toBe('full_prep')
   })
 })

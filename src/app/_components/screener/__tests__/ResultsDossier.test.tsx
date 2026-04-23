@@ -17,7 +17,7 @@ const qualified: ScreenerResult = {
   confidence: 'high',
   recoveryPath: 'broker',
   prerequisites: { ace: true, ach: false, ior: true, liquidationKnown: true },
-  recommendedNextStep: 'recovery_service',
+  recommendedNextStep: 'full_prep',
   version: 'screener-v1+estimator-v1',
 }
 
@@ -93,16 +93,16 @@ describe('<ResultsDossier> — qualified', () => {
     ).toBeTruthy()
   })
 
-  it('marks Full Prep as recommended for recovery_service', () => {
+  it('marks Full Prep as recommended when the screener recommends full_prep', () => {
     render(<ResultsDossier result={qualified} />)
     const recommended = screen.getByLabelText('Recommended')
     expect(recommended.textContent).toMatch(/Full Prep/)
   })
 
-  it('marks Audit as recommended for recovery_kit', () => {
+  it('marks Audit as recommended when the screener recommends audit', () => {
     render(
       <ResultsDossier
-        result={{ ...qualified, recommendedNextStep: 'recovery_kit' }}
+        result={{ ...qualified, recommendedNextStep: 'audit' }}
       />,
     )
     const recommended = screen.getByLabelText('Recommended')

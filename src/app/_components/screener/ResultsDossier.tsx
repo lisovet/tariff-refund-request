@@ -268,17 +268,16 @@ function verdictFor(result: ScreenerResult): string {
 }
 
 /**
- * UI-layer mapping from the legacy 5-value `RecommendedNextStep`
- * union to the commercial two-tier model. Kept at the UI layer so
- * the screener branching logic + `qualification.ts` unit tests stay
- * untouched; follow-up PR can collapse the union once Stripe wiring
- * settles.
+ * Map from the screener's `RecommendedNextStep` union to the tier
+ * card the results page highlights. The union already mirrors the
+ * two-tier `TierId` surface (`'audit' | 'full_prep' | 'none'`); the
+ * `'none'` branch only fires on the DQ path, which renders a
+ * different dossier variant entirely. Default non-DQ leads here to
+ * the Audit recommendation (lower-friction entry point).
  */
 const TIER_FOR_STEP: Record<RecommendedNextStep, TierId> = {
-  recovery_kit: 'audit',
-  recovery_service: 'full_prep',
-  cape_prep: 'full_prep',
-  concierge: 'full_prep',
+  audit: 'audit',
+  full_prep: 'full_prep',
   none: 'audit',
 }
 
