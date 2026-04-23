@@ -11,6 +11,13 @@
 export type { Tier, TierId } from './tiers'
 export { TIERS, TIER_ORDER, isTierId } from './tiers'
 
+export {
+  CUSTOMER_FACING_SKUS,
+  TIER_TO_SKU,
+  isCustomerFacingSku,
+  skuForTier,
+} from './tier-sku-bridge'
+
 export type {
   BillingRepo,
   MarkEventInput,
