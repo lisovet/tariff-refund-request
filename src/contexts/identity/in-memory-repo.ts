@@ -76,6 +76,14 @@ export function createInMemoryIdentityRepo(): IdentityRepo {
       return null
     },
 
+    async findCustomerByEmail(email) {
+      const normalized = email.trim().toLowerCase()
+      for (const c of customers.values()) {
+        if (c.email.trim().toLowerCase() === normalized) return c
+      }
+      return null
+    },
+
     async findStaffUserByClerkUserId(clerkUserId) {
       return staff.get(clerkUserId) ?? null
     },

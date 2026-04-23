@@ -1,6 +1,10 @@
 import { conciergeCheckoutOnSignedWorkflow } from '@contexts/billing/server'
 import { artifactGenerationWorkflow } from '@contexts/cape/server'
-import { auditLogMirrorWorkflow, stalledCadenceWorkflow } from '@contexts/ops/server'
+import {
+  auditLogMirrorWorkflow,
+  paymentCompletedWorkflow,
+  stalledCadenceWorkflow,
+} from '@contexts/ops/server'
 import {
   nudgeCadenceWorkflow,
   screenerCompletedWorkflow,
@@ -28,6 +32,7 @@ export const workflows = [
   nudgeCadenceWorkflow,
   auditLogMirrorWorkflow,
   stalledCadenceWorkflow,
+  paymentCompletedWorkflow,
   artifactGenerationWorkflow,
   conciergeCheckoutOnSignedWorkflow,
   ...funnelMirrorWorkflows,
@@ -39,6 +44,7 @@ export {
   nudgeCadenceWorkflow,
   auditLogMirrorWorkflow,
   stalledCadenceWorkflow,
+  paymentCompletedWorkflow,
   artifactGenerationWorkflow,
   conciergeCheckoutOnSignedWorkflow,
 }

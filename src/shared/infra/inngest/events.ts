@@ -54,6 +54,7 @@ export const paymentCompleted = eventType('platform/payment.completed', {
     data: {
       sessionId: string // screener session — used for cadence cancellation
       sku: string
+      tier: string // 'smb' | 'mid_market' — Stripe session metadata
       stripeChargeId: string
       amountUsdCents: number
       email: string
