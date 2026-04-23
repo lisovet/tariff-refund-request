@@ -6,6 +6,7 @@ import {
   type Sku,
 } from '@contexts/billing'
 import { dollars } from '../_components/formatDollars'
+import { BuyButton } from './_components/BuyButton'
 
 /**
  * /pricing — stage-by-stage ladder per PRD 05 + PRD 06.
@@ -159,11 +160,29 @@ export default function PricingPage() {
                       <p className="mt-3 text-base text-ink/75">{row.note}</p>
                     )}
                   </div>
-                  <div
-                    data-price-mono
-                    className="font-mono text-lg text-accent sm:text-right"
-                  >
-                    {row.priceLabel}
+                  <div className="sm:text-right">
+                    <div
+                      data-price-mono
+                      className="font-mono text-lg text-accent"
+                    >
+                      {row.priceLabel}
+                    </div>
+                    {row.sku !== 'free' ? (
+                      <div className="mt-3 flex flex-wrap items-center gap-3 sm:justify-end">
+                        <BuyButton
+                          sku={row.sku}
+                          tier="smb"
+                          anchor={`#${stage.id}`}
+                          label={`Buy · SMB · ${dollars(priceFor(row.sku, 'smb').usdCents)}`}
+                        />
+                        <BuyButton
+                          sku={row.sku}
+                          tier="mid_market"
+                          anchor={`#${stage.id}`}
+                          label={`Buy · Mid-market · ${dollars(priceFor(row.sku, 'mid_market').usdCents)}`}
+                        />
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               ))}
@@ -211,8 +230,24 @@ export default function PricingPage() {
                 Coordination through filing and CBP response.
               </p>
             </div>
-            <div data-price-mono className="font-mono text-lg text-accent sm:text-right">
-              {dollars(priceFor('concierge_base', 'smb').usdCents)} – {dollars(priceFor('concierge_base', 'mid_market').usdCents)}
+            <div className="sm:text-right">
+              <div data-price-mono className="font-mono text-lg text-accent">
+                {dollars(priceFor('concierge_base', 'smb').usdCents)} – {dollars(priceFor('concierge_base', 'mid_market').usdCents)}
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-3 sm:justify-end">
+                <BuyButton
+                  sku="concierge_base"
+                  tier="smb"
+                  anchor="#concierge"
+                  label={`Buy · SMB · ${dollars(priceFor('concierge_base', 'smb').usdCents)}`}
+                />
+                <BuyButton
+                  sku="concierge_base"
+                  tier="mid_market"
+                  anchor="#concierge"
+                  label={`Buy · Mid-market · ${dollars(priceFor('concierge_base', 'mid_market').usdCents)}`}
+                />
+              </div>
             </div>
           </div>
 
@@ -261,9 +296,23 @@ export default function PricingPage() {
                 Annual prepay gets two months free.
               </p>
             </div>
-            <div data-price-mono className="font-mono text-lg text-accent sm:text-right">
-              {dollars(priceFor('monitoring', 'smb').usdCents)} – {dollars(priceFor('monitoring', 'mid_market').usdCents)}
-              <span className="ml-1 text-ink/55">/ mo</span>
+            <div className="sm:text-right">
+              <div data-price-mono className="font-mono text-lg text-accent">
+                {dollars(priceFor('monitoring', 'smb').usdCents)} – {dollars(priceFor('monitoring', 'mid_market').usdCents)}
+                <span className="ml-1 text-ink/55">/ mo</span>
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-3 sm:justify-end">
+                <BuyButton
+                  sku="monitoring"
+                  tier="smb"
+                  label={`Subscribe · SMB · ${dollars(priceFor('monitoring', 'smb').usdCents)}/mo`}
+                />
+                <BuyButton
+                  sku="monitoring"
+                  tier="mid_market"
+                  label={`Subscribe · Mid-market · ${dollars(priceFor('monitoring', 'mid_market').usdCents)}/mo`}
+                />
+              </div>
             </div>
           </div>
         </div>
