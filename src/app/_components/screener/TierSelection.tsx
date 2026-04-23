@@ -38,9 +38,19 @@ export function TierSelection({ recommendedTier }: Props) {
           />
         ))}
       </div>
-      <p className="mt-6 text-xs text-ink/60">
-        Paid Audit? The $99 credits toward Full Prep if you upgrade.
-      </p>
+      <aside
+        aria-label="Audit credit toward Full Prep"
+        className="mt-8 flex items-baseline gap-5 border-l-2 border-accent pl-6"
+      >
+        <span className="font-mono text-2xl text-accent sm:text-3xl">$99</span>
+        <p className="text-base text-ink/85 sm:text-lg">
+          <span className="font-medium text-ink">
+            Paid for the Audit first?
+          </span>{' '}
+          We credit the full $99 toward Full Prep when you upgrade — no
+          double-charging for the same eligibility work.
+        </p>
+      </aside>
     </section>
   )
 }

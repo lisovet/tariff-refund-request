@@ -49,10 +49,21 @@ export default function PricingPage() {
               <PricingTierCard key={id} tier={TIERS[id]} />
             ))}
           </div>
-          <p className="mt-6 text-xs text-ink/60">
-            Paid Audit first? The $99 credits toward Full Prep when you
-            upgrade.
-          </p>
+          <aside
+            aria-label="Audit credit toward Full Prep"
+            className="mt-10 flex items-baseline gap-6 border-l-2 border-accent pl-6 sm:mt-12"
+          >
+            <span className="font-mono text-3xl text-accent sm:text-4xl">
+              $99
+            </span>
+            <p className="text-lg text-ink/85 sm:text-xl">
+              <span className="font-medium text-ink">
+                Paid for the Audit first?
+              </span>{' '}
+              We credit the full $99 toward Full Prep when you upgrade — no
+              double-charging for the same eligibility work.
+            </p>
+          </aside>
         </div>
       </section>
 

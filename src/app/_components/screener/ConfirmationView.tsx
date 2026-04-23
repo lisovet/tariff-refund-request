@@ -82,6 +82,23 @@ export function ConfirmationView() {
         request up front.
       </p>
 
+      <aside
+        aria-label="Homework email"
+        className="mt-10 border-l-2 border-accent pl-6"
+      >
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
+          Check your inbox
+        </p>
+        <p className="mt-3 text-base text-ink/85">
+          You&rsquo;ll also get an automated email in the next few minutes with
+          the standard documents and records most importers need for a refund
+          file — broker statements, carrier records, ACE exports, HTS codes
+          by entry. Start pulling these together while your account manager
+          reviews your case. The final checklist we send back will be
+          tailored, but this gets you a head start.
+        </p>
+      </aside>
+
       <Hairline className="my-12" />
 
       <section>

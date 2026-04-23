@@ -113,11 +113,11 @@ describe('/pricing — success fee section', () => {
     ).toBeGreaterThan(0)
   })
 
-  it('advertises the $99 Audit credit toward Full Prep', () => {
+  it('advertises the $99 Audit credit toward Full Prep prominently', () => {
     renderPricing()
-    expect(
-      screen.getAllByText(/\$99 credits toward Full Prep/i).length,
-    ).toBeGreaterThan(0)
+    const aside = screen.getByLabelText(/Audit credit toward Full Prep/i)
+    expect(aside.textContent).toMatch(/\$99/)
+    expect(aside.textContent).toMatch(/credit the full \$99 toward Full Prep/i)
   })
 
   it('fee table renders correct math (5% → 10% repricing)', () => {

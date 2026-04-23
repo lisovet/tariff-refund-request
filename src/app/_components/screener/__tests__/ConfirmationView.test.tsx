@@ -60,6 +60,13 @@ describe('<ConfirmationView>', () => {
     expect(screen.queryByText(/file with CBP/i)).toBeNull()
   })
 
+  it('tells the user an automated homework email is coming', () => {
+    withTier('full_prep')
+    render(<ConfirmationView />)
+    expect(screen.getByText(/automated email/i)).toBeTruthy()
+    expect(screen.getByText(/head start/i)).toBeTruthy()
+  })
+
   it('renders the canonical trust promise footer', () => {
     withTier('full_prep')
     render(<ConfirmationView />)

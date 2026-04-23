@@ -38,9 +38,12 @@ describe('<TierSelection>', () => {
     expect(pushSpy).toHaveBeenCalledWith('/screener/confirmation?tier=full_prep')
   })
 
-  it('renders the $99 credit note', () => {
+  it('renders the prominent $99 Audit credit aside', () => {
     render(<TierSelection recommendedTier="audit" />)
-    expect(screen.getByText(/\$99 credits toward Full Prep/i)).toBeTruthy()
+    const aside = screen.getByLabelText(/Audit credit toward Full Prep/i)
+    expect(aside).toBeTruthy()
+    expect(aside.textContent).toMatch(/\$99/)
+    expect(aside.textContent).toMatch(/credit the full \$99 toward Full Prep/i)
   })
 
   it('shows the success-fee subline on Full Prep only', () => {
