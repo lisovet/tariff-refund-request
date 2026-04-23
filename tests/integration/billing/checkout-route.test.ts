@@ -10,6 +10,8 @@ const mocks = vi.hoisted(() => ({
   createCheckoutForSku: vi.fn(),
   findPriceIdByLookupKey: vi.fn(),
   createCheckoutSession: vi.fn(),
+  authFn: vi.fn(),
+  currentUserFn: vi.fn(),
 }))
 
 vi.mock('@contexts/billing/server', () => ({
@@ -22,6 +24,14 @@ vi.mock('@contexts/billing/server', () => ({
 
 vi.mock('@contexts/billing', () => ({
   createCheckoutForSku: mocks.createCheckoutForSku,
+}))
+
+// The route auth-gates before parsing. Default to a signed-in user
+// so existing tests still exercise the validation + checkout paths;
+// the 401 branch has its own dedicated test.
+vi.mock('@clerk/nextjs/server', () => ({
+  auth: mocks.authFn,
+  currentUser: mocks.currentUserFn,
 }))
 
 const { createCheckoutForSku, findPriceIdByLookupKey, createCheckoutSession } = mocks
@@ -40,6 +50,13 @@ beforeEach(() => {
   createCheckoutForSku.mockReset()
   findPriceIdByLookupKey.mockReset()
   createCheckoutSession.mockReset()
+  // Default: a Clerk-signed-in user whose verified email is known.
+  mocks.authFn.mockReset()
+  mocks.currentUserFn.mockReset()
+  mocks.authFn.mockResolvedValue({ userId: 'user_test' })
+  mocks.currentUserFn.mockResolvedValue({
+    primaryEmailAddress: { emailAddress: 'buyer@example.com' },
+  })
 })
 
 afterEach(() => {
@@ -47,6 +64,22 @@ afterEach(() => {
 })
 
 describe('POST /api/checkout', () => {
+  it('401s when the caller has no Clerk session (signup-first gate)', async () => {
+    mocks.authFn.mockResolvedValueOnce({ userId: null })
+    const res = await POST(
+      makeRequest({
+        sku: 'recovery_kit',
+        tier: 'smb',
+        screenerSessionId: 'ses_1',
+      }),
+    )
+    expect(res.status).toBe(401)
+    const json = (await res.json()) as { error?: string }
+    expect(json.error).toBe('signin_required')
+    // Must NOT have attempted to open a Stripe session.
+    expect(createCheckoutForSku).not.toHaveBeenCalled()
+  })
+
   it('400s on a missing sku/tier/sessionId', async () => {
     const res = await POST(makeRequest({ sku: 'recovery_kit' }))
     expect(res.status).toBe(400)
@@ -109,10 +142,32 @@ describe('POST /api/checkout', () => {
     expect(json.error).toBe('checkout_failed')
   })
 
-  it('passes the customer email through when supplied', async () => {
+  it('prefers the authenticated email over a body-supplied customerEmail', async () => {
     createCheckoutForSku.mockResolvedValueOnce({
       sessionId: 'cs_y',
       url: 'https://checkout.stripe.com/c/pay/cs_y',
+    })
+    // buyer@example.com is what the default currentUser mock returns.
+    await POST(
+      makeRequest({
+        sku: 'recovery_kit',
+        tier: 'smb',
+        screenerSessionId: 'ses_1',
+        customerEmail: 'spoofed@attacker.test',
+      }),
+    )
+    // Clerk-verified email wins — the body value is ignored.
+    expect(createCheckoutForSku).toHaveBeenCalledWith(
+      expect.objectContaining({ customerEmail: 'buyer@example.com' }),
+      expect.anything(),
+    )
+  })
+
+  it('falls back to the body-supplied customerEmail when Clerk has no email', async () => {
+    mocks.currentUserFn.mockResolvedValueOnce(null)
+    createCheckoutForSku.mockResolvedValueOnce({
+      sessionId: 'cs_yy',
+      url: 'https://checkout.stripe.com/c/pay/cs_yy',
     })
     await POST(
       makeRequest({

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
 import { z } from 'zod'
 import { createCheckoutForSku } from '@contexts/billing'
 import {
@@ -44,6 +45,17 @@ export async function POST(req: Request): Promise<Response> {
   const log = getLogger()
   const tracker = getErrorTracker()
 
+  // Auth gate: sign-up-first identity contract from the remediation
+  // plan. An unauthenticated Buy click returns 401 so the client
+  // component can redirect the user through /sign-up before we ever
+  // open a Stripe session. This keeps the Buy button itself free of
+  // Clerk hooks — critical because the button renders on the
+  // (marketing) layout, which does not mount a ClerkProvider.
+  const session = await auth()
+  if (!session.userId) {
+    return NextResponse.json({ error: 'signin_required' }, { status: 401 })
+  }
+
   let parsed: z.infer<typeof BodySchema>
   try {
     parsed = BodySchema.parse(await req.json())
@@ -54,6 +66,11 @@ export async function POST(req: Request): Promise<Response> {
     )
   }
 
+  // Pull the authenticated buyer's email so the post-payment workflow
+  // can resolve their customer row reliably.
+  const user = await currentUser()
+  const authedEmail = user?.primaryEmailAddress?.emailAddress
+
   const origin = req.headers.get('origin') ?? new URL(req.url).origin
 
   try {
@@ -63,7 +80,11 @@ export async function POST(req: Request): Promise<Response> {
         tier: parsed.tier,
         screenerSessionId: parsed.screenerSessionId,
         origin,
-        customerEmail: parsed.customerEmail,
+        // Prefer the authenticated user's email — it's the one that
+        // was verified at Clerk sign-up and that the customers row
+        // was upserted against. Falls back to a caller-supplied value
+        // only when auth() returned no email (rare).
+        customerEmail: authedEmail ?? parsed.customerEmail,
       },
       createStripeCheckoutClient(getStripeClient()),
     )
