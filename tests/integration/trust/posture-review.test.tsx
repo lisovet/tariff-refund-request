@@ -102,8 +102,8 @@ describe('USER-TEST #12 — trust-posture consistency across surfaces', () => {
     }
   })
 
-  it('concierge-v1 carries the canonical trust promise verbatim (after interpolation)', () => {
-    const rendered = renderAgreement('concierge-v1', AGREEMENT_VARS)
+  it('full-prep-v1 carries the canonical trust promise verbatim (after interpolation)', () => {
+    const rendered = renderAgreement('full-prep-v1', AGREEMENT_VARS)
     expect(rendered).toContain(CANONICAL_TRUST_PROMISE)
     expect(rendered).toContain(NOT_LEGAL_ADVICE_DISCLOSURE)
   })

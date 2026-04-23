@@ -33,8 +33,8 @@ function makeCheckoutClient(): {
 const BASE_EVENT: ConciergeCheckoutOnSignedInput['event'] = {
   data: {
     caseId: 'cas_c2',
-    sku: 'concierge',
-    agreementId: 'concierge-v1',
+    sku: 'full-prep',
+    agreementId: 'full-prep-v1',
     agreementVersion: 1,
     envelopeId: 'env_xyz',
     signedAtIso: '2026-04-21T14:00:00.000Z',
@@ -61,13 +61,13 @@ describe('conciergeCheckoutOnSignedHandler', () => {
     expect(params?.customer_email).toBe('controller@acme.test')
   })
 
-  it('refuses non-concierge SKUs (defense in depth — event filter should prevent this)', async () => {
+  it('refuses non-full-prep SKUs (defense in depth — event filter should prevent this)', async () => {
     const { client } = makeCheckoutClient()
     const result = await conciergeCheckoutOnSignedHandler(
       {
         event: {
           ...BASE_EVENT,
-          data: { ...BASE_EVENT.data, sku: 'recovery-kit' },
+          data: { ...BASE_EVENT.data, sku: 'audit' },
         },
         step: makeStep(),
       },

@@ -22,12 +22,12 @@ const FIXTURE_VARS: AgreementVariables = {
 }
 
 describe('AGREEMENTS registry', () => {
-  it('exposes at least one engagement letter per customer-facing SKU tier', () => {
+  it('exposes exactly one active version per customer-facing tier', () => {
     const ids = Object.keys(AGREEMENTS) as AgreementId[]
-    // v1 must cover the Concierge engagement letter AND the
-    // lightweight Recovery / Prep clickwrap.
-    expect(ids).toContain('concierge-v1')
-    expect(ids).toContain('recovery-prep-v1')
+    // v1 covers the Full Prep engagement letter AND the
+    // lightweight Audit clickwrap — the two-tier surface.
+    expect(ids).toContain('audit-v1')
+    expect(ids).toContain('full-prep-v1')
   })
 
   it('every entry has a non-empty body + a non-zero version number', () => {
@@ -41,20 +41,17 @@ describe('AGREEMENTS registry', () => {
 
   it('every entry declares exactly which SKU(s) it applies to', () => {
     const all = Object.values(AGREEMENTS).flatMap((a) => a.appliesTo)
-    expect(all).toContain('concierge')
-    expect(all).toContain('recovery-kit')
-    expect(all).toContain('cape-prep')
+    expect(all).toContain('audit')
+    expect(all).toContain('full-prep')
   })
 })
 
 describe('resolveAgreement', () => {
   it('returns the agreement applicable to a given SKU', () => {
-    const concierge = resolveAgreement('concierge')
-    expect(concierge.id).toBe('concierge-v1')
-    const recovery = resolveAgreement('recovery-kit')
-    expect(recovery.id).toBe('recovery-prep-v1')
-    const prep = resolveAgreement('cape-prep')
-    expect(prep.id).toBe('recovery-prep-v1')
+    const fullPrep = resolveAgreement('full-prep')
+    expect(fullPrep.id).toBe('full-prep-v1')
+    const audit = resolveAgreement('audit')
+    expect(audit.id).toBe('audit-v1')
   })
 
   it('throws when no agreement is registered for the SKU', () => {
@@ -97,7 +94,7 @@ describe('every AGREEMENT passes its REQUIRED_CLAUSES', () => {
 
 describe('renderAgreement', () => {
   it('interpolates every {{VAR}} placeholder with the provided values', () => {
-    const rendered = renderAgreement('concierge-v1', FIXTURE_VARS)
+    const rendered = renderAgreement('full-prep-v1', FIXTURE_VARS)
     expect(rendered).toContain(FIXTURE_VARS.customerName)
     expect(rendered).toContain(FIXTURE_VARS.customerEmail)
     expect(rendered).toContain(FIXTURE_VARS.caseId)
@@ -110,7 +107,7 @@ describe('renderAgreement', () => {
 
   it('throws when an expected variable is missing (agreements must not ship with dangling placeholders)', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect(() => renderAgreement('concierge-v1', {} as any)).toThrow(
+    expect(() => renderAgreement('full-prep-v1', {} as any)).toThrow(
       /missing variable/i,
     )
   })
@@ -122,35 +119,40 @@ describe('renderAgreement', () => {
     )
   })
 
-  it('Concierge letter carries the canonical trust promise verbatim', () => {
-    const rendered = renderAgreement('concierge-v1', FIXTURE_VARS)
+  it('Full Prep letter carries the canonical trust promise verbatim', () => {
+    const rendered = renderAgreement('full-prep-v1', FIXTURE_VARS)
     expect(rendered).toContain(CANONICAL_TRUST_PROMISE)
   })
 
-  it('Concierge letter carries the "Not legal advice" language verbatim', () => {
-    const rendered = renderAgreement('concierge-v1', FIXTURE_VARS)
+  it('Full Prep letter carries the "Not legal advice" language verbatim', () => {
+    const rendered = renderAgreement('full-prep-v1', FIXTURE_VARS)
     expect(rendered).toContain(NOT_LEGAL_ADVICE_DISCLOSURE)
   })
 
-  it('Concierge letter stamps its own version id in the rendered output', () => {
-    const rendered = renderAgreement('concierge-v1', FIXTURE_VARS)
-    expect(rendered).toContain('concierge-v1')
+  it('Full Prep letter stamps its own version id in the rendered output', () => {
+    const rendered = renderAgreement('full-prep-v1', FIXTURE_VARS)
+    expect(rendered).toContain('full-prep-v1')
+  })
+
+  it('Audit clickwrap stamps its own version id in the rendered output', () => {
+    const rendered = renderAgreement('audit-v1', FIXTURE_VARS)
+    expect(rendered).toContain('audit-v1')
   })
 })
 
-describe('renderAgreement — Concierge scope + success fee + dispute', () => {
-  it('names the success-fee mechanic (concierge gates the success-fee clause)', () => {
-    const rendered = renderAgreement('concierge-v1', FIXTURE_VARS)
+describe('renderAgreement — Full Prep scope + success fee + dispute', () => {
+  it('names the success-fee mechanic (Full Prep gates the success-fee clause)', () => {
+    const rendered = renderAgreement('full-prep-v1', FIXTURE_VARS)
     expect(rendered).toMatch(/success fee/i)
   })
 
   it('names the dispute resolution clause', () => {
-    const rendered = renderAgreement('concierge-v1', FIXTURE_VARS)
+    const rendered = renderAgreement('full-prep-v1', FIXTURE_VARS)
     expect(rendered).toMatch(/dispute/i)
   })
 
   it('names governing law with the interpolated state', () => {
-    const rendered = renderAgreement('concierge-v1', {
+    const rendered = renderAgreement('full-prep-v1', {
       ...FIXTURE_VARS,
       governingLawState: 'California',
     })

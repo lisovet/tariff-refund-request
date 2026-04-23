@@ -75,8 +75,8 @@ describe('Launch readiness — disclosure carriage', () => {
 
 describe('Launch readiness — agreements + compliance', () => {
   it('both v1 agreements register + each one passes its required clauses', () => {
-    expect(AGREEMENTS['concierge-v1']).toBeDefined()
-    expect(AGREEMENTS['recovery-prep-v1']).toBeDefined()
+    expect(AGREEMENTS['audit-v1']).toBeDefined()
+    expect(AGREEMENTS['full-prep-v1']).toBeDefined()
 
     for (const a of Object.values(AGREEMENTS)) {
       for (const clause of REQUIRED_CLAUSES) {

@@ -161,8 +161,8 @@ Each section is a hard gate — do not move past it until the "verify" step pass
 
 ## 13. Launch gates — legal + content (variable)
 
-- [ ] **Lawyer review** of `src/contexts/billing/agreements/concierge-v1.md`. Specifically the AAA arbitration clause (§8), governing law (§9), success-fee mechanic (§5). Get written sign-off before the first real Concierge purchase.
-- [ ] **Lawyer review** of `src/contexts/billing/agreements/recovery-prep-v1.md` — the clickwrap for Recovery / CAPE-Prep purchases.
+- [ ] **Lawyer review** of `src/contexts/billing/agreements/full-prep-v1.md`. Specifically the AAA arbitration clause (§9), governing law (§10), success-fee mechanic (§5), and the 5-business-day SLA (§6). Get written sign-off before the first real Full Prep purchase.
+- [ ] **Lawyer review** of `src/contexts/billing/agreements/audit-v1.md` — the clickwrap for Audit purchases ($99 digital-delivery).
 - [ ] **Founder + design reviewer** open `tmp/readiness-report-sample.pdf` (after step 11) and confirm the "CFO would forward this unchanged" bar per task #71.
 - [ ] **Founder + outside reviewer** read `/trust`, `/trust/security`, `/trust/sub-processors` top-to-bottom per task #76. Outside reviewer should include a lawyer.
 

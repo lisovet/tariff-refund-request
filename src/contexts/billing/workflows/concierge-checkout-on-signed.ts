@@ -2,7 +2,8 @@ import { inngest } from '@shared/infra/inngest/client'
 import { conciergeSigned } from '@shared/infra/inngest/events'
 import type { CheckoutClient } from '../checkout'
 import { createCheckoutForSku } from '../checkout'
-import type { PricingTier, Sku } from '../pricing'
+import type { PricingTier } from '../pricing'
+import { skuForTier } from '../tier-sku-bridge'
 
 /**
  * Opens the Stripe Checkout session only AFTER the Concierge
@@ -68,15 +69,21 @@ export async function conciergeCheckoutOnSignedHandler(
   const { event, step } = input
 
   // Defense in depth — the event should only ever fire for the
-  // Concierge SKU, but the event schema types `sku: string`.
-  if (event.data.sku !== 'concierge') {
+  // Full Prep SKU (the tier that requires e-sign), but the event
+  // schema types `sku: string`.
+  if (event.data.sku !== 'full-prep') {
     return { ok: false, reason: 'sku_not_concierge' }
   }
+
+  // The event carries the agreement-sku ('full-prep'); the backend
+  // Stripe catalog is keyed on the legacy SKU ladder, where Full Prep
+  // maps to `concierge_base`. `skuForTier` encapsulates that bridge.
+  const backendSku = skuForTier('full_prep')
 
   const session = await step.run('open-checkout-after-signature', async () =>
     createCheckoutForSku(
       {
-        sku: event.data.sku as Sku,
+        sku: backendSku,
         tier: deps.tier,
         screenerSessionId: event.data.envelopeId, // envelope id is stable + unique
         origin: deps.appOrigin,
