@@ -29,13 +29,13 @@ export const STATE_COPY: Record<CaseState, StateCopy> = {
   new_lead: {
     customerLabel: 'Getting started',
     customerDescription:
-      "We've received your screener — next step is to purchase Recovery so we can rebuild your entry list.",
+      "We've received your screener — next step is to pick a tier (Audit or Full Prep & Concierge Service) so we know what you're asking us to do.",
     opsLabel: 'New lead',
   },
   qualified: {
     customerLabel: 'Eligible',
     customerDescription:
-      'Your answers qualify. Purchase Recovery to open the case.',
+      'Your answers qualify. Pick Audit ($99) or Full Prep & Concierge Service ($999 + success fee) to open the case.',
     opsLabel: 'Qualified',
   },
   disqualified: {
@@ -46,7 +46,8 @@ export const STATE_COPY: Record<CaseState, StateCopy> = {
   },
   awaiting_purchase: {
     customerLabel: 'Awaiting purchase',
-    customerDescription: 'Complete the Recovery purchase to move forward.',
+    customerDescription:
+      'Complete the tier purchase to move forward.',
     opsLabel: 'Awaiting purchase',
   },
   awaiting_docs: {
@@ -56,42 +57,46 @@ export const STATE_COPY: Record<CaseState, StateCopy> = {
     opsLabel: 'Awaiting docs',
   },
   entry_recovery_in_progress: {
-    customerLabel: 'Recovery in progress',
+    customerLabel: 'Full Prep & Concierge Service in progress',
     customerDescription:
       "We're reconciling your entries across broker, carrier, and ACE sources.",
     opsLabel: 'Recovery in progress',
   },
   entry_list_ready: {
-    customerLabel: 'Entry list ready',
+    customerLabel: 'Full Prep & Concierge Service in progress',
     customerDescription:
-      'Review the recovered entry list. Next: purchase Filing prep.',
+      "Your entry list is rebuilt. We're moving straight into CAPE file prep — no extra purchase needed.",
     opsLabel: 'Entry list ready',
   },
   awaiting_prep_purchase: {
-    customerLabel: 'Awaiting Filing prep purchase',
+    // Internal legacy state — under the two-tier model, Full Prep is
+    // paid up front, so customers should never land here. If they do,
+    // surface neutral copy rather than a dead nomenclature.
+    customerLabel: 'Almost ready',
     customerDescription:
-      'Purchase Filing prep to move from entry list to submission-ready file.',
+      'Your case is almost ready for file prep — your account manager will reach out.',
     opsLabel: 'Awaiting prep purchase',
   },
   cape_prep_in_progress: {
-    customerLabel: 'Filing prep in progress',
+    customerLabel: 'Full Prep & Concierge Service in progress',
     customerDescription:
-      "We're running your entries through the CAPE validator and drafting the Readiness Report.",
+      "We're running your entries through the CAPE validator and drafting your pre-submission confidence report.",
     opsLabel: 'CAPE prep in progress',
   },
   batch_qa: {
     customerLabel: 'Human review',
-    customerDescription: 'A validator is reviewing your batch before it ships.',
+    customerDescription:
+      'A named validator is reviewing your file before it ships — per our human-review promise.',
     opsLabel: 'Batch QA',
   },
   submission_ready: {
     customerLabel: 'Submission ready',
     customerDescription:
-      'Your CSV + Readiness Report are available. You or your broker submit to CBP.',
+      'Your CSV + pre-submission confidence report are available. You or your broker submit to CBP.',
     opsLabel: 'Submission ready',
   },
   concierge_active: {
-    customerLabel: 'Concierge active',
+    customerLabel: 'Coordinating your filing',
     customerDescription:
       "We're coordinating the filing with you or your broker.",
     opsLabel: 'Concierge active',

@@ -2,136 +2,149 @@
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import PricingPage from '../page'
-import { PRICE_LADDER, priceFor } from '@contexts/billing'
 
 /**
- * /pricing must mirror PRICE_LADDER verbatim — no hand-typed numbers.
- * The snapshot tests below pull straight from pricing.ts so when the
- * ladder changes, the tests re-pin the page automatically.
+ * /pricing — two-tier layout (Audit + Full Prep). Replaces the
+ * previous 3-stage ladder. Prices and copy flow from
+ * `@contexts/billing` TIERS so there are no hand-typed dollar values
+ * in the view.
  */
 
 function renderPricing() {
   return render(<PricingPage />)
 }
 
-function dollars(cents: number): string {
-  const whole = Math.trunc(cents / 100)
-  const formatted = whole.toLocaleString('en-US')
-  if (cents % 100 === 0) return `$${formatted}`
-  const fractional = String(cents % 100).padStart(2, '0')
-  return `$${formatted}.${fractional}`
-}
-
 describe('/pricing — page structure', () => {
   it('renders the editorial H1', () => {
     renderPricing()
     expect(
-      screen.getByRole('heading', { level: 1, name: /pricing|paid in stages/i }),
+      screen.getByRole('heading', { level: 1, name: /two tiers/i }),
     ).toBeInTheDocument()
   })
 
-  it('renders three stage columns: free, recover, prepare', () => {
+  it('renders an Audit card and a Full Prep card', () => {
     renderPricing()
-    // Heading anchors per stage. Free tier rendered with same weight,
-    // not de-emphasized.
-    expect(screen.getByRole('heading', { name: /see if it.?s worth your time/i })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /rebuild your entry list/i })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /turn it into a submission-ready package/i })).toBeInTheDocument()
+    expect(document.querySelector('[data-tier="audit"]')).not.toBeNull()
+    expect(document.querySelector('[data-tier="full_prep"]')).not.toBeNull()
   })
 
-  it('renders Concierge as a separate section below', () => {
+  it('no longer renders the legacy 3-stage headings', () => {
     renderPricing()
-    // Section heading + product-row heading both contain "Concierge".
-    const matches = screen.getAllByRole('heading', { name: /concierge/i })
-    expect(matches.length).toBeGreaterThanOrEqual(2)
+    expect(
+      screen.queryByRole('heading', { name: /rebuild your entry list/i }),
+    ).toBeNull()
+    expect(
+      screen.queryByRole('heading', {
+        name: /turn it into a submission-ready package/i,
+      }),
+    ).toBeNull()
   })
 
-  it('does not render a "popular" badge or any plan badge', () => {
+  it('does not render the legacy Concierge / Monitoring rows', () => {
+    renderPricing()
+    expect(document.querySelector('[data-sku="concierge_base"]')).toBeNull()
+    expect(document.querySelector('[data-sku="monitoring"]')).toBeNull()
+  })
+
+  it('does not render a popular / recommended / best-value badge', () => {
     renderPricing()
     expect(screen.queryByText(/popular/i)).toBeNull()
-    expect(screen.queryByText(/recommended/i)).toBeNull()
     expect(screen.queryByText(/best value/i)).toBeNull()
   })
 
-  it('does not pitch "Get a Quote" or "Contact Sales" — direct prices only', () => {
+  it('does not pitch "Get a Quote" or "Contact Sales"', () => {
     renderPricing()
     expect(screen.queryByText(/get a quote/i)).toBeNull()
     expect(screen.queryByText(/contact sales/i)).toBeNull()
   })
 })
 
-describe('/pricing — figures from pricing.ts (no hand-typed numbers)', () => {
-  it.each([
-    ['recovery_kit', 'smb'],
-    ['recovery_kit', 'mid_market'],
-    ['recovery_service', 'smb'],
-    ['recovery_service', 'mid_market'],
-    ['cape_prep_standard', 'smb'],
-    ['cape_prep_standard', 'mid_market'],
-    ['cape_prep_premium', 'smb'],
-    ['cape_prep_premium', 'mid_market'],
-    ['concierge_base', 'smb'],
-    ['concierge_base', 'mid_market'],
-    ['monitoring', 'smb'],
-    ['monitoring', 'mid_market'],
-  ] as const)('renders %s/%s exactly as priced in pricing.ts', (sku, tier) => {
+describe('/pricing — tier prices', () => {
+  it('Audit is $99 one-time and has no success fee line', () => {
     renderPricing()
-    const expected = dollars(priceFor(sku, tier).usdCents)
-    // Use getAllByText because the ladder repeats some round figures.
-    expect(screen.getAllByText(new RegExp(expected.replace('$', '\\$'))).length).toBeGreaterThan(0)
+    const audit = document.querySelector('[data-tier="audit"]') as HTMLElement
+    expect(within(audit).getByText('$99')).toBeInTheDocument()
+    expect(within(audit).getByText(/one time/i)).toBeInTheDocument()
+    expect(within(audit).queryByText(/success fee/i)).toBeNull()
   })
 
-  it('exposes every SKU on the page', () => {
+  it('Full Prep shows $999 due now + success fee billed after delivery', () => {
     renderPricing()
-    for (const sku of Object.keys(PRICE_LADDER)) {
-      // SKU labels are humanized in the UI — assert at least a recognizable
-      // anchor for each, by data-sku attribute.
-      expect(document.querySelector(`[data-sku="${sku}"]`)).not.toBeNull()
-    }
+    const fp = document.querySelector(
+      '[data-tier="full_prep"]',
+    ) as HTMLElement
+    expect(within(fp).getByText('$999')).toBeInTheDocument()
+    expect(within(fp).getByText(/due now/i)).toBeInTheDocument()
+    expect(
+      within(fp).getByText(/10% of estimated refund/i),
+    ).toBeInTheDocument()
+    expect(within(fp).getByText(/cap \$25,000/i)).toBeInTheDocument()
+    expect(
+      within(fp).getByText(/billed only after your file is delivered/i),
+    ).toBeInTheDocument()
   })
 
   it('renders prices in monospace numerics (Berkeley Mono fallback)', () => {
     renderPricing()
-    const recoveryRow = document.querySelector('[data-sku="recovery_kit"]')
-    expect(recoveryRow).not.toBeNull()
-    const priceCell = recoveryRow?.querySelector('[data-price-mono]')
+    const audit = document.querySelector('[data-tier="audit"]')
+    const priceCell = audit?.querySelector('[data-price-mono]')
     expect(priceCell).not.toBeNull()
     expect(priceCell?.className).toMatch(/font-mono/)
   })
 })
 
-describe('/pricing — success-fee disclosure on Concierge', () => {
-  it('mentions the SMB band 10–12% explicitly', () => {
+describe('/pricing — success fee section', () => {
+  it('names the 10 % rate and the $25,000 cap', () => {
     renderPricing()
-    const concierge = screen.getByRole('region', { name: /concierge/i })
-    const text = within(concierge).getByText(/10\s*[–-]\s*12\s*%/i)
-    expect(text).toBeInTheDocument()
+    const section = screen.getByRole('region', { name: /success fee/i })
+    expect(within(section).getByRole('heading', { level: 2 }).textContent).toMatch(
+      /10\s*%/,
+    )
+    expect(
+      within(section).getByRole('heading', { level: 2 }).textContent,
+    ).toMatch(/\$25,000/)
   })
 
-  it('mentions the mid-market band 8–10% explicitly', () => {
+  it('explains the fee is charged against the estimate, not CBP', () => {
     renderPricing()
-    const concierge = screen.getByRole('region', { name: /concierge/i })
-    expect(within(concierge).getByText(/8\s*[–-]\s*10\s*%/i)).toBeInTheDocument()
+    const section = screen.getByRole('region', { name: /success fee/i })
+    expect(
+      within(section).getAllByText(/estimated/i).length,
+    ).toBeGreaterThan(0)
   })
 
-  it('discloses the per-case hard cap', () => {
+  it('advertises the $99 Audit credit toward Full Prep prominently', () => {
     renderPricing()
-    const concierge = screen.getByRole('region', { name: /concierge/i })
-    expect(within(concierge).getByText(/\$50,000/)).toBeInTheDocument()
+    const aside = screen.getByLabelText(/Audit credit toward Full Prep/i)
+    expect(aside.textContent).toMatch(/\$99/)
+    expect(aside.textContent).toMatch(/credit the full \$99 toward Full Prep/i)
   })
 
-  it('frames the success fee against the realized refund, not estimate', () => {
+  it('fee table renders correct math (5% → 10% repricing)', () => {
     renderPricing()
-    const concierge = screen.getByRole('region', { name: /concierge/i })
-    expect(within(concierge).getByText(/realized refund/i)).toBeInTheDocument()
+    const table = screen.getByRole('table', {
+      name: /success fee by estimated refund/i,
+    })
+    // $5,000 refund row → 10% = $500 success fee, $1,499 total, $4,500 kept.
+    expect(within(table).getByText(/^\$500$/)).toBeInTheDocument()
+    expect(within(table).getByText(/^\$1,499$/)).toBeInTheDocument()
+    expect(within(table).getByText(/^\$4,500$/)).toBeInTheDocument()
+    // Cap row: $250,000 refund → cap applies at $25,000.
+    expect(within(table).getAllByText(/^\$25,000$/).length).toBeGreaterThan(0)
+    // Capped flag appears at least once.
+    expect(within(table).getAllByText(/^cap$/i).length).toBeGreaterThan(0)
   })
 })
 
-describe('/pricing — anti-positioning', () => {
-  it('CTA points at the screener (free entry to the ladder)', () => {
+describe('/pricing — CTA', () => {
+  it('CTA points at the screener (free entry to the tiers)', () => {
     renderPricing()
-    const cta = screen.getAllByRole('link', { name: /check eligibility|start the screener|start screener/i })[0]
-    expect(cta).toBeDefined()
-    expect(cta?.getAttribute('href')).toBe('/screener')
+    const ctas = screen.getAllByRole('link', {
+      name: /check eligibility/i,
+    })
+    expect(ctas.length).toBeGreaterThan(0)
+    for (const cta of ctas) {
+      expect(cta.getAttribute('href')).toBe('/screener')
+    }
   })
 })

@@ -1,47 +1,44 @@
 import { Eyebrow } from '@/app/_components/ui'
+import { TIERS, TIER_ORDER } from '@contexts/billing'
 
 /**
- * Three-movement explainer per PRD 05: Recovery → Filing prep →
- * Concierge. Each rendered as a hairline-bordered movement (no
- * shadow, no rounded-full pill price badge). Mono numerics on prices
- * per docs/DESIGN-LANGUAGE.md.
+ * Two-tier explainer on the homepage. Mirrors the commercial model
+ * (Audit / Full Prep) that the rest of the funnel now runs on —
+ * /pricing, /how-it-works, the results page tier cards, and the
+ * confirmation flow. Copy pulls from the TIERS catalog so marketing
+ * and pricing never drift.
  *
- * Copy is leaner than v1 — each card reads like a magazine-sidebar,
- * not a pricing-tier pitch. The homepage promises "from $X" so the
- * ladder stays legible without freezing figures that change
- * quarterly. Exact prices + tier math live on /pricing.
+ * Each tier renders as a hairline-bordered card (no shadow, no pill
+ * badge). Prices are Berkeley Mono per docs/DESIGN-LANGUAGE.md. No
+ * "popular" / "best value" decorations — both tiers are legitimate
+ * entry points depending on how much time the importer has.
  */
 
 interface Movement {
-  readonly stage: string
-  readonly title: 'Recovery' | 'Filing prep' | 'Concierge'
+  readonly num: '01' | '02'
+  readonly title: string
   readonly priceLabel: string
   readonly summary: string
 }
 
-const MOVEMENTS: readonly Movement[] = [
-  {
-    stage: '01',
-    title: 'Recovery',
-    priceLabel: 'from $99',
-    summary:
-      'We rebuild your entry list from every broker and carrier on your shipments. Outreach kit, secure upload portal, and a case coordinator who chases the records that don’t return on their own.',
-  },
-  {
-    stage: '02',
-    title: 'Filing prep',
-    priceLabel: 'from $199',
-    summary:
-      'Validated entries. A CBP-compliant CSV. A signed Readiness Report your broker can submit unchanged. Reviewed by a named validator before it reaches you.',
-  },
-  {
-    stage: '03',
-    title: 'Concierge',
-    priceLabel: 'from $999 + success fee',
-    summary:
-      'End-to-end coordination with your broker or ours. Status monitoring through CBP review. The success fee only posts if the refund does.',
-  },
-]
+const PRICE_LABEL: Readonly<Record<'audit' | 'full_prep', string>> = {
+  audit: '$99 · one-time',
+  full_prep: '$999 due now + success fee',
+}
+
+const SUMMARY: Readonly<Record<'audit' | 'full_prep', string>> = {
+  audit:
+    "A written eligibility verdict, a defensible refund estimate, a personalized checklist, and every template you need to run the rest yourself — broker outreach, ACE setup, and the CAPE CSV spec.",
+  full_prep:
+    "We manage document collection, extract every entry number, build your validated CAPE file, and hand you a pre-submission confidence report — signed off by a named validator. You upload to ACE yourself; we never hit submit.",
+}
+
+const MOVEMENTS: readonly Movement[] = TIER_ORDER.map((id, i) => ({
+  num: (i === 0 ? '01' : '02') as '01' | '02',
+  title: TIERS[id].name,
+  priceLabel: PRICE_LABEL[id],
+  summary: SUMMARY[id],
+}))
 
 export function HomeMovements() {
   return (
@@ -50,21 +47,23 @@ export function HomeMovements() {
         <header className="max-w-2xl">
           <Eyebrow>How it works</Eyebrow>
           <h2 className="mt-3 font-display text-4xl tracking-display text-ink sm:text-5xl">
-            Three stages. Paid as you reach them.
+            Two tiers. Pick what you have time for.
           </h2>
           <p className="mt-6 text-lg text-ink/75">
-            Start free with the eligibility screener. You pay only
-            for the stage you use, and only when you use it.
+            Everyone starts with the same free eligibility screener.
+            Then you decide: do the work yourself with our Audit
+            packet, or hand it to us and get a submission-ready file
+            back in five business days.
           </p>
         </header>
 
-        <ol className="mt-16 grid gap-8 sm:mt-20 sm:grid-cols-3">
+        <ol className="mt-16 grid gap-8 sm:mt-20 sm:grid-cols-2">
           {MOVEMENTS.map((m) => (
             <li
               key={m.title}
               className="flex flex-col rounded-card border border-rule bg-paper-2 p-8"
             >
-              <Eyebrow>Stage {m.stage}</Eyebrow>
+              <Eyebrow>Tier {m.num}</Eyebrow>
               <h3 className="mt-4 font-display text-3xl tracking-display text-ink">
                 {m.title}
               </h3>

@@ -17,7 +17,7 @@ const qualified: ScreenerResult = {
   confidence: 'high',
   recoveryPath: 'broker',
   prerequisites: { ace: true, ach: false, ior: true, liquidationKnown: true },
-  recommendedNextStep: 'recovery_service',
+  recommendedNextStep: 'full_prep',
   version: 'screener-v1+estimator-v1',
 }
 
@@ -83,47 +83,49 @@ describe('<ResultsDossier> — qualified', () => {
     expect(screen.getByText(/3 \/ 4 ready/i)).toBeTruthy()
   })
 
-  it('deep-links the primary CTA to the pricing anchor for recommendedNextStep', () => {
+  it('renders both tier cards on the results page', () => {
     render(<ResultsDossier result={qualified} />)
-    const primary = screen.getByRole('link', { name: /See your options/i })
-    // recovery_service → /pricing#recovery
-    expect(primary.getAttribute('href')).toBe('/pricing#recovery')
-  })
-
-  it('maps cape_prep to /pricing#prep and concierge to /pricing#concierge', () => {
-    const { rerender } = render(
-      <ResultsDossier result={{ ...qualified, recommendedNextStep: 'cape_prep' }} />,
-    )
     expect(
-      screen.getByRole('link', { name: /See your options/i }).getAttribute('href'),
-    ).toBe('/pricing#prep')
-    rerender(
-      <ResultsDossier result={{ ...qualified, recommendedNextStep: 'concierge' }} />,
-    )
-    expect(
-      screen.getByRole('link', { name: /See your options/i }).getAttribute('href'),
-    ).toBe('/pricing#concierge')
-  })
-
-  it('renders the next-step product name in display face and its bullet list', () => {
-    render(<ResultsDossier result={qualified} />)
-    const name = screen.getByRole('heading', { level: 2 })
-    expect(name.textContent).toMatch(/Recovery Service/)
-    expect(name.className).toMatch(/font-display/)
-    // Three "what you get" bullets for recovery_service.
-    expect(
-      screen.getByText(/Analyst extracts entries from your uploads/i),
+      screen.getByRole('heading', { level: 3, name: /Audit/ }),
     ).toBeTruthy()
-    expect(screen.getByText(/Source \+ confidence on every row/i)).toBeTruthy()
     expect(
-      screen.getByText(/You get a single canonical entry list back/i),
+      screen.getByRole('heading', { level: 3, name: /Full Prep/ }),
     ).toBeTruthy()
   })
 
-  it('keeps "How each stage works" as a quieter secondary link', () => {
+  it('marks Full Prep as recommended when the screener recommends full_prep', () => {
     render(<ResultsDossier result={qualified} />)
-    const secondary = screen.getByRole('link', { name: /How each stage works/i })
-    expect(secondary.getAttribute('href')).toBe('/how-it-works')
+    const recommended = screen.getByLabelText('Recommended')
+    expect(recommended.textContent).toMatch(/Full Prep/)
+  })
+
+  it('marks Audit as recommended when the screener recommends audit', () => {
+    render(
+      <ResultsDossier
+        result={{ ...qualified, recommendedNextStep: 'audit' }}
+      />,
+    )
+    const recommended = screen.getByLabelText('Recommended')
+    expect(recommended.textContent).toMatch(/Audit/)
+  })
+
+  it('Pay CTAs push to /screener/confirmation with the tier id', () => {
+    pushSpy.mockClear()
+    render(<ResultsDossier result={qualified} />)
+    fireEvent.click(screen.getByRole('button', { name: /start Audit/i }))
+    expect(pushSpy).toHaveBeenCalledWith('/screener/confirmation?tier=audit')
+    fireEvent.click(screen.getByRole('button', { name: /start Full Prep/i }))
+    expect(pushSpy).toHaveBeenCalledWith(
+      '/screener/confirmation?tier=full_prep',
+    )
+  })
+
+  it('no longer links to /pricing from the qualified results page', () => {
+    render(<ResultsDossier result={qualified} />)
+    const pricingLinks = screen
+      .queryAllByRole('link')
+      .filter((el) => el.getAttribute('href')?.startsWith('/pricing'))
+    expect(pricingLinks).toHaveLength(0)
   })
 })
 

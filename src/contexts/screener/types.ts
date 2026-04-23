@@ -72,12 +72,14 @@ export type DisqualificationReason =
 
 export type Confidence = 'high' | 'moderate' | 'low'
 
-export type RecommendedNextStep =
-  | 'recovery_kit'
-  | 'recovery_service'
-  | 'cape_prep'
-  | 'concierge'
-  | 'none'
+/**
+ * Customer-facing recommendation emitted by the screener. Mirrors
+ * the two-tier commercial surface (`TierId` from `@contexts/billing`)
+ * plus a `'none'` terminator for the DQ path. If the tier catalog
+ * ever adds a third tier, add it here too — the two taxonomies are
+ * intentionally kept in lockstep.
+ */
+export type RecommendedNextStep = 'audit' | 'full_prep' | 'none'
 
 export interface RefundEstimate {
   readonly low: number

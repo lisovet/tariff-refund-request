@@ -62,3 +62,4 @@ tmp/
 
 # clerk configuration (can include secrets)
 /.clerk/
+.claude/worktrees/

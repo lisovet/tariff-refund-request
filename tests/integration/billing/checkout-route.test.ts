@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type * as BillingModule from '@contexts/billing'
 
 /**
  * Integration test for POST /api/checkout. Stubs the checkout client
@@ -22,9 +23,13 @@ vi.mock('@contexts/billing/server', () => ({
   }),
 }))
 
-vi.mock('@contexts/billing', () => ({
-  createCheckoutForSku: mocks.createCheckoutForSku,
-}))
+vi.mock('@contexts/billing', async (importOriginal) => {
+  const actual = await importOriginal<typeof BillingModule>()
+  return {
+    ...actual,
+    createCheckoutForSku: mocks.createCheckoutForSku,
+  }
+})
 
 // The route auth-gates before parsing. Default to a signed-in user
 // so existing tests still exercise the validation + checkout paths;
@@ -95,6 +100,25 @@ describe('POST /api/checkout', () => {
     )
     expect(res.status).toBe(400)
   })
+
+  it.each([
+    'recovery_service',
+    'cape_prep_standard',
+    'cape_prep_premium',
+    'monitoring',
+  ] as const)(
+    '400s on SKU %s — not reachable from the two-tier checkout',
+    async (sku) => {
+      const res = await POST(
+        makeRequest({ sku, tier: 'smb', screenerSessionId: 'ses_1' }),
+      )
+      expect(res.status).toBe(400)
+      const body = (await res.json()) as { error: string; sku?: string }
+      expect(body.error).toBe('sku_not_available')
+      expect(body.sku).toBe(sku)
+      expect(createCheckoutForSku).not.toHaveBeenCalled()
+    },
+  )
 
   it('returns the Stripe Checkout url on success', async () => {
     createCheckoutForSku.mockResolvedValueOnce({

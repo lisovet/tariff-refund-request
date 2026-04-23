@@ -25,9 +25,9 @@ describe('SiteHeader', () => {
 
   it('renders the sign-in link', () => {
     render(<SiteHeader />)
-    expect(screen.getByRole('link', { name: /sign in/i }).getAttribute('href')).toBe(
-      '/sign-in',
-    )
+    expect(
+      screen.getByRole('link', { name: /sign in/i }).getAttribute('href'),
+    ).toBe('/sign-in')
   })
 
   it('renders the primary CTA — Check eligibility', () => {

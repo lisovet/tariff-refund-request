@@ -14,7 +14,7 @@ import {
 
 const BASE_INPUT: RequestSignatureInput = {
   caseId: 'cas_c1',
-  sku: 'concierge',
+  sku: 'full-prep',
   signerEmail: 'controller@acme.test',
   signerName: 'Dana Finance',
   customerName: 'Acme Imports LLC',
@@ -25,21 +25,21 @@ const BASE_INPUT: RequestSignatureInput = {
 }
 
 describe('requestConciergeSignature', () => {
-  it('renders the concierge-v1 agreement + requests an envelope + records pending state', async () => {
+  it('renders the full-prep-v1 agreement + requests an envelope + records pending state', async () => {
     const repo = createInMemorySignedAgreementRepo()
     const provider = createInMemoryESignProvider()
     const result = await requestConciergeSignature(BASE_INPUT, { repo, provider })
     expect(result.envelopeId.startsWith('env_')).toBe(true)
     expect(result.signingUrl.length).toBeGreaterThan(0)
-    expect(result.agreementId).toBe('concierge-v1')
+    expect(result.agreementId).toBe('full-prep-v1')
 
     const pending = await repo.findByEnvelope(result.envelopeId)
     expect(pending).toBeDefined()
     expect(pending?.status).toBe('pending')
-    expect(pending?.agreementId).toBe('concierge-v1')
+    expect(pending?.agreementId).toBe('full-prep-v1')
     expect(pending?.agreementVersion).toBe(1)
     expect(pending?.caseId).toBe('cas_c1')
-    expect(pending?.sku).toBe('concierge')
+    expect(pending?.sku).toBe('full-prep')
     expect(pending?.signerEmail).toBe('controller@acme.test')
     // Archival snapshot of the rendered body — so if the template
     // drifts later, the signed copy still carries the customer's
@@ -49,16 +49,16 @@ describe('requestConciergeSignature', () => {
     expect(pending?.renderedBody).not.toMatch(/\{\{[A-Z_]+\}\}/)
   })
 
-  it('refuses non-concierge SKUs (lightweight clickwrap does not use this flow)', async () => {
+  it('refuses non-full-prep SKUs (Audit clickwrap does not use this flow)', async () => {
     const repo = createInMemorySignedAgreementRepo()
     const provider = createInMemoryESignProvider()
     await expect(
       requestConciergeSignature(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        { ...BASE_INPUT, sku: 'recovery-kit' as any },
+        { ...BASE_INPUT, sku: 'audit' as any },
         { repo, provider },
       ),
-    ).rejects.toThrow(/concierge/i)
+    ).rejects.toThrow(/full-prep/i)
   })
 })
 
@@ -89,8 +89,8 @@ describe('handleSignatureCompleted', () => {
     expect(publishConciergeSigned).toHaveBeenCalledTimes(1)
     const payload = publishConciergeSigned.mock.calls[0]?.[0]
     expect(payload?.caseId).toBe('cas_c1')
-    expect(payload?.sku).toBe('concierge')
-    expect(payload?.agreementId).toBe('concierge-v1')
+    expect(payload?.sku).toBe('full-prep')
+    expect(payload?.agreementId).toBe('full-prep-v1')
     expect(payload?.envelopeId).toBe(envelopeId)
   })
 
@@ -162,7 +162,7 @@ describe('ConciergeCheckoutGate — payment cannot capture before signature', ()
     )
     const records = await repo.findSignedByCase('cas_c1')
     expect(records).toHaveLength(1)
-    expect(records[0]?.sku).toBe('concierge')
+    expect(records[0]?.sku).toBe('full-prep')
   })
 })
 
@@ -170,14 +170,14 @@ describe('createInMemoryESignProvider', () => {
   it('produces stable envelope ids + signing URLs per request', async () => {
     const provider: ESignProvider = createInMemoryESignProvider()
     const a = await provider.requestSignature({
-      agreementId: 'concierge-v1',
+      agreementId: 'full-prep-v1',
       renderedBody: '# A',
       signerEmail: 'x@y.test',
       signerName: 'X',
       caseId: 'cas_1',
     })
     const b = await provider.requestSignature({
-      agreementId: 'concierge-v1',
+      agreementId: 'full-prep-v1',
       renderedBody: '# B',
       signerEmail: 'x@y.test',
       signerName: 'X',
@@ -199,9 +199,9 @@ describe('createInMemorySignedAgreementRepo', () => {
     await repo.recordPending({
       envelopeId: 'env_pending',
       caseId: 'cas_gate',
-      agreementId: 'concierge-v1',
+      agreementId: 'full-prep-v1',
       agreementVersion: 1,
-      sku: 'concierge',
+      sku: 'full-prep',
       signerEmail: 'e@e.test',
       signerName: 'E',
       renderedBody: '...body...',

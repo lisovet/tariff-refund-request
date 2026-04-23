@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { z } from 'zod'
-import { createCheckoutForSku } from '@contexts/billing'
+import {
+  CUSTOMER_FACING_SKUS,
+  createCheckoutForSku,
+  isCustomerFacingSku,
+} from '@contexts/billing'
 import {
   createStripeCheckoutClient,
   getStripeClient,
@@ -62,6 +66,21 @@ export async function POST(req: Request): Promise<Response> {
   } catch (err) {
     return NextResponse.json(
       { error: 'invalid_body', detail: String(err) },
+      { status: 400 },
+    )
+  }
+
+  // Two-tier gate: only SKUs mapped to a customer-facing Tier are
+  // reachable from this route. The four middle-ladder SKUs
+  // (recovery_service, cape_prep_*, monitoring) remain price-defined
+  // and in the Stripe catalog but are ops-only.
+  if (!isCustomerFacingSku(parsed.sku)) {
+    log.warn('checkout.create rejected non-customer-facing sku', {
+      sku: parsed.sku,
+      allowed: CUSTOMER_FACING_SKUS,
+    })
+    return NextResponse.json(
+      { error: 'sku_not_available', sku: parsed.sku },
       { status: 400 },
     )
   }

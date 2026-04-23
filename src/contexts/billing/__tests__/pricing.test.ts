@@ -41,12 +41,12 @@ describe('PRICE_LADDER — canonical SKUs per PRD 06', () => {
   })
 })
 
-describe('SUCCESS_FEE_RATES — per PRD 06', () => {
-  it('SMB: 10–12%', () => {
-    expect(SUCCESS_FEE_RATES.smb).toEqual({ min: 0.10, max: 0.12 })
+describe('SUCCESS_FEE_RATES — April 2026 two-tier repricing', () => {
+  it('SMB: locked at 10% (matches customer-visible /pricing promise)', () => {
+    expect(SUCCESS_FEE_RATES.smb).toEqual({ min: 0.10, max: 0.10 })
   })
-  it('mid-market: 8–10%', () => {
-    expect(SUCCESS_FEE_RATES.mid_market).toEqual({ min: 0.08, max: 0.10 })
+  it('mid-market: also locked at 10% — tier copy shows one number', () => {
+    expect(SUCCESS_FEE_RATES.mid_market).toEqual({ min: 0.10, max: 0.10 })
   })
 })
 
@@ -86,19 +86,19 @@ describe('determineTier', () => {
 })
 
 describe('computeSuccessFeeCents', () => {
-  it('uses the rate parameter clamped to the tier band', () => {
-    // SMB band is 10–12%. 11% on $10,000 refund = $1,100 = 110_000 cents.
+  it('applies the 10% locked rate regardless of requested rate', () => {
+    // Band is {min: 0.10, max: 0.10} — any rate the caller passes
+    // gets clamped to exactly 10%.
     expect(
       computeSuccessFeeCents({
         refundAmountUsdCents: 10_000_00,
         tier: 'smb',
         rate: 0.11,
       }),
-    ).toBe(110_000)
+    ).toBe(100_000)
   })
 
-  it('clamps a too-low rate up to the tier minimum', () => {
-    // SMB minimum = 10%. Caller asks for 5% → use 10%.
+  it('clamps a too-low rate up to 10%', () => {
     expect(
       computeSuccessFeeCents({
         refundAmountUsdCents: 10_000_00,
@@ -108,18 +108,17 @@ describe('computeSuccessFeeCents', () => {
     ).toBe(100_000)
   })
 
-  it('clamps a too-high rate down to the tier maximum', () => {
-    // SMB max = 12%. Caller asks for 20% → use 12%.
+  it('clamps a too-high rate down to 10%', () => {
     expect(
       computeSuccessFeeCents({
         refundAmountUsdCents: 10_000_00,
         tier: 'smb',
         rate: 0.20,
       }),
-    ).toBe(120_000)
+    ).toBe(100_000)
   })
 
-  it('defaults to the tier minimum when no rate is supplied', () => {
+  it('defaults to 10% when no rate is supplied (SMB and mid-market)', () => {
     expect(
       computeSuccessFeeCents({
         refundAmountUsdCents: 10_000_00,
@@ -131,30 +130,29 @@ describe('computeSuccessFeeCents', () => {
         refundAmountUsdCents: 10_000_00,
         tier: 'mid_market',
       }),
-    ).toBe(80_000)
+    ).toBe(100_000)
   })
 
-  it('caps the fee at the per-case ladder maximum (per PRD 06: never bill more than the refund makes reasonable)', () => {
-    // Hard cap at $50k = 5_000_000 cents — on a $1M refund at 12%, raw
-    // fee would be $120k; clamped to $50k.
+  it('caps the fee at the $25,000 customer-promise ceiling', () => {
+    // Hard cap at $25k = 2_500_000 cents — on a $1M refund at 10%,
+    // raw fee would be $100k; clamped to $25k.
     expect(
       computeSuccessFeeCents({
         refundAmountUsdCents: 1_000_000_00,
         tier: 'smb',
         rate: 0.12,
       }),
-    ).toBe(5_000_000)
+    ).toBe(2_500_000)
   })
 
   it('rounds to whole cents (no fractional cents)', () => {
-    // $1,234.56 refund at 11% = $135.8016 → 13580 cents.
+    // $1,234.56 refund at 10% = $123.456 → 12346 cents (rounded).
     expect(
       computeSuccessFeeCents({
         refundAmountUsdCents: 1234_56,
         tier: 'smb',
-        rate: 0.11,
       }),
-    ).toBe(13_580)
+    ).toBe(12_346)
   })
 
   it('returns 0 on a zero or negative refund', () => {
