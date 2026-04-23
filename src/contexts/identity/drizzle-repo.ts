@@ -121,6 +121,17 @@ export function createDrizzleIdentityRepo(db: Db): IdentityRepo {
       return rows[0] ? toCustomer(rows[0]) : null
     },
 
+    async findCustomerByEmail(email) {
+      // Email matching is case-insensitive — Clerk normalizes, we
+      // defensively lower() on the DB side too.
+      const rows = (await db
+        .select()
+        .from(customers)
+        .where(sql`lower(${customers.email}) = lower(${email})`)
+        .limit(1)) as CustomerRow[]
+      return rows[0] ? toCustomer(rows[0]) : null
+    },
+
     async findStaffUserByClerkUserId(clerkUserId) {
       const rows = (await db
         .select()
